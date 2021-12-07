@@ -1,0 +1,16 @@
+.main-container {
+  display: flex;
+
+}
+
+#myPaletteDiv {
+  height: 500px;
+  border: 1px solid black;
+  width: 200px;
+}
+
+#myDiagramDiv {
+  height: 500px;
+  min-width: 800px;
+  margin: 0 10px;
+}

@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 function init() {
-  var $ = go.GraphObject.make
+  var $ = go.GraphObject.make;
   myDiagram = $(go.Diagram, 'myDiagramDiv', {
     'undoManager.isEnabled': true,
   });
@@ -7,11 +9,9 @@ function init() {
   myDiagram.nodeTemplate = $(
     go.Node,
     'Auto',
-    { locationSpot: go.Spot.Center },
+    {locationSpot: go.Spot.Center},
     new go.Binding('location', 'location', go.Point.parse).makeTwoWay(go.Point.stringify),
-    $(
-      go.Shape,
-      'Circle',
+    $(go.Shape, 'Circle',
       {
         fill: 'white',
         stroke: 'gray',
@@ -19,62 +19,67 @@ function init() {
         portId: '',
         fromLinkable: true,
         toLinkable: true,
-        fromLinkableSelfNode: true,
-        toLinkableSelfNode: true,
       },
       new go.Binding('stroke', 'color'),
-      new go.Binding('figure')
+      new go.Binding('strokeDashArray'),
+      new go.Binding('figure'),
+      new go.Binding('width'),
+      new go.Binding('height'),
     ),
     $(
       go.TextBlock,
       {
-        margin: new go.Margin(5, 5, 3, 5),
+        margin: new go.Margin(5, 5, 5, 5),
         font: '10pt sans-serif',
         minSize: new go.Size(16, 16),
         maxSize: new go.Size(120, NaN),
         textAlign: 'center',
         editable: true,
       },
-      new go.Binding('text').makeTwoWay()
+      new go.Binding('text').makeTwoWay(),
+      new go.Binding("isUnderline", "underline"),
     )
   );
 
   myDiagram.linkTemplate =
     $(go.Link,
-      new go.Binding("toArrow", "toArrow"),
       $(go.Shape),
-      $(go.Shape, { toArrow: "OpenTriangle" })
+      $(go.Shape, {toArrow: ""},  // the "to" arrowhead
+        new go.Binding("toArrow", "toArrow"),
+      ),
     );
-
+  
+    
 
   // initialize Palette
   myPalette = $(go.Palette, 'myPaletteDiv', {
     nodeTemplate: myDiagram.nodeTemplate,
     contentAlignment: go.Spot.Center,
-    layout: $(go.GridLayout, { wrappingColumn: 1, cellSize: new go.Size(2, 2) }),
+    layout: $(go.GridLayout, {wrappingColumn: 4, cellSize: new go.Size(4, 4)}),
   });
 
   // now add the initial contents of the Palette
   myPalette.model.nodeDataArray = [
-    { text: 'Circle', color: 'black', figure: 'Circle' },
-    { text: 'Square', color: 'black', figure: 'Square' },
-    { text: 'Ellipse', color: 'black', figure: 'Ellipse' },
-    { text: 'Rectangle', color: 'black', figure: 'Rectangle' },
-    { text: 'Rounded\nRectangle', color: 'black', figure: 'RoundedRectangle' },
-    { text: 'Triangle', color: 'black', figure: 'Triangle' },
+    {text: 'Derived\nAttribute', color: 'black', figure: 'Ellipse', strokeDashArray: [2, 2]},
+    {text: 'Identifier\nAttribute', color: 'black', figure: 'Ellipse', underline: true},
+    {text: 'Regular\nAttribute', color: 'black', figure: 'Ellipse', },
+    {text: 'Relation', color: 'black', figure: 'Diamond'},
+    {text: 'Entity', color: 'black', figure: 'Rectangle', width: 90, height: 50},
+    {text: 'Is A', color: 'black', figure: 'TriangleDown'},
+    {text: 'Custom', color: 'black', figure: 'Custom'},
   ];
 
   var inspector = new Inspector('myInspectorDiv', myDiagram, {
     // uncomment this line to only inspect the named properties below instead of all properties on each object:
     includesOwnProperties: true,
     properties: {
-      text: { show: Inspector.showIfPresent },
+      text: {show: Inspector.showIfPresent},
       // key would be automatically added for nodes, but we want to declare it read-only also:
-      key: { readOnly: true, show: Inspector.showIfPresent },
+      key: {readOnly: true, show: Inspector.showIfPresent},
       // color would be automatically added for nodes, but we want to declare it a color also:
-      color: { type: 'color', show: Inspector.showIfPresent },
-      figure: { show: Inspector.showIfPresent },
-      toArrow: { show: Inspector.showIfLink }
+      color: {type: 'color', show: Inspector.showIfPresent},
+      figure: {show: Inspector.showIfPresent},
+      toArrow: {show: Inspector.showIfLink}
     },
   });
 
@@ -87,7 +92,7 @@ function save() {
   myDiagram.isModified = false;
 }
 function load() {
-  console.log(go.Model.fromJson(document.getElementById('mySavedModel').value))
+  console.log(go.Model.fromJson(document.getElementById('mySavedModel').value));
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
 }
 
