@@ -62,7 +62,7 @@ const App = () => {
   return (
     <div style={{display: 'flex'}}>
       <ReactDiagram
-        initDiagram={initDiagram}
+        initDiagram={initPalette}
         divClassName='diagram-component'
         nodeDataArray={[
           {key: 0, text: 'Alpha', color: 'lightblue'},
