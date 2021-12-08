@@ -8,18 +8,24 @@
     <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
       <script src="../gojs/go.js"></script>
       <div>
-        <script src="../helper/Figures.js"></script>
-        <link rel="stylesheet" href="../helper/DataInspector.css" />
+        <!-- Styles -->
+        <link rel="stylesheet" href="../helpers/DataInspector.css" />
         <link rel="stylesheet" href="./style.css" />
-        <script src="../helper/DataInspector.js"></script>
-        <script src="./script.js" id="code"></script>
+        <!-- Components -->
+        <script src="../helpers/Figures.js"></script>
+        <script src="../helpers/DataInspector.js"></script>
+        <script src="./components/global.js"></script>
+        <script src="./components/customShapes.js"></script>
+        <script src="./components/erInspector.js"></script>
+        <script src="./components/erPalette.js"></script>
+        <script src="./components/erDiagram.js"></script>
+        <script src="./app.js" id="code"></script>
 
+        <!-- ERD Canvas -->
         <div id="sample">
           <div class="main-container">
             <div class="palette-container">
-              <div
-                id="myPaletteDiv"
-              ></div>
+              <div id="myPaletteDiv"></div>
             </div>
             <div class="diagram-container">
               <div id="myDiagramDiv" style="border: solid 1px black; height: 500px"></div>
@@ -29,7 +35,7 @@
             </div>
           </div>
 
-
+          <!-- ERD Functionality -->
           <div class="button-container">
             <button id="loadModel" onclick="load()">Load</button>
             <button id="saveModel" onclick="save()">Save</button>
