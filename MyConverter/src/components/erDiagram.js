@@ -31,7 +31,7 @@ function initERDiagram () {
       go.TextBlock,
       {
         margin: new go.Margin(5, 5, 5, 5),
-        font: '10pt sans-serif',
+        font: '9pt sans-serif',
         minSize: new go.Size(16, 16),
         maxSize: new go.Size(120, NaN),
         textAlign: 'center',
