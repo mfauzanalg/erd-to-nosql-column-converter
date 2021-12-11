@@ -3,13 +3,17 @@
 
 function initERInspector() {
   var inspector = new Inspector('myInspectorDiv', myDiagram, {
-    includesOwnProperties: true,
     properties: {
       text: {show: Inspector.showIfPresent},
-      key: {readOnly: true, show: Inspector.showIfPresent},
-      color: {type: 'color', show: Inspector.showIfPresent},
-      figure: {show: Inspector.showIfPresent},
-      toArrow: {show: Inspector.showIfLink}
+      color: {show: false},
+      figure: {show: false},
+      width: {show: false},
+      key: {show: false},
+      location: {show: false},
+      height: {show: false},
+      fromLinkable: {show: false},
+      isOne: {show: Inspector.showIfLink, type: "checkbox"},
+      isTotal: {show: Inspector.showIfLink, type: "checkbox"}
     },
   });
 }

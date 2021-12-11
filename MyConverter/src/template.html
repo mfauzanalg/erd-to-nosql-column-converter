@@ -42,13 +42,15 @@
             Diagram model:
           </div>
           <textarea id="mySavedModel" style="width: 100%; height: 200px">
-            { "class": "go.GraphLinksModel",
+            { "class": "GraphLinksModel",
               "nodeDataArray": [
-                { "key": 1, "text": "hello", "figure":"Circle", "color":"black", "location":"0 0" },
-                { "key": 2, "text": "world", "figure":"Rectangle", "color":"black", "location":"100 0" }
+            {"text":"Entity","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-9,"location":"-168 69"},
+            {"text":"Relation","color":"black","figure":"Diamond","width":110,"height":50,"key":-7,"location":"25 69"},
+            {"text":"Entity","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-3,"location":"207 68"}
             ],
               "linkDataArray": [
-                { "from":1, "to":2, "toArrow": "OpenTriangle" }
+            {"from":-7,"to":-9,"isTotal": true,"isMany":true},
+            {"from":-7,"to":-3}
             ]}
           </textarea>
         </div>

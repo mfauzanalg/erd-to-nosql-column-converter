@@ -1,16 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
-function initERDiagram () {
+function initERDiagram() {
   // Diagram
   myDiagram = $(go.Diagram, 'myDiagramDiv', {
     'undoManager.isEnabled': true,
   });
 
+  myDiagram.scrollMode = go.Diagram.InfiniteScroll;
   myDiagram.nodeTemplate = $(
     go.Node,
     'Auto',
-    {locationSpot: go.Spot.Center},
+    {locationSpot: go.Spot.Center, fromSpot: go.Spot.AllSides, toSpot: go.Spot.AllSides},
     new go.Binding('location', 'location', go.Point.parse).makeTwoWay(go.Point.stringify),
     $(go.Shape, 'Circle',
       {
@@ -26,6 +27,8 @@ function initERDiagram () {
       new go.Binding('figure'),
       new go.Binding('width'),
       new go.Binding('height'),
+      new go.Binding('fromLinkable'),
+      new go.Binding('toLinkable'),
     ),
     $(
       go.TextBlock,
@@ -36,7 +39,6 @@ function initERDiagram () {
         maxSize: new go.Size(120, NaN),
         textAlign: 'center',
         editable: true,
-        overflow: go.TextBlock.OverflowEllipsis
       },
       new go.Binding('text').makeTwoWay(),
       new go.Binding("isUnderline", "underline"),
@@ -44,10 +46,30 @@ function initERDiagram () {
   );
 
   myDiagram.linkTemplate =
-  $(go.Link,
-    $(go.Shape),
-    $(go.Shape, {toArrow: ""},  
-      new go.Binding("toArrow", "toArrow"),
-    ),
-  );
+    $(go.Link,
+      {reshapable: true, toShortLength: 0, adjusting: go.Link.Stretch},
+      new go.Binding("toShortLength", "isOne", function(isOne) { return isOne ? 5 : 0 }),
+      $(go.Shape, 
+        {
+          isPanelMain: true, 
+          stroke: "black", 
+          strokeWidth: 1.5
+        },
+        new go.Binding("strokeWidth", "isTotal", function(isTotal) { return isTotal ? 4 : 1.5 }),
+      ),
+      $(go.Shape, 
+        {
+          isPanelMain: true, 
+          stroke: "white", 
+          strokeWidth: 0
+        },
+        new go.Binding("strokeWidth", "isTotal", function(isTotal) { return isTotal ? 2 : 0 }),
+      ),
+      $(go.Shape,
+        {
+          toArrow: "", scale: 1
+        },
+        new go.Binding("toArrow", "isOne", function(isOne) { return isOne ? "triangle" : "" }),
+      ),
+    );
 }

@@ -15,11 +15,12 @@ function initERPalette() {
     {text: 'Derived\nAttribute', color: 'black', figure: 'Ellipse', strokeDashArray: [2, 2], width: 80, height: 40},
     {text: 'Identifier\nAttribute', color: 'black', figure: 'Ellipse', underline: true, width: 80, height: 40},
     {text: 'Regular\nAttribute', color: 'black', figure: 'Ellipse', width: 80, height: 40},
-    {text: 'Is A', color: 'black', figure: 'TriangleDown'},
+    {text: 'Total', color: 'black', figure: 'TriangleDown'},
+    {text: 'Partial', color: 'black', figure: 'TriangleDown'},
     {text: 'Relation', color: 'black', figure: 'Diamond', width: 110, height: 50},
     {text: 'Weak\nRelation', color: 'black', figure: 'DoubleDiamond', width: 120, height: 50},
-    {text: 'Entity', color: 'black', figure: 'Rectangle', width: 90, height: 50},
-    {text: 'Weak\nEntity', color: 'black', figure: 'DoubleRectangle', width: 90, height: 50},
+    {text: 'Entity', color: 'black', figure: 'Rectangle', width: 90, height: 50, fromLinkable: false},
+    {text: 'Weak\nEntity', color: 'black', figure: 'DoubleRectangle', width: 90, height: 50, fromLinkable: false},
     {text: 'Associative\nEntity', color: 'black', figure: 'AssociativeRectangle', width: 100, height: 60},
   ];
 
