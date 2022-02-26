@@ -1,18 +1,17 @@
-const logicalStructure = [
+const LogicalStructure = [
   {
     name: String,
-    attributes: [
+    attributes: Attributes,
+    children: [
       {
         name: String,
-        additional: {
-          isKey: Boolean,
-        }
+        attributes: Attributes
       }
     ]
   }
 ]
 
-const attributes = [
+const Attributes = [
   {
     name: String,
     additional: {
