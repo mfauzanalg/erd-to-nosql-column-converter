@@ -71,7 +71,8 @@ const ERSchema = {
 }
 
 
-const visited = []
+let visited = []
+let artificialID = 0;
 
 const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   let found = false;
@@ -99,18 +100,16 @@ const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   return columnFamilySet
 }
 
-const findColumnFamilyByID = (id) => {
+const findColumnFamilyByID = (id, logicalSchema) => {
   let found = false;
   let i = 0;
   let key = []
- 
   while (!found && i < logicalSchema.length) {
     let j = 0;
     if (logicalSchema[i].id === id) {
       found = true
-      columnFamilySet = logicalSchema[i].key
+      key = [...logicalSchema[i].key]
     }
-
     if (!found && logicalSchema[i].children) {
       while (j < logicalSchema[i].children.length) {
         if (logicalSchema[i].children[j].label === id) {
@@ -125,15 +124,15 @@ const findColumnFamilyByID = (id) => {
   return key
 }
 
-const findRelationshipKey = (relationship) => {
+const findRelationshipKey = (relationship, logicalSchema) => {
   let i = 0;
   let found = false;
   let key = []
   const connectors = relationship.connectors
-  while (!found && i < connectorsors.length) {
+  while (!found && i < connectors.length) {
     if (connectors[i].cardinality == 'One') {
       found = true
-      key = findColumnFamilyByID(connectors[i].to).key
+      key = findColumnFamilyByID(connectors[i].to, logicalSchema)
     }
     i += 1
   }
@@ -147,7 +146,7 @@ const isVisited = (entityRelation, visited) => {
 const convertERToLogical = (ERSchema) => {
   let logicalSchema = []
   ERSchema.shapes.forEach((item) => {
-    if (item.type == 'Entity') {
+    if (item.type === 'Entity') {
       const columnFamilySet = createFamily(item,logicalSchema)
       logicalSchema = [...columnFamilySet, ...logicalSchema]
     }
@@ -171,7 +170,7 @@ const findRelationArray = (entityRelation) => {
         if (relation.connectors[0].from === entityRelation.id) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
 
-        if (entityFromCardinality == 'Many' && (connectorTo.cardinality == 'One' || connectorTo.cardinality == 'Many')) {
+        if (entityFromCardinality === 'Many' && (connectorTo.cardinality === 'One' || connectorTo.cardinality === 'Many')) {
           relationArray.push ({
             type: 'Binary',
             relation: relation,
@@ -187,25 +186,34 @@ const findRelationArray = (entityRelation) => {
 const createFamily = (entityRelation, logicalSchema) => {
   let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
   let columnFamily = {}
-  if (!isVisited(entityRelation, visited)){
+  if (!isVisited(entityRelation, visited)) {
     visited.push(entityRelation.id)
     // Here process parentnya first tapi nanti dlu ya
+    columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
-    columnFamily.key = defineKey(entityRelation);
+    columnFamily.key = [...defineKey(entityRelation, logicalSchema)];
     columnFamily.attributes = [];
-
     entityRelation.attributes?.forEach(attribute => {
       columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
     })
-  }
-  columnFamilySet.push(columnFamily)
 
-  //Process for the relation
-  if (entityRelation.type === 'Entity') {
-    const relationArray = findRelationArray(entityRelation)
-    relationArray.forEach((relation) => {
-      columnFamilySet = [...columnFamilySet, ...convertRelationship(relation, columnFamily, logicalSchema)]
-    })
+    if (entityRelation.type === 'Relationship') columnFamily.isFromRelationhip = true
+    columnFamilySet.push(columnFamily)
+  
+    //Process for the relation
+    if (entityRelation.type === 'Entity') {
+      const relationDetailArray = findRelationArray(entityRelation)
+      relationDetailArray.forEach((relationDetail) => {
+        columnFamilySet = [...columnFamilySet, ...convertRelationship(relationDetail, columnFamily, logicalSchema)]
+        
+        columnFamilySet = columnFamilySet.filter((value, index, self) =>
+          index === self.findIndex((t) => (
+            t.id === value.id
+          ))
+        )
+
+      })
+    }
   }
 
   return columnFamilySet
@@ -215,29 +223,57 @@ const isArrayEqual = (array1, array2) => {
   return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
 }
 
-const convertRelationship = (relation, columnFamily) => {
+const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Baru case 1 doang yang diimplement
   let newLogicalSchema = [];
-  if (['Binary'].includes(relation.type)) {
-    const convertedRelation = createFamily(relation)
-    if (relation.relation.attributes) {
+  if (['Binary'].includes(relationDetail.type)) {
+    const convertedRelation = createFamily(relationDetail.relation, logicalSchema)
+    if (relationDetail.relation.attributes) {
       // nanti ya pusing
       newLogicalSchema = [...convertedRelation]
     }
     columFamilyFromRelation = convertedRelation[0]
     if (!isArrayEqual(columnFamily.key, columFamilyFromRelation.key) || relation.type == 'Reflexive') {
-      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation]
+      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail.relation)]
     }
   }
-
   return newLogicalSchema
 }
 
 const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
-  console.log(columnFamily1);
-  console.log(columnFamily2);
-  console.log(relation);
-  return []
+  // console.log(columnFamily1)
+  // console.log(columnFamily2)
+  // console.log(relation)
+  let newLogicalSchema = []
+  let newColumnFamily;
+  if (columnFamily1.isFromRelationhip) {
+    newColumnFamily = {...columnFamily1}
+  }
+  else {
+    // Nanti deh ini apasi
+  }
+  if (!newColumnFamily) {
+    // Nanti juga saya pusing
+  }
+  let auxAttribute = {};
+  auxAttribute.label = columnFamily2.label
+  auxAttribute.isAuxilary = true;
+  auxAttribute.artificialID = artificialID;
+  newColumnFamily.attributes.push(auxAttribute)
+  
+  // Nanti dikerjain ini knp many to many ngga
+  if (true) {
+    let interAttribute = {};
+    interAttribute.label = columnFamily1.label
+    interAttribute.isIntermediary = true;
+    interAttribute.artificialID = artificialID;
+    columnFamily2.attributes.push(interAttribute)
+  }
+  
+  artificialID += 1
+
+  newLogicalSchema = [...newLogicalSchema, newColumnFamily, columnFamily2]
+  return newLogicalSchema
 }
 
 // Masih harus dikerjain yaaa
@@ -259,17 +295,20 @@ const convertAttribute = (columnFamily, attribute) => {
   return []
 }
 
-const defineKey = (entityRelation) => {
-  let key = entityRelation.key
+const defineKey = (entityRelation, logicalSchema) => {
+  let key;
+  if (entityRelation.key) {
+    key = [...entityRelation.key]
+  }
   if (!key) {
-    if (entityRelation.type = 'Entity') {
+    if (entityRelation.type == 'Entity') {
       // Pake parent key alias jadi shared key gitu, tapi nanti ya
     }
     else { // if thre type is Relationship
-      key = findRelationshipKey(entityRelation)
+      key = [...findRelationshipKey(entityRelation, logicalSchema)]
     }
     if (!key) {
-      key = `id_${entityRelation.label}`
+      key = [`id_${entityRelation.label}`]
     }
   }
   return key
