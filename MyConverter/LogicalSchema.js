@@ -1,94 +1,144 @@
-const logicalShcema = [
+// const logicalSchema = [
+//   {
+//     label: 'X',
+//     key: 'x1',
+//     attributes: [
+//       {
+//         label: 'x1',
+//         additional: {
+//           isKey: true,
+//         },
+//       },
+//     ],
+//     children: [
+//       {
+//         label: 'Y',
+//         parent: 'X',
+//         sharedKey: 'x1',
+//         attributes: [
+//           {
+//             label: 'y1',
+//           },
+//           {
+//             label: 'y2',
+//             additional: {
+//               isMultiple: true,
+//               length: [-1, -1]
+//             }
+//           },
+//           {
+//             label: 'Z',
+//             additional: {
+//               isKey: true,
+//               isAuxiliary: true,
+//               artificialId: 1,
+//             }
+//           }
+//         ]
+//       }
+//     ]
+//   },
+//   {
+//     label: 'Z',
+//     key: 'z1',
+//     attributes: [
+//       {
+//         label: 'z1',
+//         additional: {
+//           isKey: true,
+//         }
+//       },
+//       {
+//         label: 'z2',
+//         additional: {
+//           isMandatory: true,
+//         }
+//       },
+//       {
+//         label: 'z3',
+//         additional: {
+//           isMultiple: true,
+//           length: ['n', 'm']
+//         }
+//       },
+//       {
+//         label: 'Y',
+//         additional: {
+//           isIntermediary: true,
+//           artificialId: 1,
+//         }
+//       }
+//     ],
+//     children: [
+//       {
+//         label: 'W',
+//         parent: 'Z',
+//         attributes: [
+//           {
+//             label: 'w1'
+//           }
+//         ]
+//       }
+//     ]
+//   }
+// ]
+
+
+const logicalSchema = [
   {
-    name: 'X',
+    label: 'Person',
+    key: ['Name'],
     attributes: [
       {
-        name: 'x1',
-        additional: {
-          isKey: true,
-        },
+        label: 'Name',
+        isKey: true,
       },
     ],
     children: [
       {
-        name: 'Y',
+        label: 'Have',
+        parent: 'Person',
+        sharedKey: 'name',
         attributes: [
           {
-            name: 'y1',
-            additional: {
-              isKey: true,
-            },
-          },
-          {
-            name: 'y2',
-            additional: {
-              isMultiple: true,
-              length: [-1, -1]
-            }
-          },
-          {
-            name: 'Z',
-            additional: {
-              isKey: true,
-              isAuxiliary: true,
-              artificialId: 1,
-            }
+            label: 'Car',
+            isKey: true,
+            isAuxiliary: true,
+            artificialId: 1,
           }
         ]
       }
     ]
   },
   {
-    name: 'Z',
+    label: 'Car',
+    key: ['Plat'],
     attributes: [
       {
-        name: 'z1',
-        additional: {
-          isKey: true,
-        }
+        label: 'Plat',
+          isKey: true
       },
       {
-        name: 'z2',
-        additional: {
-          isMandatory: true,
-        }
+        label: 'Color',
       },
       {
-        name: 'z3',
-        additional: {
-          isMultiple: true,
-          length: ['n', 'm']
-        }
-      },
-      {
-        name: 'Y',
-        additional: {
-          isIntermediary: true,
-          artificialId: 1,
-        }
-      }
-    ],
-    children: [
-      {
-        name: 'W',
-        attributes: [
-          {
-            name: 'w1'
-          }
-        ]
+        label: 'Have',
+        isIntermediary: true,
+        artificialId: 1,
       }
     ]
   }
 ]
 
+
 let tableQuery = []
 const convertLogical = (logical, tableQuery) => {
   logical.forEach((table) => {
-    tableQuery.push(`DROP TABLE IF EXISTS ${table.name}`)
-    tableQuery.push(`CREATE TABLE ${table.name} (`)
+    tableQuery.push(`DROP TABLE IF EXISTS ${table.label}`)
+    tableQuery.push(`CREATE TABLE ${table.label} (`)
     if (table.attributes) {
       table.attributes.forEach((attr) => {
-        tableQuery.push(`  ${attr.name} TEXT,`)
+        tableQuery.push(`  ${attr.label} TEXT,`)
       })
     }
     tableQuery.push(')')
@@ -108,4 +158,4 @@ const printDDL = (arrStr) => {
   })
 }
 
-printDDL(convertLogical(logicalShcema, tableQuery));
+printDDL(convertLogical(logicalSchema, tableQuery));
