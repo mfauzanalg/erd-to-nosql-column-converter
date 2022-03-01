@@ -41,7 +41,7 @@ const ERSchema = {
           type: 'RelationConnector',
           from: 2,
           to: 3,
-          cardinality: 'Many',
+          cardinality: 'One',
           participation: 'Total'
         }
       ]
@@ -56,7 +56,7 @@ const ERSchema = {
           type: 'RelationConnector',
           from: 2,
           to: 3,
-          cardinality: 'Many',
+          cardinality: 'One',
           participation: 'Total'
         },
       ],
@@ -179,7 +179,6 @@ const findRelationArray = (entityRelation) => {
         if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
 
-        // One to Many, Many side is being processed
         if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
           relationArray.push ({
             type: 'BinaryOneToMany',
@@ -187,13 +186,21 @@ const findRelationArray = (entityRelation) => {
             entityAcrossId: connectorTo.to
           })
         }
-        // Many to many, but only if the other many side has already processed before
         else if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'Many') {
           relationArray.push ({
             type: 'BinaryManyToMany',
             relation: relation,
             entityAcrossId: connectorTo.to
           })
+        }
+        else if (entityFromCardinality === 'One' && connectorTo.cardinality === 'One') {
+          if (!isVisited(relation, visited)) {
+            relationArray.push ({
+              type: 'BinaryOneToOne',
+              relation: relation,
+              entityAcrossId: connectorTo.to
+            })
+          }
         }
       }
     })
@@ -249,7 +256,7 @@ const isArrayEqual = (array1, array2) => {
 const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Baru case 1 doang yang diimplement
   let newLogicalSchema = [];
-  if (['BinaryOneToMany', 'BinaryManyToMany'].includes(relationDetail.type)) {
+  if (['BinaryOneToMany', 'BinaryManyToMany', 'BinaryOneToOne'].includes(relationDetail.type)) {
     const convertedRelation = createFamily(relationDetail.relation, logicalSchema)
     if (relationDetail.relation.attributes) {
       // nanti ya pusing
@@ -301,6 +308,10 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail) 
     newColumnFamily.key = [...columnFamily2.key]
   }
 
+  if (relationDetail.type === 'BinaryOneToOne') {
+    newColumnFamily.key = [...columnFamily2.key]
+  }
+
   newLogicalSchema = [...newLogicalSchema, newColumnFamily, columnFamily2]
   return newLogicalSchema
 }
@@ -335,6 +346,7 @@ const defineKey = (entityRelation, logicalSchema) => {
     }
     else { // if thre type is Relationship
       key = [...findRelationshipKey(entityRelation, logicalSchema)]
+      console.log(logicalSchema)
     }
     if (!key) {
       key = [`id_${entityRelation.label}`]
