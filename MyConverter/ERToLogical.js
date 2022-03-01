@@ -20,7 +20,7 @@ const ERSchema = {
           type: 'RelationConnector',
           from: 2,
           to: 0,
-          cardinality: 'Many',
+          cardinality: 'One',
           participation: 'Total'
         },
       ]
@@ -29,18 +29,12 @@ const ERSchema = {
       id: 2,
       label: 'Have',
       type: 'Relationship',
-      attributes: [
-        {
-          type: 'Regular',
-          label: 'STNK'
-        }
-      ],
       connectors: [
         {
           type: 'RelationConnector',
           from: 2,
           to: 0,
-          cardinality: 'Many',
+          cardinality: 'One',
           participation: 'Total'
         },
         {
@@ -181,12 +175,22 @@ const findRelationArray = (entityRelation) => {
 
         let relation = ERSchema.shapes.find(o => o.id === targetRelation);
         let connectorTo;
-        if (relation.connectors[0].from === entityRelation.id) connectorTo = relation.connectors[1]
+
+        if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
 
-        if (entityFromCardinality === 'Many' && (connectorTo.cardinality === 'One' || connectorTo.cardinality === 'Many')) {
+        // One to Many, Many side is being processed
+        if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
           relationArray.push ({
-            type: 'Binary',
+            type: 'BinaryOneToMany',
+            relation: relation,
+            entityAcrossId: connectorTo.to
+          })
+        }
+        // Many to many, but only if the other many side has already processed before
+        else if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'Many') {
+          relationArray.push ({
+            type: 'BinaryManyToMany',
             relation: relation,
             entityAcrossId: connectorTo.to
           })
@@ -198,9 +202,10 @@ const findRelationArray = (entityRelation) => {
 }
 
 const createFamily = (entityRelation, logicalSchema) => {
-  let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
+  // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
+  let columnFamilySet = []
   let columnFamily = {}
-  if (!isVisited(entityRelation, visited)) {
+  if (!isVisited(entityRelation, visited) || entityRelation.type === 'Relationship') {
     visited.push(entityRelation.id)
     // Here process parentnya first tapi nanti dlu ya
     columnFamily.id = entityRelation.id
@@ -244,7 +249,7 @@ const isArrayEqual = (array1, array2) => {
 const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Baru case 1 doang yang diimplement
   let newLogicalSchema = [];
-  if (['Binary'].includes(relationDetail.type)) {
+  if (['BinaryOneToMany', 'BinaryManyToMany'].includes(relationDetail.type)) {
     const convertedRelation = createFamily(relationDetail.relation, logicalSchema)
     if (relationDetail.relation.attributes) {
       // nanti ya pusing
@@ -252,17 +257,18 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
     }
     columFamilyFromRelation = convertedRelation[0]
     if (!isArrayEqual(columnFamily.key, columFamilyFromRelation.key) || relation.type == 'Reflexive') {
-      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail.relation)]
+      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail)]
     }
   }
   return newLogicalSchema
 }
 
-const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
+const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail) => {
+  let relation = relationDetail.relation
   let newLogicalSchema = []
   let newColumnFamily;
   if (columnFamily1.isFromRelationhip) {
-    newColumnFamily = {...columnFamily1}
+    newColumnFamily = JSON.parse(JSON.stringify(columnFamily1));
   }
   else {
     // Nanti deh ini apasi
@@ -288,6 +294,12 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
   }
   
   artificialID += 1
+
+  // handle many to many artificial relation
+  if (relationDetail.type === 'BinaryManyToMany') {
+    newColumnFamily.parentID = columnFamily2.id
+    newColumnFamily.key = [...columnFamily2.key]
+  }
 
   newLogicalSchema = [...newLogicalSchema, newColumnFamily, columnFamily2]
   return newLogicalSchema
