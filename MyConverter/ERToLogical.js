@@ -9,6 +9,10 @@ const ERSchema = {
         {
           type: 'Key',
           label: 'Name'
+        },
+        {
+          type: 'Regular',
+          label: 'Address'
         }
       ],
       connectors: [
@@ -16,7 +20,7 @@ const ERSchema = {
           type: 'RelationConnector',
           from: 2,
           to: 0,
-          cardinality: 'One',
+          cardinality: 'Many',
           participation: 'Total'
         },
       ]
@@ -25,12 +29,18 @@ const ERSchema = {
       id: 2,
       label: 'Have',
       type: 'Relationship',
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'STNK'
+        }
+      ],
       connectors: [
         {
           type: 'RelationConnector',
           from: 2,
           to: 0,
-          cardinality: 'One',
+          cardinality: 'Many',
           participation: 'Total'
         },
         {
@@ -73,6 +83,8 @@ const ERSchema = {
 
 let visited = []
 let artificialID = 0;
+let parentID = 0;
+let isHasParent = false;
 
 const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   let found = false;
@@ -133,6 +145,8 @@ const findRelationshipKey = (relationship, logicalSchema) => {
     if (connectors[i].cardinality == 'One') {
       found = true
       key = findColumnFamilyByID(connectors[i].to, logicalSchema)
+      parentID = ERSchema.shapes.find(o => o.id === connectors[i].to).id
+      isHasParent = true
     }
     i += 1
   }
@@ -192,6 +206,10 @@ const createFamily = (entityRelation, logicalSchema) => {
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
     columnFamily.key = [...defineKey(entityRelation, logicalSchema)];
+    if (isHasParent) {
+      columnFamily.parentID = parentID;
+      isHasParent = false;
+    }
     columnFamily.attributes = [];
     entityRelation.attributes?.forEach(attribute => {
       columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
@@ -241,9 +259,6 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
 }
 
 const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
-  // console.log(columnFamily1)
-  // console.log(columnFamily2)
-  // console.log(relation)
   let newLogicalSchema = []
   let newColumnFamily;
   if (columnFamily1.isFromRelationhip) {
@@ -258,6 +273,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
   let auxAttribute = {};
   auxAttribute.label = columnFamily2.label
   auxAttribute.isAuxilary = true;
+  auxAttribute.isKey = true;
   auxAttribute.artificialID = artificialID;
   newColumnFamily.attributes.push(auxAttribute)
   
@@ -267,6 +283,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relation) => {
     interAttribute.label = columnFamily1.label
     interAttribute.isIntermediary = true;
     interAttribute.artificialID = artificialID;
+    interAttribute.isKey = true;
     columnFamily2.attributes.push(interAttribute)
   }
   

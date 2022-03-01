@@ -116,7 +116,7 @@ const logicalSchema = [
     attributes: [
       {
         label: 'Plat',
-          isKey: true
+        isKey: true
       },
       {
         label: 'Color',
