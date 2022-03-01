@@ -1,6 +1,80 @@
 const ERSchema = {
   shapes: [
     {
+      id: 3,
+      label: 'Car',
+      type: 'Entity',
+      key: ['Plat'],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Plat'
+        },
+        {
+          type: 'Regular',
+          label: 'Color'
+        }
+      ],
+    },
+    {
+      id: 2,
+      label: 'Have',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
+      id: 4,
+      label: 'Drive',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
       id: 0,
       label: 'Person',
       type: 'Entity',
@@ -26,50 +100,25 @@ const ERSchema = {
       ]
     },
     {
-      id: 2,
-      label: 'Have',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'One',
-          participation: 'Total'
-        }
-      ]
-    },
-    {
-      id: 3,
-      label: 'Car',
+      id: 5,
+      label: 'Driver',
       type: 'Entity',
-      key: ['Plat'],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-      ],
+      key: ['LicenseNumber'],
       attributes: [
         {
           type: 'Key',
-          label: 'Plat'
+          label: 'LicenseNumber'
         },
-        {
-          type: 'Regular',
-          label: 'Color'
-        }
       ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+      ]
     },
   ],
 }
@@ -162,6 +211,33 @@ const convertERToLogical = (ERSchema) => {
   return logicalSchema
 }
 
+
+const findParentArray = (entityRelation) => {
+  let parentArray = []
+  let connectors = entityRelation.connectors
+  if (connectors && connectors.length > 0) {
+    connectors.forEach((connector) => {
+      if (connector.type === 'RelationConnector') {
+        let entityFromCardinality = connector.cardinality
+        let targetRelation
+        if (entityRelation.id === connector.to) targetRelation = connector.from
+        else targetRelation = connector.to
+
+        let relation = ERSchema.shapes.find(o => o.id === targetRelation);
+        let connectorTo;
+
+        if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
+        else connectorTo = relation.connectors[0]
+
+        if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
+          parentArray.push(ERSchema.shapes.find(o => o.id === connectorTo.to))
+        }
+      }
+    })
+  }
+  return parentArray
+}
+
 const findRelationArray = (entityRelation) => {
   let relationArray = []
   let connectors = entityRelation.connectors
@@ -214,7 +290,16 @@ const createFamily = (entityRelation, logicalSchema) => {
   let columnFamily = {}
   if (!isVisited(entityRelation, visited) || entityRelation.type === 'Relationship') {
     visited.push(entityRelation.id)
+
     // Here process parentnya first tapi nanti dlu ya
+    if(entityRelation.type === 'Entity') {
+      const parentArray = findParentArray(entityRelation)
+      parentArray.forEach((entity) => {
+        columnFamilySet = [...columnFamilySet, ...createFamily(entity, logicalSchema)]
+      })
+    }
+
+    console.log(entityRelation.label)
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
     columnFamily.key = [...defineKey(entityRelation, logicalSchema)];
@@ -346,7 +431,6 @@ const defineKey = (entityRelation, logicalSchema) => {
     }
     else { // if thre type is Relationship
       key = [...findRelationshipKey(entityRelation, logicalSchema)]
-      console.log(logicalSchema)
     }
     if (!key) {
       key = [`id_${entityRelation.label}`]
