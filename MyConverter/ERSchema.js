@@ -1,3 +1,4 @@
+// Simple
 const ERSchema = {
   shapes: [
     {
@@ -75,7 +76,7 @@ const ERSchema = {
 }
 
 // Game
-const ERSchema2 = {
+const ERSchema = {
   shapes: [
     {
       id: 0,
@@ -182,7 +183,7 @@ const ERSchema2 = {
 }
 
 // ERSchema3 One to many to many
-const ERSchema3 = {
+const ERSchema = {
   shapes: [
     {
       id: 3,
@@ -303,6 +304,87 @@ const ERSchema3 = {
           participation: 'Total'
         },
       ]
+    },
+  ],
+}
+
+// Specialization
+const ERSchema = {
+  shapes: [
+    {
+      id: 0,
+      label: 'H',
+      type: 'Entity',
+      key: ['id_1'],
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'id_1'
+        },
+      ],
+    },
+    {
+      id: 2,
+      label: 'F',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+      ],
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Bogor'
+        },
+      ],
+    },
+    
+    {
+      id: 1,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: false,
+      isDisjoint: true,
+      parentID: 0,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
+    },
+    {
+      id: 3,
+      label: 'G',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
     },
   ],
 }
