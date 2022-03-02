@@ -1,68 +1,96 @@
 const ERSchema = {
   shapes: [
     {
-      id: 3,
-      label: 'Car',
+      id: 2,
+      label: 'B',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
         },
         {
           type: 'RelationConnector',
           from: 4,
-          to: 3,
-          cardinality: 'Many',
+          to: 2,
+          cardinality: 'One',
           participation: 'Total'
         },
       ],
       attributes: [
         {
-          type: 'Key',
-          label: 'Plat'
-        },
-        {
           type: 'Regular',
-          label: 'Color'
-        }
+          label: 'Bogor'
+        },
       ],
     },
     {
-      id: 2,
-      label: 'Have',
-      type: 'Relationship',
+      id: 0,
+      label: 'A',
+      type: 'Entity',
+      key: ['id_1'],
       connectors: [
         {
-          type: 'RelationConnector',
-          from: 2,
+          type: 'ParentSpecialization',
+          from: 1,
           to: 0,
-          cardinality: 'One',
-          participation: 'Total'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'id_1'
+        },
+      ],
+    },
+    {
+      id: 1,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: true,
+      isDisjoint: true,
+      parentID: 0,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
         },
         {
-          type: 'RelationConnector',
-          from: 2,
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
           to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        }
-      ]
+        },
+      ],
+    },
+    {
+      id: 3,
+      label: 'C',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
     },
     {
       id: 4,
-      label: 'Drive',
+      label: 'R1',
       type: 'Relationship',
       connectors: [
         {
           type: 'RelationConnector',
           from: 4,
-          to: 3,
-          cardinality: 'Many',
+          to: 2,
+          cardinality: 'One',
           participation: 'Total'
         },
         {
@@ -75,41 +103,9 @@ const ERSchema = {
       ]
     },
     {
-      id: 0,
-      label: 'Person',
-      type: 'Entity',
-      key: ['Name'],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Name'
-        },
-        {
-          type: 'Regular',
-          label: 'Address'
-        }
-      ],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-      ]
-    },
-    {
       id: 5,
-      label: 'Driver',
+      label: 'E',
       type: 'Entity',
-      key: ['LicenseNumber'],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'LicenseNumber'
-        },
-      ],
       connectors: [
         {
           type: 'RelationConnector',
@@ -280,6 +276,15 @@ const findParentArray = (entityRelation) => {
   return parentArray
 }
 
+const getParentID = (id, logicalSchema) => {
+  const parent = logicalSchema.find(o => o.id === id)
+  
+  if (parent.parentID || parent.parentID == 0) {
+    return getParentID(parent.parentID, logicalSchema)
+  } 
+  else return id
+}
+
 const findRelationArray = (entityRelation) => {
   let relationArray = []
   let connectors = entityRelation.connectors
@@ -355,7 +360,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     columnFamily.label = entityRelation.label
     columnFamily.key = [...defineKey(entityRelation, logicalSchema)];
     if (isHasParent) {
-      columnFamily.parentID = parentID;
+      columnFamily.parentID = getParentID(parentID, columnFamilySet);
       isHasParent = false;
     }
     columnFamily.attributes = [];

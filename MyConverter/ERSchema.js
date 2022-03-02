@@ -388,3 +388,125 @@ const ERSchema = {
     },
   ],
 }
+
+// Specialization & One to many
+const ERSchema = {
+  shapes: [
+    {
+      id: 2,
+      label: 'B',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 2,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Bogor'
+        },
+      ],
+    },
+    {
+      id: 0,
+      label: 'A',
+      type: 'Entity',
+      key: ['id_1'],
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'id_1'
+        },
+      ],
+    },
+    {
+      id: 1,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: true,
+      isDisjoint: true,
+      parentID: 0,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
+    },
+    {
+      id: 3,
+      label: 'C',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
+    },
+    {
+      id: 4,
+      label: 'R1',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 2,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
+      id: 5,
+      label: 'E',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+      ]
+    },
+  ],
+}
