@@ -1,124 +1,78 @@
 const ERSchema = {
   shapes: [
     {
-      id: 3,
-      label: 'Car',
+      id: 2,
+      label: 'B',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 4,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
         },
       ],
       attributes: [
         {
-          type: 'Key',
-          label: 'Plat'
-        },
-        {
           type: 'Regular',
-          label: 'Color'
-        }
+          label: 'Bogor'
+        },
       ],
-    },
-    {
-      id: 2,
-      label: 'Have',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        }
-      ]
-    },
-    {
-      id: 4,
-      label: 'Drive',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 4,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 4,
-          to: 5,
-          cardinality: 'Many',
-          participation: 'Total'
-        }
-      ]
     },
     {
       id: 0,
-      label: 'Person',
+      label: 'A',
       type: 'Entity',
-      key: ['Name'],
+      key: ['id_1'],
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+      ],
       attributes: [
         {
           type: 'Key',
-          label: 'Name'
+          label: 'id_1'
         },
-        {
-          type: 'Regular',
-          label: 'Address'
-        }
       ],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-      ]
     },
     {
-      id: 5,
-      label: 'Driver',
-      type: 'Entity',
-      key: ['LicenseNumber'],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'LicenseNumber'
-        },
-      ],
+      id: 1,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: true,
+      isDisjoint: true,
+      parentID: 0,
       connectors: [
         {
-          type: 'RelationConnector',
-          from: 4,
-          to: 5,
-          cardinality: 'Many',
-          participation: 'Total'
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
         },
-      ]
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
+    },
+    {
+      id: 3,
+      label: 'C',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
     },
   ],
 }
@@ -179,6 +133,23 @@ const findColumnFamilyByID = (id, logicalSchema) => {
   return key
 }
 
+const findParentKey = (entity, logicalSchema) => {
+  let connectors = entity.connectors
+  key = []
+  if (connectors && connectors.length > 0) {
+    connectors.forEach((connector) => {
+      if (connector.type === 'ChildrenSpecialization') {
+        specializationShape = ERSchema.shapes.find(o => o.id === connector.from)
+        parentEntity = ERSchema.shapes.find(o => o.id === specializationShape.parentID)
+        key = [...parentEntity.key]
+        isHasParent = true
+        parentID = specializationShape.parentID
+      }
+    })
+  }
+  return key
+}
+
 const findRelationshipKey = (relationship, logicalSchema) => {
   let i = 0;
   let found = false;
@@ -217,7 +188,12 @@ const findParentArray = (entityRelation) => {
   let connectors = entityRelation.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
-      if (connector.type === 'RelationConnector') {
+      if (connector.type === 'ChildrenSpecialization') {
+        specializationShape = ERSchema.shapes.find(o => o.id === connector.from)
+        parentEntity = ERSchema.shapes.find(o => o.id === specializationShape.parentID)
+        parentArray.push(parentEntity);
+      }
+      else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
         let targetRelation
         if (entityRelation.id === connector.to) targetRelation = connector.from
@@ -428,6 +404,7 @@ const defineKey = (entityRelation, logicalSchema) => {
   if (!key) {
     if (entityRelation.type == 'Entity') {
       // Pake parent key alias jadi shared key gitu, tapi nanti ya
+      key = [...findParentKey(entityRelation, logicalSchema)]
     }
     else { // if thre type is Relationship
       key = [...findRelationshipKey(entityRelation, logicalSchema)]
