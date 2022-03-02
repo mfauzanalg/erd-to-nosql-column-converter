@@ -13,6 +13,13 @@ const ERSchema = {
           cardinality: 'Many',
           participation: 'Total'
         },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
       ],
       attributes: [
         {
@@ -24,6 +31,48 @@ const ERSchema = {
           label: 'Color'
         }
       ],
+    },
+    {
+      id: 2,
+      label: 'Have',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
+      id: 4,
+      label: 'Drive',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
     },
     {
       id: 0,
@@ -51,24 +100,24 @@ const ERSchema = {
       ]
     },
     {
-      id: 2,
-      label: 'Have',
-      type: 'Relationship',
+      id: 5,
+      label: 'Driver',
+      type: 'Entity',
+      key: ['LicenseNumber'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'LicenseNumber'
+        },
+      ],
       connectors: [
         {
           type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
+          from: 4,
+          to: 5,
           cardinality: 'Many',
           participation: 'Total'
-        }
+        },
       ]
     },
   ],
@@ -78,6 +127,20 @@ let visited = []
 let artificialID = 0;
 let parentID = 0;
 let isHasParent = false;
+
+
+const mergeLogicalSchema = (logical1, logical2) => {
+  let newLogicalSchema = [...logical1, ...logical2]
+  
+  newLogicalSchema = newLogicalSchema.filter((value, index) => {
+    const _value = JSON.stringify(value);
+    return index === newLogicalSchema.findIndex(newLogicalSchema => {
+      return JSON.stringify(newLogicalSchema) === _value;
+    });
+  });
+
+  return newLogicalSchema
+}
 
 const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   let found = false;
@@ -179,20 +242,12 @@ const convertERToLogical = (ERSchema) => {
   for (let i = 0; i < shapes.length; i++) {
     if (shapes[i].type === 'Entity') {
       const columnFamilySet = createFamily(shapes[i],logicalSchema)
-      logicalSchema = [...columnFamilySet, ...logicalSchema]
+      logicalSchema = mergeLogicalSchema(columnFamilySet, logicalSchema)
     }
   }
-
-  logicalSchema = logicalSchema.filter((value, index) => {
-    const _value = JSON.stringify(value);
-    return index === logicalSchema.findIndex(logicalSchema => {
-      return JSON.stringify(logicalSchema) === _value;
-    });
-  });
   
   return logicalSchema
 }
-
 
 const findParentArray = (entityRelation) => {
   let parentArray = []
@@ -280,7 +335,7 @@ const findRelationArray = (entityRelation) => {
   return relationArray
 }
 
-const createFamily = (entityRelation, logicalSchema) => {
+const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
   // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
   let columnFamilySet = [...logicalSchema]
   let columnFamily = {}
@@ -316,18 +371,14 @@ const createFamily = (entityRelation, logicalSchema) => {
       const relationDetailArray = findRelationArray(entityRelation)
      
       relationDetailArray.forEach((relationDetail) => {
-        columnFamilySet = [...columnFamilySet, ...convertRelationship(relationDetail, columnFamily, columnFamilySet)]
-
-        columnFamilySet = columnFamilySet.filter((value, index, self) =>
-          index === self.findIndex((t) => (
-            t.id === value.id
-          ))
-        )
+        // columnFamilySet = [...columnFamilySet, ...convertRelationship(relationDetail, columnFamily, columnFamilySet)]
+        columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
 
       })
     }
   }
 
+  if (returnNewCF) return columnFamily
   return columnFamilySet
 }
 
@@ -339,13 +390,13 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Baru case 1 doang yang diimplement
   let newLogicalSchema = [];
   if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne'].includes(relationDetail.type)) {
-    const convertedRelation = createFamily(relationDetail.relation, logicalSchema)
- 
+    const columFamilyFromRelation = createFamily(relationDetail.relation, logicalSchema, true)
+
     if (relationDetail.relation.attributes) {
       // nanti ya pusing
       newLogicalSchema = [...convertedRelation]
     }
-    columFamilyFromRelation = convertedRelation.find(o => o.id === relationDetail.relation.id);
+
     if (!isArrayEqual(columnFamily.key, columFamilyFromRelation.key) || relation.type == 'Reflexive') {
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail)]
     }

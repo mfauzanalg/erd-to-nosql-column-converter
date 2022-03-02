@@ -1,4 +1,4 @@
-// Simple
+// Simple One to Many
 const ERSchema = {
   shapes: [
     {
