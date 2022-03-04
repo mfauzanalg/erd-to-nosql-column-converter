@@ -1,3 +1,86 @@
+// One total - One Partial
+const ERSchema = {
+  shapes: [
+    {
+      id: 0,
+      label: 'Person',
+      type: 'Entity',
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+      ]
+    },
+    {
+      id: 2,
+      label: 'Have',
+      type: 'Relationship',
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Partial'
+        }
+      ]
+    },
+    {
+      id: 3,
+      label: 'Car',
+      type: 'Entity',
+      key: ['Plat'],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Partial'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Plat'
+        },
+        {
+          type: 'Regular',
+          label: 'Color'
+        }
+      ],
+    },
+  ],
+}
+
 // Simple One to Many
 const ERSchema = {
   shapes: [
@@ -308,7 +391,7 @@ const ERSchema = {
   ],
 }
 
-// Specialization
+// Specialization No Total
 const ERSchema = {
   shapes: [
     {
@@ -389,7 +472,7 @@ const ERSchema = {
   ],
 }
 
-// Specialization & One to many
+// Specialization Total & One to many
 const ERSchema = {
   shapes: [
     {
@@ -507,6 +590,115 @@ const ERSchema = {
           participation: 'Total'
         },
       ]
+    },
+  ],
+}
+
+// Asssociative Relation
+const ERSchema = {
+  shapes: [
+    {
+      id: 4,
+      label: 'D',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 4,
+          cardinality: 'One',
+          participation: 'Total',
+        }
+      ]
+    },
+    {
+      id: 5,
+      label: 'R2',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 4,
+          cardinality: 'One',
+          participation: 'Total',
+        }
+      ],
+    },
+    {
+      id: 0,
+      label: 'E',
+      type: 'Entity',
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+      ]
+    },
+    {
+      id: 2,
+      label: 'R3',
+      type: 'AssociativeEntity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 5,
+          cardinality: 'One',
+          participation: 'Partial'
+
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Partial'
+        }
+      ]
+    },
+    {
+      id: 3,
+      label: 'H',
+      type: 'Entity',
+      key: ['Plat'],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Plat'
+        },
+        {
+          type: 'Regular',
+          label: 'Color'
+        }
+      ],
     },
   ],
 }
