@@ -1,4 +1,4 @@
-// One total - One Partial
+// One partial - One Total
 const ERSchema = {
   shapes: [
     {
@@ -22,7 +22,7 @@ const ERSchema = {
           from: 2,
           to: 0,
           cardinality: 'One',
-          participation: 'Total'
+          participation: 'Partial'
         },
       ]
     },
@@ -42,14 +42,14 @@ const ERSchema = {
           from: 2,
           to: 0,
           cardinality: 'One',
-          participation: 'Total'
+          participation: 'Partial'
         },
         {
           type: 'RelationConnector',
           from: 2,
           to: 3,
           cardinality: 'One',
-          participation: 'Partial'
+          participation: 'Total'
         }
       ]
     },
@@ -64,7 +64,7 @@ const ERSchema = {
           from: 2,
           to: 3,
           cardinality: 'One',
-          participation: 'Partial'
+          participation: 'Total'
         },
       ],
       attributes: [
@@ -598,6 +598,27 @@ const ERSchema = {
 const ERSchema = {
   shapes: [
     {
+      id: 0,
+      label: 'E',
+      type: 'Entity',
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+      ]
+    },
+    {
       id: 4,
       label: 'D',
       type: 'Entity',
@@ -622,29 +643,15 @@ const ERSchema = {
           to: 4,
           cardinality: 'One',
           participation: 'Total',
-        }
-      ],
-    },
-    {
-      id: 0,
-      label: 'E',
-      type: 'Entity',
-      key: ['Name'],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Name'
         },
-      ],
-      connectors: [
         {
           type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-      ]
+          from: 5,
+          to: 2,
+          cardinality: 'One',
+          participation: 'partial',
+        }
+      ],
     },
     {
       id: 2,
@@ -653,11 +660,10 @@ const ERSchema = {
       connectors: [
         {
           type: 'RelationConnector',
-          from: 2,
-          to: 5,
+          from: 5,
+          to: 2,
           cardinality: 'One',
-          participation: 'Partial'
-
+          participation: 'Partial',
         },
         {
           type: 'RelationConnector',
