@@ -2,116 +2,81 @@ const ERSchema = {
   shapes: [
     {
       id: 0,
-      label: 'E',
+      label: 'H',
       type: 'Entity',
-      key: ['Name'],
+      key: ['id_1'],
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
+        },
+      ],
       attributes: [
         {
           type: 'Key',
-          label: 'Name'
+          label: 'id_1'
         },
-      ],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-      ]
-    },
-    {
-      id: 4,
-      label: 'D',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 4,
-          cardinality: 'One',
-          participation: 'Total',
-        }
-      ]
-    },
-    {
-      id: 5,
-      label: 'R2',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 4,
-          cardinality: 'One',
-          participation: 'Total',
-        },
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 2,
-          cardinality: 'One',
-          participation: 'partial',
-        }
       ],
     },
     {
       id: 2,
-      label: 'R3',
-      type: 'AssociativeEntity',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 2,
-          cardinality: 'One',
-          participation: 'Partial',
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Partial'
-        }
-      ]
-    },
-    {
-      id: 3,
-      label: 'H',
+      label: 'F',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Partial'
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
         },
       ],
       attributes: [
         {
-          type: 'Key',
-          label: 'Plat'
+          type: 'Regular',
+          label: 'Bogor'
+        },
+      ],
+    },
+    
+    {
+      id: 1,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: false,
+      isDisjoint: true,
+      parentID: 0,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 1,
+          to: 0,
         },
         {
-          type: 'Regular',
-          label: 'Color'
-        }
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 2,
+        },
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
+      ],
+    },
+    {
+      id: 3,
+      label: 'G',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ChildrenSpecialization',
+          from: 1,
+          to: 3,
+        },
       ],
     },
   ],
 }
-
 
 let visited = []
 let artificialID = 0;
@@ -212,13 +177,12 @@ const findParentKey = (entity, logicalSchema) => {
 
       let relation = ERSchema.shapes.find(o => o.id === targetRelation);
 
-
       if (relation.type == 'Relationship') {
 
         if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
         
-        if (connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+        if (connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
           const entityAcrossID = connectorTo.to
           const entityAcross = logicalSchema.find(o => o.id === entityAcrossID)
   
@@ -292,17 +256,9 @@ const findParentArray = (entityRelation) => {
         let connectorTo;
         
         if (relation.type == 'Relationship') {
-          // if (entityRelation.type == 'AssociativeEntity') {
-            
-          // }
-          // else {
-            if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
-            else connectorTo = relation.connectors[0]
-          // }
-          
-          // console.log('AAAAAAAAAA')
-          // console.log(relation)
-          // console.log(connectorTo)
+
+          if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
+          else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             parentArray.push(ERSchema.shapes.find(o => o.id === connectorTo.to))
@@ -355,7 +311,7 @@ const findRelationArray = (entityRelation) => {
         if (relation.type == 'Relationship') {
           if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
-          relation.label = `${entityRelation.label}-${relation.label}`
+          // relation.label = `${entityRelation.label}-${relation.label}`
   
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             relationArray.push ({
@@ -400,13 +356,22 @@ const findRelationArray = (entityRelation) => {
 const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
   // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
   let columnFamilySet = [...logicalSchema]
-  let columnFamily = {}
+  let columnFamily = logicalSchema.find(o => o.id === entityRelation.id);
+
+  // Soalnya ngedouble kalo relation
+  if (!columnFamily || entityRelation.type == 'Relationship') {
+    console.log('masuuk', entityRelation.label)
+    columnFamily = {}
+  }
+
   if (!isVisited(entityRelation, visited) || entityRelation.type !== 'Entity') {
     visited.push(entityRelation.id)
 
     // Here process parentnya first tapi nanti dlu ya
     if(entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
       const parentArray = findParentArray(entityRelation)
+      console.log('parent array', entityRelation.label)
+      console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
         columnFamilySet = mergeLogicalSchema(columnFamilySet, createFamily(entity, logicalSchema))
@@ -421,7 +386,9 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
       columnFamily.parentID = getParentID(parentID, columnFamilySet);
       isHasParent = false;
     }
-    columnFamily.attributes = [];
+    if (!columnFamily.attributes) {
+      columnFamily.attributes = [];
+    }
     entityRelation.attributes?.forEach(attribute => {
       columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
     })
@@ -432,18 +399,23 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     //Process for the relation
     if (entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
       const relationDetailArray = findRelationArray(entityRelation)
+      console.log('relation array detail')
+      console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
         columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
     }
   }
 
+
   if (returnNewCF) return columnFamily
   return columnFamilySet
 }
 
-const isArrayEqual = (array1, array2) => {
-  return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
+const isSameKey = (array1, array2) => {
+  // return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
+  const result = array2.every(val => array1.includes(val));
+  return result
 }
 
 const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
@@ -458,24 +430,15 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
     //   newLogicalSchema = newLogicalSchema.push(columFamilyFromRelation)
     // }
 
-    if (!isArrayEqual(columnFamily.key, columFamilyFromRelation.key) || relationDetail.relation.type == 'Reflexive') {
+    if (!isSameKey(columnFamily.key, columFamilyFromRelation.key) || relationDetail.relation.type == 'Reflexive') {
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalSchema)]
     }
   }
   // Case 2 
   else if (['AssociativeEntity'].includes(relationDetail.type)) {
-
-    // ID nya R3
-    // console.log(relationDetail.relation.id)
-
-    // ID nya E
-    // console.log(columnFamily)
-    // console.log(relationDetail.connector)
-
     const columFamilyFromAssociative = createFamily(relationDetail.relation, logicalSchema)
     newLogicalSchema = mergeLogicalSchema(newLogicalSchema, columFamilyFromAssociative)
 
-    // console.log(relationDetail.relation)
     let type = 'BinaryManyToOne'
     if (relationDetail.connector.cardinality === 'One') {
       type = 'BinaryOneToOne'
@@ -490,13 +453,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
       }
     }
 
-    console.log("WAHHT")
-    console.log(logicalSchema)
-    const hasil = convertRelationship(temporaryRelationDetail,columnFamily, newLogicalSchema)
-    console.log('hasill')
-    print(hasil)
-    console.log('====')
-    console.log(newLogicalSchema)
+    const hasil = convertRelationship(temporaryRelationDetail, columnFamily, newLogicalSchema)
     newLogicalSchema = mergeLogicalSchema(hasil, newLogicalSchema)
 
   }
@@ -511,24 +468,17 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
 }
 
 const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, logicalSchema) => {
-  let relation = relationDetail.relation
-  let withTemporary = false;
+  // let relation = relationDetail.relation
+  // let withTemporary = false;
   let newLogicalSchema = []
   let newColumnFamily = {};
+
   if (columnFamily1.isFromRelationship) {
     newColumnFamily = JSON.parse(JSON.stringify(columnFamily1));
-    console.log(columnFamily1)
-    console.log(logicalSchema)
   }
   else {
-    // Lagi ngerjain
     const preexistentColumnFamily = logicalSchema.find(o => o.id === columnFamily1.id);
-    console.log("WOWWWWWWWWWWWW")
-    console.log(preexistentColumnFamily)
-    console.log(columnFamily1)
-    console.log(logicalSchema)
-    newColumnFamily = JSON.parse(JSON.stringify(preexistentColumnFamily));
-    // const pre
+    newColumnFamily = preexistentColumnFamily
   }
   if (!newColumnFamily) {
     withTemporary = true
@@ -540,6 +490,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
       parentID: columnFamily1.id,
       attributes: []
     }
+    // Kayaknya ini sih
     newColumnFamily = createFamily(temporaryEntity, logicalSchema, true)
   }
   
@@ -551,7 +502,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   newColumnFamily.attributes.push(auxAttribute)
   
   // Nanti dikerjain ini knp many to many ngga
-  if (true) {
+  if (relationDetail.type !== 'BinaryManyToMany') {
     let interAttribute = {};
     interAttribute.label = columnFamily1.label
     interAttribute.isIntermediary = true;
@@ -571,8 +522,8 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   if (relationDetail.type === 'BinaryOneToOne') {
     newColumnFamily.key = [...columnFamily2.key]
   }
-
-  newLogicalSchema = [...newLogicalSchema, newColumnFamily, columnFamily2]
+  newLogicalSchema = mergeLogicalSchema(newLogicalSchema, [newColumnFamily, columnFamily2])
+  // [...newLogicalSchema, newColumnFamily, columnFamily2]
   return newLogicalSchema
 }
 

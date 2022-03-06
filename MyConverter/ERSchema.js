@@ -30,12 +30,6 @@ const ERSchema = {
       id: 2,
       label: 'Have',
       type: 'Relationship',
-      attributes: [
-        {
-          type: 'Regular',
-          label: 'Address'
-        }
-      ],
       connectors: [
         {
           type: 'RelationConnector',
@@ -265,7 +259,7 @@ const ERSchema = {
   ],
 }
 
-// ERSchema3 One to many to many
+// ERSchema One to many to many
 const ERSchema = {
   shapes: [
     {
@@ -619,20 +613,6 @@ const ERSchema = {
       ]
     },
     {
-      id: 4,
-      label: 'D',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 4,
-          cardinality: 'One',
-          participation: 'Total',
-        }
-      ]
-    },
-    {
       id: 5,
       label: 'R2',
       type: 'Relationship',
@@ -678,6 +658,20 @@ const ERSchema = {
           to: 3,
           cardinality: 'Many',
           participation: 'Partial'
+        }
+      ]
+    },
+    {
+      id: 4,
+      label: 'D',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 4,
+          cardinality: 'One',
+          participation: 'Total',
         }
       ]
     },
