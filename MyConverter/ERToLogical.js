@@ -28,7 +28,7 @@ const ERSchema = {
     {
       id: 2,
       label: 'Have',
-      type: 'Relationship',
+      type: 'WeakRelationship',
       connectors: [
         {
           type: 'RelationConnector',
@@ -49,7 +49,7 @@ const ERSchema = {
     {
       id: 3,
       label: 'Car',
-      type: 'Entity',
+      type: 'WeakEntity',
       key: ['Plat'],
       connectors: [
         {
@@ -173,16 +173,18 @@ const findParentKey = (entity, logicalSchema) => {
 
       let relation = ERSchema.shapes.find(o => o.id === targetRelation);
 
-      if (relation.type == 'Relationship') {
+      if (relation.type == 'Relationship' || relation.type == 'WeakRelationship') {
 
         if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
-        
-        if (connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+
+        if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
+          || (relation.type === 'WeakRelationship' && connectorTo.cardinality === 'One')) {
+          
           const entityAcrossID = connectorTo.to
           const entityAcross = logicalSchema.find(o => o.id === entityAcrossID)
   
-          // If not in logical then do nothiong, will be processed for the next entity (for one-to-one both total)
+          // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
             key = [...entityAcross.key]
             isHasParent = true
@@ -223,7 +225,7 @@ const convertERToLogical = (ERSchema) => {
   let logicalSchema = []
   const shapes = ERSchema.shapes
   for (let i = 0; i < shapes.length; i++) {
-    if (shapes[i].type === 'Entity') {
+    if (['Entity', 'WeakEntity'].includes(shapes[i].type)) {
       const columnFamilySet = createFamily(shapes[i],logicalSchema)
       logicalSchema = mergeLogicalSchema(columnFamilySet, logicalSchema)
     }
@@ -364,10 +366,10 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     visited.push(entityRelation.id)
 
     // Here process parentnya first tapi nanti dlu ya
-    if(entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
+    if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const parentArray = findParentArray(entityRelation)
-      // console.log('parent array', entityRelation.label)
-      // console.log(parentArray)
+      console.log('parent array', entityRelation.label)
+      console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
         columnFamilySet = mergeLogicalSchema(columnFamilySet, createFamily(entity, logicalSchema))
@@ -394,10 +396,10 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     columnFamilySet.push(columnFamily)
   
     //Process for the relation
-    if (entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
+    if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const relationDetailArray = findRelationArray(entityRelation)
-      // console.log('relation array detail')
-      // console.log(relationDetailArray)
+      console.log('relation array detail')
+      console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
         columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
@@ -564,7 +566,7 @@ const defineKey = (entityRelation, logicalSchema) => {
   if (entityRelation.key) {
     key = [...entityRelation.key]
   }
-  if (entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
+  if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
     key = [...key, ...findParentKey(entityRelation, logicalSchema)]
   }
   else { // if thre type is Relationship
