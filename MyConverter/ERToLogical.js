@@ -2,77 +2,73 @@ const ERSchema = {
   shapes: [
     {
       id: 0,
-      label: 'H',
+      label: 'Person',
       type: 'Entity',
-      key: ['id_1'],
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
+      ],
       connectors: [
         {
-          type: 'ParentSpecialization',
-          from: 1,
+          type: 'RelationConnector',
+          from: 2,
           to: 0,
+          cardinality: 'One',
+          participation: 'Partial'
+        },
+      ]
+    },
+    {
+      id: 2,
+      label: 'Have',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Partial'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
+      id: 3,
+      label: 'Car',
+      type: 'Entity',
+      key: ['Plat'],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Total'
         },
       ],
       attributes: [
         {
           type: 'Key',
-          label: 'id_1'
+          label: 'Plat'
         },
-      ],
-    },
-    {
-      id: 2,
-      label: 'F',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 2,
-        },
-      ],
-      attributes: [
         {
           type: 'Regular',
-          label: 'Bogor'
-        },
-      ],
-    },
-    
-    {
-      id: 1,
-      label: 'Special',
-      type: 'Specialization',
-      isTotal: false,
-      isDisjoint: true,
-      parentID: 0,
-      connectors: [
-        {
-          type: 'ParentSpecialization',
-          from: 1,
-          to: 0,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 2,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 3,
-        },
-      ],
-    },
-    {
-      id: 3,
-      label: 'G',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 3,
-        },
+          label: 'Color'
+        }
       ],
     },
   ],
@@ -360,7 +356,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
 
   // Soalnya ngedouble kalo relation
   if (!columnFamily || entityRelation.type == 'Relationship') {
-    console.log('masuuk', entityRelation.label)
+    // console.log('masuuk', entityRelation.label)
     columnFamily = {}
   }
 
@@ -370,8 +366,8 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     // Here process parentnya first tapi nanti dlu ya
     if(entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
       const parentArray = findParentArray(entityRelation)
-      console.log('parent array', entityRelation.label)
-      console.log(parentArray)
+      // console.log('parent array', entityRelation.label)
+      // console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
         columnFamilySet = mergeLogicalSchema(columnFamilySet, createFamily(entity, logicalSchema))
@@ -394,13 +390,14 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     })
 
     if (entityRelation.type === 'Relationship' && !entityRelation.isTemporaryRelation) columnFamily.isFromRelationship = true
+    if (entityRelation.type === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
     columnFamilySet.push(columnFamily)
   
     //Process for the relation
     if (entityRelation.type === 'Entity' || entityRelation.type === 'AssociativeEntity') {
       const relationDetailArray = findRelationArray(entityRelation)
-      console.log('relation array detail')
-      console.log(relationDetailArray)
+      // console.log('relation array detail')
+      // console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
         columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
@@ -460,6 +457,9 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Case 3
   else if (['Specialization'].includes(relationDetail.type)) {
     if (!relationDetail.relation?.isTotal) {
+      // console.log(relationDetail)
+      // console.log(columnFamily)
+      // console.log(logicalSchema)
       const parentColumnFamily = logicalSchema.find(o => o.id === relationDetail.relation.parentID);
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalSchema)]
     }
@@ -471,17 +471,16 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // let relation = relationDetail.relation
   // let withTemporary = false;
   let newLogicalSchema = []
-  let newColumnFamily = {};
+  let newColumnFamily = undefined;
 
   if (columnFamily1.isFromRelationship) {
     newColumnFamily = JSON.parse(JSON.stringify(columnFamily1));
   }
   else {
     const preexistentColumnFamily = logicalSchema.find(o => o.id === columnFamily1.id);
-    newColumnFamily = preexistentColumnFamily
+    if (preexistentColumnFamily.isAssociativeEntity) newColumnFamily = preexistentColumnFamily
   }
   if (!newColumnFamily) {
-    withTemporary = true
     const temporaryEntity = {
       id: `temporary${columnFamily1.id}`,
       label: `${columnFamily1.label}-${columnFamily2.label}`,
@@ -490,6 +489,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
       parentID: columnFamily1.id,
       attributes: []
     }
+  
     // Kayaknya ini sih
     newColumnFamily = createFamily(temporaryEntity, logicalSchema, true)
   }
@@ -534,16 +534,29 @@ const getColumnType = (column, attribute) => {
 }
 
 const convertAttribute = (columnFamily, attribute) => {
-  let column = {}
+  let additionalColumnFamily = []
   if (attribute.type === 'Composite') {
-    // Nanti yaa kalo komposite kayak gimana
+    let newColumFamily = {}
+    newColumFamily.label = `${columnFamily.label}-${attribute.label}`
+    newColumFamily.parentID = columnFamily.parentID || columnFamily.id
+    newColumFamily.key = [...columnFamily.key]
+    newColumFamily.attributes = []
+    if (attribute.children) {
+      attribute.children.forEach(child => {
+        console.log(child)
+        additionalColumnFamily = [...additionalColumnFamily,
+          ...convertAttribute(newColumFamily, child)] 
+      })
+    }
+    additionalColumnFamily.push(newColumFamily)
   }
   else {
+    const column = {}
     column.label = attribute.label
     getColumnType(column, attribute)
     columnFamily.attributes.push(column)
   }
-  return []
+  return additionalColumnFamily
 }
 
 const defineKey = (entityRelation, logicalSchema) => {
@@ -576,5 +589,5 @@ print(convertERToLogical(ERSchema));
 // N-ary
 // One to one partial both
 // Refelxive
-// Attribute nested
 // Weak Entity
+// Kalo kebetulan nama key nya sama gmn
