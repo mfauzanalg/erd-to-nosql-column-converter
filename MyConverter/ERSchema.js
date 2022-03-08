@@ -1032,3 +1032,139 @@ const ERSchema = {
     },
   ],
 }
+
+// Weak Entity
+const ERSchema = {
+  shapes: [
+    {
+      id: 0,
+      label: 'Person',
+      type: 'Entity',
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+      ]
+    },
+    {
+      id: 2,
+      label: 'Have',
+      type: 'WeakRelationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Total'
+        }
+      ]
+    },
+    {
+      id: 3,
+      label: 'Car',
+      type: 'WeakEntity',
+      key: ['Plat'],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 3,
+          cardinality: 'One',
+          participation: 'Total'
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Plat'
+        },
+        {
+          type: 'Regular',
+          label: 'Color'
+        }
+      ],
+    },
+  ],
+}
+
+// Reflexive
+const ERSchema = {
+  shapes: [
+    {
+      id: 0,
+      label: 'Employee',
+      type: 'Entity',
+      key: ['Name'],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Name'
+        },
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
+      ],
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Partial'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+      ]
+    },
+    {
+      id: 2,
+      label: 'Supervision',
+      type: 'ReflexiveRelationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'One',
+          participation: 'Partial'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Total'
+        }
+      ]
+    },
+  ],
+}

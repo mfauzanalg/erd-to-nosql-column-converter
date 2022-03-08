@@ -21,27 +21,33 @@ const ERSchema = {
           from: 2,
           to: 0,
           cardinality: 'One',
-          participation: 'Partial'
+          participation: 'Total'
         },
       ]
     },
     {
       id: 2,
       label: 'Have',
-      type: 'WeakRelationship',
+      type: 'Relationship',
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Hape'
+        }
+      ],
       connectors: [
         {
           type: 'RelationConnector',
           from: 2,
           to: 0,
           cardinality: 'One',
-          participation: 'Partial'
+          participation: 'Total'
         },
         {
           type: 'RelationConnector',
           from: 2,
           to: 3,
-          cardinality: 'One',
+          cardinality: 'Many',
           participation: 'Total'
         }
       ]
@@ -49,14 +55,14 @@ const ERSchema = {
     {
       id: 3,
       label: 'Car',
-      type: 'WeakEntity',
+      type: 'Entity',
       key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
           from: 2,
           to: 3,
-          cardinality: 'One',
+          cardinality: 'Many',
           participation: 'Total'
         },
       ],
@@ -207,9 +213,10 @@ const findRelationshipKey = (relationship, logicalSchema) => {
   const connectors = relationship.connectors
   while (!found && connectors && i < connectors.length) {
     if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
+      const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
-      key = findColumnFamilyByID(connectors[i].to, logicalSchema)
-      parentID = ERSchema.shapes.find(o => o.id === connectors[i].to).id
+      key = parent.key
+      parentID = parent.id
       isHasParent = true
     }
     i += 1
@@ -282,6 +289,10 @@ const getParentID = (id, logicalSchema) => {
   else return id
 }
 
+const duplicateArray = (array) => {
+  return JSON.parse(JSON.stringify(array)); 
+}
+
 const findRelationArray = (entityRelation) => {
   let relationArray = []
   let connectors = entityRelation.connectors
@@ -305,6 +316,13 @@ const findRelationArray = (entityRelation) => {
         let relationReference = ERSchema.shapes.find(o => o.id === targetRelation);
         let relation = JSON.parse(JSON.stringify(relationReference)); 
         let connectorTo;
+
+        if (relation.type == 'ReflexiveRelationship') {
+          relationArray.push ({
+            type: 'ReflexiveRelationship',
+            relation: relation,
+          })
+        }
 
         if (relation.type == 'Relationship') {
           if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
@@ -348,7 +366,20 @@ const findRelationArray = (entityRelation) => {
       }
     })
   }
-  return relationArray
+
+
+  return removeDuplicate(relationArray)
+}
+
+const removeDuplicate = (arr) => {
+  const uniqueArray = arr.filter((value, index) => {
+    const _value = JSON.stringify(value);
+    return index === arr.findIndex(obj => {
+      return JSON.stringify(obj) === _value;
+    });
+  });
+
+  return uniqueArray
 }
 
 const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
@@ -391,8 +422,13 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
       columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
     })
 
-    if (entityRelation.type === 'Relationship' && !entityRelation.isTemporaryRelation) columnFamily.isFromRelationship = true
+    if (
+        (['Relationship', 'ReflexiveRelationship'].includes(entityRelation.type) 
+        && !entityRelation.isTemporaryRelation)
+        ) columnFamily.isFromRelationship = true
+
     if (entityRelation.type === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
+
     columnFamilySet.push(columnFamily)
   
     //Process for the relation
@@ -411,25 +447,29 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
   return columnFamilySet
 }
 
-const isSameKey = (array1, array2) => {
-  // return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
-  const result = array2.every(val => array1.includes(val));
+const isSameKey = (columnFamily1, columnFamily2) => {
+  let result = false
+  if (columnFamily1.parentID === columnFamily2.parentID) {
+    result = true
+  }
+  result = columnFamily2.key.every(val => columnFamily1.key.includes(val));
+  if (!result) result = columnFamily1.key.every(val => columnFamily2.key.includes(val));
   return result
 }
 
 const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
   // Baru case 1 doang yang diimplement
   let newLogicalSchema = [];
-  if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne'].includes(relationDetail.type)) {
+  let isHasAttributes = false
+  console.log(isHasAttributes)
+  if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
     const columFamilyFromRelation = createFamily(relationDetail.relation, logicalSchema, true)
 
-    // if (relationDetail.relation.attributes) {
-    //   // nanti ya pusing
-    //   // newLogicalSchema = [...columFamilyFromRelation]
-    //   newLogicalSchema = newLogicalSchema.push(columFamilyFromRelation)
-    // }
+    if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
+      newLogicalSchema.push(columFamilyFromRelation)
+    }
 
-    if (!isSameKey(columnFamily.key, columFamilyFromRelation.key) || relationDetail.relation.type == 'Reflexive') {
+    if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalSchema)]
     }
   }
@@ -476,7 +516,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   let newColumnFamily = undefined;
 
   if (columnFamily1.isFromRelationship) {
-    newColumnFamily = JSON.parse(JSON.stringify(columnFamily1));
+    newColumnFamily = duplicateArray(columnFamily1)
   }
   else {
     const preexistentColumnFamily = logicalSchema.find(o => o.id === columnFamily1.id);
@@ -492,7 +532,6 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
       attributes: []
     }
   
-    // Kayaknya ini sih
     newColumnFamily = createFamily(temporaryEntity, logicalSchema, true)
   }
   
@@ -521,9 +560,10 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
     newColumnFamily.key = [...columnFamily2.key]
   }
 
-  if (relationDetail.type === 'BinaryOneToOne') {
-    newColumnFamily.key = [...columnFamily2.key]
-  }
+  // Coba2 lagi ya nanti
+  // if (relationDetail.type === 'BinaryOneToOne') {
+  //   newColumnFamily.key = [...columnFamily2.key]
+  // }
   newLogicalSchema = mergeLogicalSchema(newLogicalSchema, [newColumnFamily, columnFamily2])
   // [...newLogicalSchema, newColumnFamily, columnFamily2]
   return newLogicalSchema
@@ -564,13 +604,14 @@ const convertAttribute = (columnFamily, attribute) => {
 const defineKey = (entityRelation, logicalSchema) => {
   let key = [];
   if (entityRelation.key) {
-    key = [...entityRelation.key]
+    key = duplicateArray(entityRelation.key)
   }
   if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
     key = [...key, ...findParentKey(entityRelation, logicalSchema)]
   }
   else { // if thre type is Relationship
     key = [...key, ...findRelationshipKey(entityRelation, logicalSchema)]
+    console.log(key, 'keyy')
   }
   if (key.length < 1 && !isHasParent) {
     key = [`id_${entityRelation.label}`]
@@ -588,8 +629,12 @@ print(convertERToLogical(ERSchema));
 
 
 // Yang blm
-// N-ary
 // One to one partial both
-// Refelxive
-// Weak Entity
+// Relationship ada attribute
 // Kalo kebetulan nama key nya sama gmn
+
+
+// Notes
+// Weak entity kalo many to many emng gabisa
+// N-ary SKIP
+// Refelxive udah tapi masih aneh
