@@ -1,4 +1,4 @@
-// One partial - One Total
+// One Partial - One Total
 const ERSchema = {
   shapes: [
     {
@@ -629,7 +629,7 @@ const ERSchema = {
           from: 5,
           to: 2,
           cardinality: 'One',
-          participation: 'partial',
+          participation: 'Partial',
         }
       ],
     },
@@ -852,7 +852,7 @@ const ERSchema = {
           from: 5,
           to: 2,
           cardinality: 'One',
-          participation: 'partial',
+          participation: 'Partial',
         }
       ],
     },
