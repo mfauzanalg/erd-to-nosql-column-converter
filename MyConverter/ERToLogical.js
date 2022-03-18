@@ -1,119 +1,73 @@
 const ERSchema = {
   entityRelations: [
     {
-      id: 2,
-      label: 'B',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 2,
-        },
-        {
-          type: 'RelationConnector',
-          from: 4,
-          to: 2,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-      ],
-      attributes: [
-        {
-          type: 'Regular',
-          label: 'Bogor'
-        },
-      ],
-    },
-    {
       id: 0,
-      label: 'A',
+      label: 'Person',
       type: 'Entity',
-      connectors: [
-        {
-          type: 'ParentSpecialization',
-          from: 1,
-          to: 0,
-        },
-      ],
       attributes: [
         {
           type: 'Key',
-          label: 'id_1'
+          label: 'Name'
         },
+        {
+          type: 'Regular',
+          label: 'Address'
+        }
       ],
-    },
-    {
-      id: 1,
-      label: 'Special',
-      type: 'Specialization',
-      isTotal: true,
-      isDisjoint: true,
-      parentID: 0,
       connectors: [
         {
-          type: 'ParentSpecialization',
-          from: 1,
+          type: 'RelationConnector',
+          from: 2,
           to: 0,
+          cardinality: 'One',
+          participation: 'Total'
         },
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 2,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 3,
-        },
-      ],
+      ]
     },
     {
-      id: 3,
-      label: 'C',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 1,
-          to: 3,
-        },
-      ],
-    },
-    {
-      id: 4,
-      label: 'R1',
+      id: 2,
+      label: 'Have',
       type: 'Relationship',
       connectors: [
         {
           type: 'RelationConnector',
-          from: 4,
-          to: 2,
+          from: 2,
+          to: 0,
           cardinality: 'One',
           participation: 'Total'
         },
         {
           type: 'RelationConnector',
-          from: 4,
-          to: 5,
+          from: 2,
+          to: 3,
           cardinality: 'Many',
           participation: 'Total'
         }
       ]
     },
     {
-      id: 5,
-      label: 'E',
+      id: 3,
+      label: 'Car',
       type: 'Entity',
       connectors: [
         {
           type: 'RelationConnector',
-          from: 4,
-          to: 5,
+          from: 2,
+          to: 3,
           cardinality: 'Many',
           participation: 'Total'
         },
-      ]
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'Plat'
+        },
+        {
+          type: 'Regular',
+          label: 'Color'
+        }
+      ],
     },
   ],
 }
