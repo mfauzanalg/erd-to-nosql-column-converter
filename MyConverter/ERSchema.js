@@ -1,11 +1,10 @@
-// One Partial - One Total
+// One Partial - One Total (OK) Pass
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'Person',
       type: 'Entity',
-      key: ['Name'],
       attributes: [
         {
           type: 'Key',
@@ -51,7 +50,6 @@ const ERSchema = {
       id: 3,
       label: 'Car',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -75,14 +73,13 @@ const ERSchema = {
   ],
 }
 
-// Simple One to Many
+// Simple One to Many (OK) Pass
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'Person',
       type: 'Entity',
-      key: ['Name'],
       attributes: [
         {
           type: 'Key',
@@ -128,7 +125,6 @@ const ERSchema = {
       id: 3,
       label: 'Car',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -154,7 +150,7 @@ const ERSchema = {
 
 // Game
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'Player',
@@ -261,7 +257,7 @@ const ERSchema = {
 
 // ERSchema One to many to many
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 3,
       label: 'Car',
@@ -385,14 +381,13 @@ const ERSchema = {
   ],
 }
 
-// Specialization No Total
+// Specialization No Total (OK) PASS
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'H',
       type: 'Entity',
-      key: ['id_1'],
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -466,9 +461,9 @@ const ERSchema = {
   ],
 }
 
-// Specialization Total & One to many
+// Specialization Total & One to many (OK) PASS
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 2,
       label: 'B',
@@ -498,7 +493,6 @@ const ERSchema = {
       id: 0,
       label: 'A',
       type: 'Entity',
-      key: ['id_1'],
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -588,14 +582,13 @@ const ERSchema = {
   ],
 }
 
-// Asssociative Relation
+// Asssociative Relation (OK) PASS
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'E',
       type: 'Entity',
-      key: ['Name'],
       attributes: [
         {
           type: 'Key',
@@ -679,7 +672,6 @@ const ERSchema = {
       id: 3,
       label: 'H',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -703,9 +695,9 @@ const ERSchema = {
   ],
 }
 
-// Contoh poffo mello
+// Contoh poffo mello (OK) PASS
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 6,
       label: 'B',
@@ -735,7 +727,6 @@ const ERSchema = {
       id: 1,
       label: 'A',
       type: 'Entity',
-      key: ['id_1'],
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -817,7 +808,6 @@ const ERSchema = {
       id: 0,
       label: 'E',
       type: 'Entity',
-      key: ['Name'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -907,7 +897,6 @@ const ERSchema = {
       id: 3,
       label: 'H',
       type: 'Entity',
-      key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -991,14 +980,40 @@ const ERSchema = {
   ],
 }
 
-// Composite attribute
+// Simplified composite attribute (OK) PASS
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'E',
       type: 'Entity',
-      key: ['Name'],
+      attributes: [
+        {
+          type: 'Composite',
+          label: 'Oke',
+          children: [
+            {
+              type: 'Regular',
+              label: 'Fauzan'
+            },
+          ]
+        },
+        {
+          type: 'Key',
+          label: 'Name'
+        }
+      ],
+    },
+  ],
+}
+
+// Composite attribute (OK) Pass
+const ERSchema = {
+  entityRelations: [
+    {
+      id: 0,
+      label: 'E',
+      type: 'Entity',
       attributes: [
         {
           type: 'Composite',
@@ -1025,7 +1040,7 @@ const ERSchema = {
           ]
         },
         {
-          type: 'Regular',
+          type: 'Key',
           label: 'Name'
         }
       ],
@@ -1033,14 +1048,13 @@ const ERSchema = {
   ],
 }
 
-// Weak Entity
+// Weak Entity (OK)
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'Person',
       type: 'Entity',
-      key: ['Name'],
       attributes: [
         {
           type: 'Key',
@@ -1086,7 +1100,6 @@ const ERSchema = {
       id: 3,
       label: 'Car',
       type: 'WeakEntity',
-      key: ['Plat'],
       connectors: [
         {
           type: 'RelationConnector',
@@ -1112,7 +1125,7 @@ const ERSchema = {
 
 // Reflexive
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
       id: 0,
       label: 'Employee',

@@ -1,19 +1,19 @@
 const ERSchema = {
-  shapes: [
+  entityRelations: [
     {
-      id: 6,
+      id: 2,
       label: 'B',
       type: 'Entity',
       connectors: [
         {
           type: 'ChildrenSpecialization',
-          from: 12,
-          to: 6,
+          from: 1,
+          to: 2,
         },
         {
           type: 'RelationConnector',
-          from: 8,
-          to: 6,
+          from: 4,
+          to: 2,
           cardinality: 'One',
           participation: 'Total'
         },
@@ -26,15 +26,14 @@ const ERSchema = {
       ],
     },
     {
-      id: 1,
+      id: 0,
       label: 'A',
       type: 'Entity',
-      key: ['id_1'],
       connectors: [
         {
           type: 'ParentSpecialization',
-          from: 12,
-          to: 1,
+          from: 1,
+          to: 0,
         },
       ],
       attributes: [
@@ -45,242 +44,76 @@ const ERSchema = {
       ],
     },
     {
-      id: 12,
+      id: 1,
       label: 'Special',
       type: 'Specialization',
       isTotal: true,
       isDisjoint: true,
-      parentID: 1,
+      parentID: 0,
       connectors: [
         {
           type: 'ParentSpecialization',
-          from: 12,
-          to: 1,
+          from: 1,
+          to: 0,
         },
         {
           type: 'ChildrenSpecialization',
-          from: 12,
-          to: 6,
+          from: 1,
+          to: 2,
         },
         {
           type: 'ChildrenSpecialization',
-          from: 12,
-          to: 7,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 12,
-          to: 4,
+          from: 1,
+          to: 3,
         },
       ],
     },
     {
-      id: 7,
+      id: 3,
       label: 'C',
       type: 'Entity',
       connectors: [
         {
           type: 'ChildrenSpecialization',
-          from: 12,
-          to: 7,
+          from: 1,
+          to: 3,
         },
       ],
     },
     {
-      id: 8,
+      id: 4,
       label: 'R1',
       type: 'Relationship',
       connectors: [
         {
           type: 'RelationConnector',
-          from: 8,
-          to: 6,
+          from: 4,
+          to: 2,
           cardinality: 'One',
           participation: 'Total'
         },
         {
           type: 'RelationConnector',
-          from: 8,
-          to: 0,
+          from: 4,
+          to: 5,
           cardinality: 'Many',
-          participation: 'Partial'
+          participation: 'Total'
         }
-      ]
-    },
-    {
-      id: 0,
-      label: 'E',
-      type: 'Entity',
-      key: ['Name'],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 8,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
       ]
     },
     {
       id: 5,
-      label: 'R2',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 4,
-          cardinality: 'One',
-          participation: 'Total',
-        },
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 2,
-          cardinality: 'One',
-          participation: 'Partial',
-        }
-      ],
-    },
-    {
-      id: 2,
-      label: 'R3',
-      type: 'AssociativeEntity',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 5,
-          to: 2,
-          cardinality: 'One',
-          participation: 'Partial',
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Partial'
-        }
-      ]
-    },
-    {
-      id: 4,
-      label: 'D',
+      label: 'E',
       type: 'Entity',
       connectors: [
         {
           type: 'RelationConnector',
-          from: 5,
-          to: 4,
-          cardinality: 'One',
-          participation: 'Total',
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 12,
-          to: 4,
+          from: 4,
+          to: 5,
+          cardinality: 'Many',
+          participation: 'Total'
         },
       ]
-    },
-    {
-      id: 3,
-      label: 'H',
-      type: 'Entity',
-      key: ['Plat'],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Partial'
-        },
-        {
-          type: 'ParentSpecialization',
-          from: 11,
-          to: 3,
-        },
-      ],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Plat'
-        },
-        {
-          type: 'Regular',
-          label: 'Color'
-        }
-      ],
-    },
-    {
-      id: 11,
-      label: 'Special',
-      type: 'Specialization',
-      isTotal: false,
-      isDisjoint: true,
-      parentID: 3,
-      connectors: [
-        {
-          type: 'ParentSpecialization',
-          from: 11,
-          to: 3,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 11,
-          to: 9,
-        },
-        {
-          type: 'ChildrenSpecialization',
-          from: 11,
-          to: 10,
-        },
-      ],
-    },
-    {
-      id: 10,
-      label: 'G',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 11,
-          to: 10,
-        },
-      ],
-    },
-    {
-      id: 9,
-      label: 'F',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'ChildrenSpecialization',
-          from: 11,
-          to: 9,
-        },
-      ],
-      attributes: [
-        {
-          type: 'Regular',
-          label: 'Bogor'
-        },
-      ],
     },
   ],
 }
@@ -290,6 +123,37 @@ let artificialID = 0;
 let parentID = 0;
 let isHasParent = false;
 
+
+const getArrayKey = (attributes) => {
+  let arrayKeys = []
+  attributes?.forEach(attr => {
+    if (attr.type == "Key" || attr.isKey) {
+      arrayKeys.push(attr.label)
+    }
+  })
+  return arrayKeys
+}
+
+const filterKey = (attributes) => {
+  let arrayKeys = []
+  attributes?.forEach(attr => {
+    if (attr.type == "Key" || attr.isKey) {
+      arrayKeys.push(attr)
+    }
+  })
+  return arrayKeys
+}
+
+const arrayKeysToAttribute = (keys) => {
+  let arrayAttr = []
+  keys?.forEach(key => {
+    arrayAttr.push ({
+      label: key,
+      isKey: true,
+    })
+  })
+  return arrayAttr
+}
 
 const mergeLogicalSchema = (logical1, logical2) => {
   let newLogicalSchema = [...logical1, ...logical2]
@@ -302,6 +166,19 @@ const mergeLogicalSchema = (logical1, logical2) => {
   });
 
   return newLogicalSchema
+}
+
+const mergeArray = (arr1, arr2) => {
+  let newArr = [...arr1, ...arr2]
+  
+  newArr = newArr.filter((value, index) => {
+    const _value = JSON.stringify(value);
+    return index === newArr.findIndex(newArr => {
+      return JSON.stringify(newArr) === _value;
+    });
+  });
+
+  return newArr
 }
 
 const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
@@ -330,6 +207,7 @@ const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   return columnFamilySet
 }
 
+// Unused
 const findColumnFamilyByID = (id, logicalSchema) => {
   let found = false;
   let i = 0;
@@ -366,10 +244,10 @@ const findParentKey = (entity, logicalSchema) => {
 
   while (!(found) && connectors && i < connectors.length) {
     if (connectors[i].type === 'ChildrenSpecialization') {
-      specializationShape = ERSchema.shapes.find(o => o.id === connectors[i].from)
+      specializationShape = ERSchema.entityRelations.find(o => o.id === connectors[i].from)
       if (specializationShape.isTotal) {
-        parentEntity = ERSchema.shapes.find(o => o.id === specializationShape.parentID)
-        key = [...parentEntity.key]
+        parentEntity = ERSchema.entityRelations.find(o => o.id === specializationShape.parentID)
+        key = getArrayKey(parentEntity.attributes)
         isHasParent = true
         parentID = specializationShape.parentID
         found = true
@@ -382,7 +260,7 @@ const findParentKey = (entity, logicalSchema) => {
       if (entity.id === connectors[i].to) targetRelation = connectors[i].from
       else targetRelation = connectors[i].to
 
-      let relation = ERSchema.shapes.find(o => o.id === targetRelation);
+      let relation = ERSchema.entityRelations.find(o => o.id === targetRelation);
 
       if (relation.type == 'Relationship' || relation.type == 'WeakRelationship') {
 
@@ -397,7 +275,7 @@ const findParentKey = (entity, logicalSchema) => {
   
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
-            key = [...entityAcross.key]
+            key = getArrayKey(entityAcross.attributes)
             isHasParent = true
             parentID = entityAcrossID
           }
@@ -420,7 +298,7 @@ const findRelationshipKey = (relationship, logicalSchema) => {
     if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
-      key = parent.key
+      key = getArrayKey(parent.attributes)
       parentID = parent.id
       isHasParent = true
     }
@@ -435,10 +313,10 @@ const isVisited = (entityRelation, visited) => {
 
 const convertERToLogical = (ERSchema) => {
   let logicalSchema = []
-  const shapes = ERSchema.shapes
-  for (let i = 0; i < shapes.length; i++) {
-    if (['Entity', 'WeakEntity'].includes(shapes[i].type)) {
-      const columnFamilySet = createFamily(shapes[i],logicalSchema)
+  const entityRelations = ERSchema.entityRelations
+  for (let i = 0; i < entityRelations.length; i++) {
+    if (['Entity', 'WeakEntity'].includes(entityRelations[i].type)) {
+      const columnFamilySet = createFamily(entityRelations[i],logicalSchema)
       logicalSchema = mergeLogicalSchema(columnFamilySet, logicalSchema)
     }
   }
@@ -452,8 +330,8 @@ const findParentArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'ChildrenSpecialization') {
-        specializationShape = ERSchema.shapes.find(o => o.id === connector.from)
-        parentEntity = ERSchema.shapes.find(o => o.id === specializationShape.parentID)
+        specializationShape = ERSchema.entityRelations.find(o => o.id === connector.from)
+        parentEntity = ERSchema.entityRelations.find(o => o.id === specializationShape.parentID)
         parentArray.push(parentEntity);
       }
       else if (connector.type === 'RelationConnector') {
@@ -462,7 +340,7 @@ const findParentArray = (entityRelation) => {
         if (entityRelation.id === connector.to) targetRelation = connector.from
         else targetRelation = connector.to
 
-        let relation = ERSchema.shapes.find(o => o.id === targetRelation);
+        let relation = ERSchema.entityRelations.find(o => o.id === targetRelation);
         let connectorTo;
         
         if (relation.type == 'Relationship') {
@@ -471,12 +349,12 @@ const findParentArray = (entityRelation) => {
           else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
-            parentArray.push(ERSchema.shapes.find(o => o.id === connectorTo.to))
+            parentArray.push(ERSchema.entityRelations.find(o => o.id === connectorTo.to))
           }
           
           if (entityFromCardinality === 'One' && connector.participation === 'Partial'
               && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
-            parentArray.push(ERSchema.shapes.find(o => o.id === connectorTo.to))
+            parentArray.push(ERSchema.entityRelations.find(o => o.id === connectorTo.to))
           }
         }
       }
@@ -504,7 +382,7 @@ const findRelationArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'ChildrenSpecialization') {
-        specializationShape = ERSchema.shapes.find(o => o.id === connector.from)
+        specializationShape = ERSchema.entityRelations.find(o => o.id === connector.from)
         relationArray.push({
           type: 'Specialization',
           relation: specializationShape,
@@ -518,7 +396,7 @@ const findRelationArray = (entityRelation) => {
         if (entityRelation.id === connector.to) targetRelation = connector.from
         else targetRelation = connector.to
 
-        let relationReference = ERSchema.shapes.find(o => o.id === targetRelation);
+        let relationReference = ERSchema.entityRelations.find(o => o.id === targetRelation);
         let relation = JSON.parse(JSON.stringify(relationReference)); 
         let connectorTo;
 
@@ -593,7 +471,6 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
 
   // Soalnya ngedouble kalo relation
   if (!columnFamily || entityRelation.type == 'Relationship') {
-    // console.log('masuuk', entityRelation.label)
     columnFamily = {}
   }
 
@@ -603,20 +480,24 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     // Here process parentnya first tapi nanti dlu ya
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const parentArray = findParentArray(entityRelation)
-      console.log('parent array', entityRelation.label)
-      console.log(parentArray)
+      // console.log('parent array', entityRelation.label)
+      // console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
         columnFamilySet = mergeLogicalSchema(columnFamilySet, createFamily(entity, logicalSchema))
       })
     }
 
-    console.log('Process', entityRelation.label)
+    // console.log('Process', entityRelation.label)
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
-    columnFamily.key = [...defineKey(entityRelation, columnFamilySet)];
+    const attributes = [...defineKey(entityRelation, columnFamilySet)];
+    columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
+
     if (isHasParent) {
       columnFamily.parentID = getParentID(parentID, columnFamilySet);
+      const parent = columnFamilySet.find(o => o.id === parentID)
+      columnFamily.attributes = mergeArray(columnFamily.attributes, parent.attributes || [])
       isHasParent = false;
     }
     if (!columnFamily.attributes) {
@@ -638,8 +519,8 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     //Process for the relation
     if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const relationDetailArray = findRelationArray(entityRelation)
-      console.log('relation array detail')
-      console.log(relationDetailArray)
+      // console.log('relation array detail')
+      // console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
         columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
@@ -656,8 +537,12 @@ const isSameKey = (columnFamily1, columnFamily2) => {
   if (columnFamily1.parentID === columnFamily2.parentID) {
     result = true
   }
-  result = columnFamily2.key.every(val => columnFamily1.key.includes(val));
-  if (!result) result = columnFamily1.key.every(val => columnFamily2.key.includes(val));
+
+  const keysCF1 = getArrayKey(columnFamily1.attributes)
+  const keysCF2 = getArrayKey(columnFamily2.attributes)
+
+  result = keysCF2.every(val => keysCF1.includes(val));
+  if (!result) result = keysCF1.every(val => keysCF2.includes(val));
   return result
 }
 
@@ -717,6 +602,8 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   let newLogicalSchema = []
   let newColumnFamily = undefined;
 
+
+
   if (columnFamily1.isFromRelationship) {
     newColumnFamily = duplicateArray(columnFamily1)
   }
@@ -724,6 +611,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
     const preexistentColumnFamily = logicalSchema.find(o => o.id === columnFamily1.id);
     if (preexistentColumnFamily.isAssociativeEntity) newColumnFamily = preexistentColumnFamily
   }
+
   if (!newColumnFamily) {
     const temporaryEntity = {
       id: `temporary${columnFamily1.id}`,
@@ -759,7 +647,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
     newColumnFamily.parentID = columnFamily2.id
-    newColumnFamily.key = [...columnFamily2.key]
+    // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
   // Coba2 lagi ya nanti
@@ -768,6 +656,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // }
   newLogicalSchema = mergeLogicalSchema(newLogicalSchema, [newColumnFamily, columnFamily2])
   // [...newLogicalSchema, newColumnFamily, columnFamily2]
+
   return newLogicalSchema
 }
 
@@ -782,9 +671,10 @@ const convertAttribute = (columnFamily, attribute) => {
   if (attribute.type === 'Composite') {
     let newColumFamily = {}
     newColumFamily.label = `${columnFamily.label}-${attribute.label}`
+    newColumFamily.id = `${columnFamily.label}-${attribute.label}`
     newColumFamily.parentID = columnFamily.parentID || columnFamily.id
-    newColumFamily.key = [...columnFamily.key]
-    newColumFamily.attributes = []
+    newColumFamily.attributes = filterKey(columnFamily.attributes)
+
     if (attribute.children) {
       attribute.children.forEach(child => {
         additionalColumnFamily = [...additionalColumnFamily,
@@ -797,27 +687,30 @@ const convertAttribute = (columnFamily, attribute) => {
     const column = {}
     column.label = attribute.label
     getColumnType(column, attribute)
-    columnFamily.attributes.push(column)
+    
+    columnFamily.attributes = mergeArray([column], columnFamily.attributes)
   }
   return additionalColumnFamily
 }
 
 const defineKey = (entityRelation, logicalSchema) => {
   let key = [];
-  if (entityRelation.key) {
-    key = duplicateArray(entityRelation.key)
+  let ERKeys = getArrayKey(entityRelation.attributes)
+
+  if (ERKeys.length > 0) {
+    key = duplicateArray(ERKeys)
   }
   if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-    key = [...key, ...findParentKey(entityRelation, logicalSchema)]
+    key = [...ERKeys, ...findParentKey(entityRelation, logicalSchema)]
   }
   else { // if thre type is Relationship
-    key = [...key, ...findRelationshipKey(entityRelation, logicalSchema)]
-    console.log(key, 'keyy')
+    key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema)]
+    // console.log(key, 'keyy')
   }
   if (key.length < 1 && !isHasParent) {
     key = [`id_${entityRelation.label}`]
   }
-  return key
+  return arrayKeysToAttribute(key)
 } 
 
 const print = (myObject) => {
