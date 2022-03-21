@@ -1,5 +1,5 @@
 // One Partial - One Total (OK) Pass
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -74,7 +74,7 @@ const ERSchema = {
 }
 
 // Simple One to Many (OK) Pass
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -149,7 +149,7 @@ const ERSchema = {
 }
 
 // Game
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -255,8 +255,8 @@ const ERSchema = {
   ],
 }
 
-// ERSchema One to many to many
-const ERSchema = {
+// ERModel One to many to many
+const ERModel = {
   entityRelations: [
     {
       id: 3,
@@ -382,7 +382,7 @@ const ERSchema = {
 }
 
 // Specialization No Total (OK) PASS
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -462,7 +462,7 @@ const ERSchema = {
 }
 
 // Specialization Total & One to many (OK) PASS
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 2,
@@ -583,7 +583,7 @@ const ERSchema = {
 }
 
 // Asssociative Relation (OK) PASS
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -696,7 +696,7 @@ const ERSchema = {
 }
 
 // Contoh poffo mello (OK) PASS
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 6,
@@ -981,7 +981,7 @@ const ERSchema = {
 }
 
 // Simplified composite attribute (OK) PASS
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -1008,7 +1008,7 @@ const ERSchema = {
 }
 
 // Composite attribute (OK) Pass
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -1049,7 +1049,7 @@ const ERSchema = {
 }
 
 // Weak Entity (OK)
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -1124,7 +1124,7 @@ const ERSchema = {
 }
 
 // Reflexive
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,

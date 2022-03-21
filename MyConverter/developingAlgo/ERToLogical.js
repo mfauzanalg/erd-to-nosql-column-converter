@@ -1,4 +1,4 @@
-const ERSchema = {
+const ERModel = {
   entityRelations: [
     {
       id: 0,
@@ -198,9 +198,9 @@ const findParentKey = (entity, logicalSchema) => {
 
   while (!(found) && connectors && i < connectors.length) {
     if (connectors[i].type === 'ChildrenSpecialization') {
-      specializationShape = ERSchema.entityRelations.find(o => o.id === connectors[i].from)
+      specializationShape = ERModel.entityRelations.find(o => o.id === connectors[i].from)
       if (specializationShape.isTotal) {
-        parentEntity = ERSchema.entityRelations.find(o => o.id === specializationShape.parentID)
+        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.parentID)
         key = getArrayKey(parentEntity.attributes)
         isHasParent = true
         parentID = specializationShape.parentID
@@ -214,7 +214,7 @@ const findParentKey = (entity, logicalSchema) => {
       if (entity.id === connectors[i].to) targetRelation = connectors[i].from
       else targetRelation = connectors[i].to
 
-      let relation = ERSchema.entityRelations.find(o => o.id === targetRelation);
+      let relation = ERModel.entityRelations.find(o => o.id === targetRelation);
 
       if (relation.type == 'Relationship' || relation.type == 'WeakRelationship') {
 
@@ -265,9 +265,9 @@ const isVisited = (entityRelation, visited) => {
   return visited.includes(entityRelation.id)
 }
 
-const convertERToLogical = (ERSchema) => {
+const convertERToLogical = (ERModel) => {
   let logicalSchema = []
-  const entityRelations = ERSchema.entityRelations
+  const entityRelations = ERModel.entityRelations
   for (let i = 0; i < entityRelations.length; i++) {
     if (['Entity', 'WeakEntity'].includes(entityRelations[i].type)) {
       const columnFamilySet = createFamily(entityRelations[i],logicalSchema)
@@ -284,8 +284,8 @@ const findParentArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'ChildrenSpecialization') {
-        specializationShape = ERSchema.entityRelations.find(o => o.id === connector.from)
-        parentEntity = ERSchema.entityRelations.find(o => o.id === specializationShape.parentID)
+        specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
+        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.parentID)
         parentArray.push(parentEntity);
       }
       else if (connector.type === 'RelationConnector') {
@@ -294,7 +294,7 @@ const findParentArray = (entityRelation) => {
         if (entityRelation.id === connector.to) targetRelation = connector.from
         else targetRelation = connector.to
 
-        let relation = ERSchema.entityRelations.find(o => o.id === targetRelation);
+        let relation = ERModel.entityRelations.find(o => o.id === targetRelation);
         let connectorTo;
         
         if (relation.type == 'Relationship') {
@@ -303,12 +303,12 @@ const findParentArray = (entityRelation) => {
           else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
-            parentArray.push(ERSchema.entityRelations.find(o => o.id === connectorTo.to))
+            parentArray.push(ERModel.entityRelations.find(o => o.id === connectorTo.to))
           }
           
           if (entityFromCardinality === 'One' && connector.participation === 'Partial'
               && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
-            parentArray.push(ERSchema.entityRelations.find(o => o.id === connectorTo.to))
+            parentArray.push(ERModel.entityRelations.find(o => o.id === connectorTo.to))
           }
         }
       }
@@ -336,7 +336,7 @@ const findRelationArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'ChildrenSpecialization') {
-        specializationShape = ERSchema.entityRelations.find(o => o.id === connector.from)
+        specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
         relationArray.push({
           type: 'Specialization',
           relation: specializationShape,
@@ -350,7 +350,7 @@ const findRelationArray = (entityRelation) => {
         if (entityRelation.id === connector.to) targetRelation = connector.from
         else targetRelation = connector.to
 
-        let relationReference = ERSchema.entityRelations.find(o => o.id === targetRelation);
+        let relationReference = ERModel.entityRelations.find(o => o.id === targetRelation);
         let relation = JSON.parse(JSON.stringify(relationReference)); 
         let connectorTo;
 
@@ -671,9 +671,9 @@ const print = (myObject) => {
   console.log(JSON.stringify(myObject, null, 4));
 }
 
-// convertERToLogical(ERSchema);
-print(convertERToLogical(ERSchema));
-// console.log(convertERToLogical(ERSchema));
+// convertERToLogical(ERModel);
+print(convertERToLogical(ERModel));
+// console.log(convertERToLogical(ERModel));
 
 
 // Yang blm
