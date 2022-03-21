@@ -424,7 +424,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
   let i = 0
   let found = false
   if (entity.isTemporaryEntity) {
-    columnFamily.sharedColumn = getSharedID(entity.sharedColumn)
+    columnFamily.sharedColumn = getSharedID(entity.sharedColumn, logicalSchema)
   }
 
   while (!(found) && connectors && i < connectors.length) {
@@ -433,7 +433,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
         key = getArrayKey(parentEntity.attributes)
-        columnFamily.sharedColumn = getSharedID(specializationShape.superER)
+        columnFamily.sharedColumn = getSharedID(specializationShape.superER, logicalSchema)
         found = true
       }
     }
@@ -459,7 +459,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
             key = getArrayKey(entityAcross.attributes)
-            columnFamily.sharedColumn = getSharedID(entityAcross)
+            columnFamily.sharedColumn = getSharedID(entityAcross, logicalSchema)
           }
         }
       }
@@ -481,7 +481,7 @@ const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
       key = getArrayKey(parent.attributes)
-      columnFamily.sharedColumn = getSharedID(parent);
+      columnFamily.sharedColumn = getSharedID(parent, logicalSchema);
     }
     i += 1
   }
@@ -544,11 +544,12 @@ const findParentArray = (entityRelation) => {
   return parentArray
 }
 
-const getSharedID = (entityRelation) => {
+const getSharedID = (entityRelation, logicalSchema) => {
+  const columnfamily = logicalSchema.find(o => o.id == entityRelation.id)
   if (entityRelation && entityRelation.sharedColumn) {
-    return getSharedID(entityRelation.sharedColumn)
+    return getSharedID(entityRelation.sharedColumn, logicalSchema)
   } 
-  else return entityRelation
+  else return columnfamily
 }
 
 const duplicateArray = (array) => {
