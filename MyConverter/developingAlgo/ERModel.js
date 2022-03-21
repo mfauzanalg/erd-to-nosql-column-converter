@@ -718,8 +718,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Bogor',
           type: 'Regular',
-          label: 'Bogor'
         },
       ],
     },
@@ -736,8 +736,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'id_1',
           type: 'Key',
-          label: 'id_1'
         },
       ],
     },
@@ -913,12 +913,12 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Plat',
           type: 'Key',
-          label: 'Plat'
         },
         {
+          label: 'Color',
           type: 'Regular',
-          label: 'Color'
         }
       ],
     },
@@ -972,8 +972,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Bogor',
           type: 'Regular',
-          label: 'Bogor'
         },
       ],
     },

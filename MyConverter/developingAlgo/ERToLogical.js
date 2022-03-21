@@ -20,8 +20,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Bogor',
           type: 'Regular',
-          label: 'Bogor'
         },
       ],
     },
@@ -38,8 +38,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'id_1',
           type: 'Key',
-          label: 'id_1'
         },
       ],
     },
@@ -215,12 +215,12 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Plat',
           type: 'Key',
-          label: 'Plat'
         },
         {
+          label: 'Color',
           type: 'Regular',
-          label: 'Color'
         }
       ],
     },
@@ -274,8 +274,8 @@ const ERModel = {
       ],
       attributes: [
         {
+          label: 'Bekasi',
           type: 'Regular',
-          label: 'Bogor'
         },
       ],
     },
@@ -302,8 +302,8 @@ const createReference = (ERSchema) => {
 
 let visited = []
 let artificialID = 0;
-let parentID = 0;
-let isHasParent = false;
+let sharedColumn = 0;
+let isSharedKey = false;
 
 
 const getArrayKey = (attributes) => {
@@ -331,14 +331,14 @@ const arrayKeysToAttribute = (keys) => {
   keys?.forEach(key => {
     arrayAttr.push ({
       label: key,
-      isKey: true,
+      type: "Key",
     })
   })
   return arrayAttr
 }
 
 const stringifyCircularObject = (key, value) => {
-  if (key == 'fromER' || key == 'toER' || key == 'super' || key == 'sharedID') { return `reference to id ${value.id}`;}
+  if (key == 'fromER' || key == 'toER' || key == 'super' || key == 'sharedColumn') { return `reference to id ${value.id}`;}
   else {return value;}
 }
 
@@ -346,9 +346,9 @@ const mergeLogicalSchema = (logical1, logical2) => {
   let newLogicalSchema = [...logical1, ...logical2]
   
   newLogicalSchema = newLogicalSchema.filter((value, index) => {
-    const _value = JSON.stringify(value);
+    const _value = JSON.stringify(value, stringifyCircularObject);
     return index === newLogicalSchema.findIndex(newLogicalSchema => {
-      return JSON.stringify(newLogicalSchema) === _value;
+      return JSON.stringify(newLogicalSchema, stringifyCircularObject) === _value;
     });
   });
 
@@ -359,9 +359,9 @@ const mergeArray = (arr1, arr2) => {
   let newArr = [...arr1, ...arr2]
   
   newArr = newArr.filter((value, index) => {
-    const _value = JSON.stringify(value);
+    const _value = JSON.stringify(value, stringifyCircularObject);
     return index === newArr.findIndex(newArr => {
-      return JSON.stringify(newArr) === _value;
+      return JSON.stringify(newArr, stringifyCircularObject) === _value;
     });
   });
 
@@ -426,8 +426,8 @@ const findParentKey = (entity, logicalSchema) => {
   let i = 0
   let found = false
   if (entity.isTemporaryEntity) {
-    isHasParent = true
-    parentID = entity.parentID
+    isSharedKey = true
+    sharedColumn = entity.sharedColumn
   }
 
   while (!(found) && connectors && i < connectors.length) {
@@ -436,8 +436,8 @@ const findParentKey = (entity, logicalSchema) => {
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
         key = getArrayKey(parentEntity.attributes)
-        isHasParent = true
-        parentID = specializationShape.superID
+        isSharedKey = true
+        sharedColumn = specializationShape.superER
         found = true
       }
     }
@@ -463,8 +463,8 @@ const findParentKey = (entity, logicalSchema) => {
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
             key = getArrayKey(entityAcross.attributes)
-            isHasParent = true
-            parentID = entityAcrossID
+            isSharedKey = true
+            sharedColumn = entityAcross
           }
         }
       }
@@ -486,8 +486,8 @@ const findRelationshipKey = (relationship, logicalSchema) => {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
       key = getArrayKey(parent.attributes)
-      parentID = parent.id
-      isHasParent = true
+      sharedColumn = parent
+      isSharedKey = true
     }
     i += 1
   }
@@ -550,16 +550,15 @@ const findParentArray = (entityRelation) => {
   return parentArray
 }
 
-const getParentID = (id, logicalSchema) => {
-  const parent = logicalSchema.find(o => o.id === id)
-  if (parent && (parent.parentID || parent.parentID == 0)) {
-    return getParentID(parent.parentID, logicalSchema)
+const getSharedID = (entityRelation) => {
+  if (entityRelation && entityRelation.sharedColumn) {
+    return getSharedID(entityRelation.sharedColumn)
   } 
-  else return id
+  else return entityRelation
 }
 
 const duplicateArray = (array) => {
-  return JSON.parse(JSON.stringify(array)); 
+  return structuredClone(array)
 }
 
 const findRelationArray = (entityRelation) => {
@@ -679,11 +678,10 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     const attributes = [...defineKey(entityRelation, columnFamilySet)];
     columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
 
-    if (isHasParent) {
-      columnFamily.parentID = getParentID(parentID, columnFamilySet);
-      const parent = columnFamilySet.find(o => o.id === parentID)
-      columnFamily.attributes = mergeArray(columnFamily.attributes, parent.attributes || [])
-      isHasParent = false;
+    if (isSharedKey) {
+      columnFamily.sharedColumn = getSharedID(sharedColumn);
+      columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.sharedColumn?.attributes) || [])
+      isSharedKey = false;
     }
     if (!columnFamily.attributes) {
       columnFamily.attributes = [];
@@ -719,7 +717,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
 
 const isSameKey = (columnFamily1, columnFamily2) => {
   let result = false
-  if (columnFamily1.parentID === columnFamily2.parentID) {
+  if (columnFamily1.sharedColumn?.id === columnFamily2.sharedColumn?.id) {
     result = true
   }
 
@@ -803,7 +801,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
       label: `${columnFamily1.label}-${columnFamily2.label}`,
       type: 'Entity',
       isTemporaryEntity: true,
-      parentID: columnFamily1.id,
+      sharedColumn: columnFamily1,
       attributes: []
     }
   
@@ -813,7 +811,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   let auxAttribute = {};
   auxAttribute.label = columnFamily2.label
   auxAttribute.isAuxilary = true;
-  auxAttribute.isKey = true;
+  auxAttribute.type = "Key";
   auxAttribute.artificialID = artificialID;
   newColumnFamily.attributes.push(auxAttribute)
   
@@ -823,7 +821,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
     interAttribute.label = columnFamily1.label
     interAttribute.isIntermediary = true;
     interAttribute.artificialID = artificialID;
-    interAttribute.isKey = true;
+    interAttribute.type = "Key";
     columnFamily2.attributes.push(interAttribute)
   }
   
@@ -831,7 +829,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
-    newColumnFamily.parentID = columnFamily2.id
+    newColumnFamily.sharedColumn = columnFamily2
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
@@ -847,7 +845,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
 // Masih harus dikerjain yaaa
 const getColumnType = (column, attribute) => {
-  if (attribute.type == 'Key') column.isKey = true
+  if (attribute.type == 'Key') column.type = 'Key'
   else column.type = 'Regular'
 }
 
@@ -857,7 +855,7 @@ const convertAttribute = (columnFamily, attribute) => {
     let newColumFamily = {}
     newColumFamily.label = `${columnFamily.label}-${attribute.label}`
     newColumFamily.id = `${columnFamily.label}-${attribute.label}`
-    newColumFamily.parentID = columnFamily.parentID || columnFamily.id
+    newColumFamily.sharedColumn = columnFamily.sharedColumn || columnFamily
     newColumFamily.attributes = filterKey(columnFamily.attributes)
 
     if (attribute.children) {
@@ -892,7 +890,7 @@ const defineKey = (entityRelation, logicalSchema) => {
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema)]
     // console.log(key, 'keyy')
   }
-  if (key.length < 1 && !isHasParent) {
+  if (key.length < 1 && !isSharedKey) {
     key = [`id_${entityRelation.label}`]
   }
   return arrayKeysToAttribute(key)
@@ -909,7 +907,8 @@ const print2 = (myObject) => {
 createReference(ERModel)
 // console.log(ERModel)
 // convertERToLogical(ERModel);
-print(convertERToLogical(ERModel));
+// print(convertERToLogical(ERModel));
+print2(convertERToLogical(ERModel));
 // console.log(convertERToLogical(ERModel));
 
 
