@@ -282,6 +282,24 @@ const ERModel = {
   ],
 }
 
+const v8 = require('v8');
+
+const structuredClone = obj => {
+  return v8.deserialize(v8.serialize(obj));
+};
+
+const createReference = (ERSchema) => {
+  ERSchema.entityRelations.forEach(er => {
+    if (er.superID || er.superID == 0) {
+      er.superER = ERSchema.entityRelations.find(o => o.id == er.superID)
+    }
+    er.connectors.forEach(conn => {
+      conn.fromER = ERSchema.entityRelations.find(o => o.id == conn.from)
+      conn.toER = ERSchema.entityRelations.find(o => o.id == conn.to)
+    })
+  })
+}
+
 let visited = []
 let artificialID = 0;
 let parentID = 0;
@@ -319,6 +337,11 @@ const arrayKeysToAttribute = (keys) => {
   return arrayAttr
 }
 
+const stringifyCircularObject = (key, value) => {
+  if (key == 'fromER' || key == 'toER' || key == 'super' || key == 'sharedID') { return `reference to id ${value.id}`;}
+  else {return value;}
+}
+
 const mergeLogicalSchema = (logical1, logical2) => {
   let newLogicalSchema = [...logical1, ...logical2]
   
@@ -345,6 +368,7 @@ const mergeArray = (arr1, arr2) => {
   return newArr
 }
 
+// Unused
 const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
   let found = false;
   let i = 0;
@@ -408,9 +432,9 @@ const findParentKey = (entity, logicalSchema) => {
 
   while (!(found) && connectors && i < connectors.length) {
     if (connectors[i].type === 'Specialization') {
-      specializationShape = ERModel.entityRelations.find(o => o.id === connectors[i].from)
+      specializationShape = connectors[i].fromER
       if (specializationShape.isTotal) {
-        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.superID)
+        parentEntity = specializationShape.superER
         key = getArrayKey(parentEntity.attributes)
         isHasParent = true
         parentID = specializationShape.superID
@@ -418,13 +442,12 @@ const findParentKey = (entity, logicalSchema) => {
       }
     }
     else if (connectors[i].type === 'RelationConnector') {
-      let targetRelation;
+      let relation;
       let connectorTo;
       
-      if (entity.id === connectors[i].to) targetRelation = connectors[i].from
-      else targetRelation = connectors[i].to
+      if (entity.id === connectors[i].to) relation = connectors[i].fromER
+      else relation = connectors[i].toER
 
-      let relation = ERModel.entityRelations.find(o => o.id === targetRelation);
 
       if (relation.type == 'Relationship' || relation.type == 'WeakRelationship') {
 
@@ -494,31 +517,30 @@ const findParentArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'Specialization') {
-        specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
-        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.superID)
+        specializationShape = connector.fromER
+        parentEntity = specializationShape.superER
         parentArray.push(parentEntity);
       }
       else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
-        let targetRelation
-        if (entityRelation.id === connector.to) targetRelation = connector.from
-        else targetRelation = connector.to
-
-        let relation = ERModel.entityRelations.find(o => o.id === targetRelation);
+        let relation
         let connectorTo;
-        
-        if (relation.type == 'Relationship') {
 
+        if (entityRelation.id === connector.to) relation = connector.fromER
+        else relation = connector.toER
+
+
+        if (relation.type == 'Relationship') {
           if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
-            parentArray.push(ERModel.entityRelations.find(o => o.id === connectorTo.to))
+            parentArray.push(connectorTo.toER)
           }
           
           if (entityFromCardinality === 'One' && connector.participation === 'Partial'
               && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
-            parentArray.push(ERModel.entityRelations.find(o => o.id === connectorTo.to))
+            parentArray.push(connectorTo.toER)
           }
         }
       }
@@ -546,7 +568,7 @@ const findRelationArray = (entityRelation) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'Specialization') {
-        specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
+        specializationShape = connector.fromER
         relationArray.push({
           type: 'Specialization',
           relation: specializationShape,
@@ -557,11 +579,10 @@ const findRelationArray = (entityRelation) => {
       else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
         let targetRelation
-        if (entityRelation.id === connector.to) targetRelation = connector.from
-        else targetRelation = connector.to
+        if (entityRelation.id === connector.to) targetRelation = connector.fromER
+        else targetRelation = connector.toER
 
-        let relationReference = ERModel.entityRelations.find(o => o.id === targetRelation);
-        let relation = JSON.parse(JSON.stringify(relationReference)); 
+        let relation = structuredClone(targetRelation)
         let connectorTo;
 
         if (relation.type == 'ReflexiveRelationship') {
@@ -619,9 +640,9 @@ const findRelationArray = (entityRelation) => {
 
 const removeDuplicate = (arr) => {
   const uniqueArray = arr.filter((value, index) => {
-    const _value = JSON.stringify(value);
+    const _value = JSON.stringify(value, stringifyCircularObject);
     return index === arr.findIndex(obj => {
-      return JSON.stringify(obj) === _value;
+      return JSON.stringify(obj, stringifyCircularObject) === _value;
     });
   });
 
@@ -878,9 +899,15 @@ const defineKey = (entityRelation, logicalSchema) => {
 } 
 
 const print = (myObject) => {
-  console.log(JSON.stringify(myObject, null, 4));
+  console.log(JSON.stringify(myObject, null, 2));
 }
 
+const print2 = (myObject) => {
+  console.log(JSON.stringify(myObject, stringifyCircularObject, 2));
+}
+
+createReference(ERModel)
+// console.log(ERModel)
 // convertERToLogical(ERModel);
 print(convertERToLogical(ERModel));
 // console.log(convertERToLogical(ERModel));
