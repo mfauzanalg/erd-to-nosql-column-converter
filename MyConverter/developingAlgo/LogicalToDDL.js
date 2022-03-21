@@ -53,7 +53,7 @@ const logicalModel = {
           "artificialID": 0
         }
       ],
-      "parentID": 0,
+      "superID": 0,
       "isFromRelationship": true
     }
   ]

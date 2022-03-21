@@ -1,53 +1,203 @@
 const ERModel = {
   entityRelations: [
     {
-      id: 0,
-      label: 'Person',
+      id: 6,
+      label: 'B',
       type: 'Entity',
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Name'
-        },
-        {
-          type: 'Regular',
-          label: 'Address'
-        }
-      ],
       connectors: [
         {
+          type: 'Specialization',
+          from: 12,
+          to: 6,
+        },
+        {
           type: 'RelationConnector',
-          from: 2,
-          to: 0,
+          from: 8,
+          to: 6,
           cardinality: 'One',
           participation: 'Total'
         },
-      ]
+      ],
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Bogor'
+        },
+      ],
     },
     {
-      id: 2,
-      label: 'Have',
+      id: 1,
+      label: 'A',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 12,
+          to: 1,
+        },
+      ],
+      attributes: [
+        {
+          type: 'Key',
+          label: 'id_1'
+        },
+      ],
+    },
+    {
+      id: 12,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: true,
+      isDisjoint: true,
+      superID: 1,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 12,
+          to: 1,
+        },
+        {
+          type: 'Specialization',
+          from: 12,
+          to: 6,
+        },
+        {
+          type: 'Specialization',
+          from: 12,
+          to: 7,
+        },
+        {
+          type: 'Specialization',
+          from: 12,
+          to: 4,
+        },
+      ],
+    },
+    {
+      id: 7,
+      label: 'C',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'Specialization',
+          from: 12,
+          to: 7,
+        },
+      ],
+    },
+    {
+      id: 8,
+      label: 'R1',
       type: 'Relationship',
       connectors: [
         {
           type: 'RelationConnector',
-          from: 2,
-          to: 0,
+          from: 8,
+          to: 6,
           cardinality: 'One',
           participation: 'Total'
+        },
+        {
+          type: 'RelationConnector',
+          from: 8,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        }
+      ]
+    },
+    {
+      id: 0,
+      label: 'E',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 8,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
+        },
+      ]
+    },
+    {
+      id: 5,
+      label: 'R2',
+      type: 'Relationship',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 4,
+          cardinality: 'One',
+          participation: 'Total',
+        },
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 2,
+          cardinality: 'One',
+          participation: 'Partial',
+        }
+      ],
+    },
+    {
+      id: 2,
+      label: 'R3',
+      type: 'AssociativeEntity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 2,
+          cardinality: 'One',
+          participation: 'Partial',
+        },
+        {
+          type: 'RelationConnector',
+          from: 2,
+          to: 0,
+          cardinality: 'Many',
+          participation: 'Partial'
         },
         {
           type: 'RelationConnector',
           from: 2,
           to: 3,
           cardinality: 'Many',
-          participation: 'Total'
+          participation: 'Partial'
         }
       ]
     },
     {
+      id: 4,
+      label: 'D',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'RelationConnector',
+          from: 5,
+          to: 4,
+          cardinality: 'One',
+          participation: 'Total',
+        },
+        {
+          type: 'Specialization',
+          from: 12,
+          to: 4,
+        },
+      ]
+    },
+    {
       id: 3,
-      label: 'Car',
+      label: 'H',
       type: 'Entity',
       connectors: [
         {
@@ -55,7 +205,12 @@ const ERModel = {
           from: 2,
           to: 3,
           cardinality: 'Many',
-          participation: 'Total'
+          participation: 'Partial'
+        },
+        {
+          type: 'ParentSpecialization',
+          from: 11,
+          to: 3,
         },
       ],
       attributes: [
@@ -67,6 +222,61 @@ const ERModel = {
           type: 'Regular',
           label: 'Color'
         }
+      ],
+    },
+    {
+      id: 11,
+      label: 'Special',
+      type: 'Specialization',
+      isTotal: false,
+      isDisjoint: true,
+      superID: 3,
+      connectors: [
+        {
+          type: 'ParentSpecialization',
+          from: 11,
+          to: 3,
+        },
+        {
+          type: 'Specialization',
+          from: 11,
+          to: 9,
+        },
+        {
+          type: 'Specialization',
+          from: 11,
+          to: 10,
+        },
+      ],
+    },
+    {
+      id: 10,
+      label: 'G',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'Specialization',
+          from: 11,
+          to: 10,
+        },
+      ],
+    },
+    {
+      id: 9,
+      label: 'F',
+      type: 'Entity',
+      connectors: [
+        {
+          type: 'Specialization',
+          from: 11,
+          to: 9,
+        },
+      ],
+      attributes: [
+        {
+          type: 'Regular',
+          label: 'Bogor'
+        },
       ],
     },
   ],
@@ -197,13 +407,13 @@ const findParentKey = (entity, logicalSchema) => {
   }
 
   while (!(found) && connectors && i < connectors.length) {
-    if (connectors[i].type === 'ChildrenSpecialization') {
+    if (connectors[i].type === 'Specialization') {
       specializationShape = ERModel.entityRelations.find(o => o.id === connectors[i].from)
       if (specializationShape.isTotal) {
-        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.parentID)
+        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.superID)
         key = getArrayKey(parentEntity.attributes)
         isHasParent = true
-        parentID = specializationShape.parentID
+        parentID = specializationShape.superID
         found = true
       }
     }
@@ -283,9 +493,9 @@ const findParentArray = (entityRelation) => {
   let connectors = entityRelation.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
-      if (connector.type === 'ChildrenSpecialization') {
+      if (connector.type === 'Specialization') {
         specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
-        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.parentID)
+        parentEntity = ERModel.entityRelations.find(o => o.id === specializationShape.superID)
         parentArray.push(parentEntity);
       }
       else if (connector.type === 'RelationConnector') {
@@ -335,12 +545,12 @@ const findRelationArray = (entityRelation) => {
   let connectors = entityRelation.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
-      if (connector.type === 'ChildrenSpecialization') {
+      if (connector.type === 'Specialization') {
         specializationShape = ERModel.entityRelations.find(o => o.id === connector.from)
         relationArray.push({
           type: 'Specialization',
           relation: specializationShape,
-          entityAcrossId: specializationShape.parentID
+          entityAcrossId: specializationShape.superID
         })
       } 
 
@@ -543,7 +753,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
       // console.log(relationDetail)
       // console.log(columnFamily)
       // console.log(logicalSchema)
-      const parentColumnFamily = logicalSchema.find(o => o.id === relationDetail.relation.parentID);
+      const parentColumnFamily = logicalSchema.find(o => o.id === relationDetail.relation.superID);
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalSchema)]
     }
   }

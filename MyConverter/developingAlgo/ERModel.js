@@ -408,7 +408,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 2,
         },
@@ -427,7 +427,7 @@ const ERModel = {
       type: 'Specialization',
       isTotal: false,
       isDisjoint: true,
-      parentID: 0,
+      superID: 0,
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -435,12 +435,12 @@ const ERModel = {
           to: 0,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 2,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 3,
         },
@@ -452,7 +452,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 3,
         },
@@ -470,7 +470,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 2,
         },
@@ -513,7 +513,7 @@ const ERModel = {
       type: 'Specialization',
       isTotal: true,
       isDisjoint: true,
-      parentID: 0,
+      superID: 0,
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -521,12 +521,12 @@ const ERModel = {
           to: 0,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 2,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 3,
         },
@@ -538,7 +538,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 1,
           to: 3,
         },
@@ -704,7 +704,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 6,
         },
@@ -747,7 +747,7 @@ const ERModel = {
       type: 'Specialization',
       isTotal: true,
       isDisjoint: true,
-      parentID: 1,
+      superID: 1,
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -755,17 +755,17 @@ const ERModel = {
           to: 1,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 6,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 7,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 4,
         },
@@ -777,7 +777,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 7,
         },
@@ -887,7 +887,7 @@ const ERModel = {
           participation: 'Total',
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 12,
           to: 4,
         },
@@ -928,7 +928,7 @@ const ERModel = {
       type: 'Specialization',
       isTotal: false,
       isDisjoint: true,
-      parentID: 3,
+      superID: 3,
       connectors: [
         {
           type: 'ParentSpecialization',
@@ -936,12 +936,12 @@ const ERModel = {
           to: 3,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 11,
           to: 9,
         },
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 11,
           to: 10,
         },
@@ -953,7 +953,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 11,
           to: 10,
         },
@@ -965,7 +965,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'ChildrenSpecialization',
+          type: 'Specialization',
           from: 11,
           to: 9,
         },
