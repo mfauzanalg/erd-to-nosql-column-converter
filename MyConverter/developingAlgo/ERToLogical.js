@@ -274,7 +274,7 @@ const ERModel = {
       ],
       attributes: [
         {
-          label: 'Bekasi',
+          label: 'Bogor',
           type: 'Regular',
         },
       ],
@@ -302,8 +302,6 @@ const createReference = (ERSchema) => {
 
 let visited = []
 let artificialID = 0;
-let sharedColumn = 0;
-let isSharedKey = false;
 
 
 const getArrayKey = (attributes) => {
@@ -420,14 +418,13 @@ const findColumnFamilyByID = (id, logicalSchema) => {
   return key
 }
 
-const findParentKey = (entity, logicalSchema) => {
+const findParentKey = (entity, logicalSchema, columnFamily) => {
   let connectors = entity.connectors
   let key = []
   let i = 0
   let found = false
   if (entity.isTemporaryEntity) {
-    isSharedKey = true
-    sharedColumn = entity.sharedColumn
+    columnFamily.sharedColumn = getSharedID(entity.sharedColumn)
   }
 
   while (!(found) && connectors && i < connectors.length) {
@@ -436,8 +433,7 @@ const findParentKey = (entity, logicalSchema) => {
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
         key = getArrayKey(parentEntity.attributes)
-        isSharedKey = true
-        sharedColumn = specializationShape.superER
+        columnFamily.sharedColumn = getSharedID(specializationShape.superER)
         found = true
       }
     }
@@ -463,8 +459,7 @@ const findParentKey = (entity, logicalSchema) => {
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
             key = getArrayKey(entityAcross.attributes)
-            isSharedKey = true
-            sharedColumn = entityAcross
+            columnFamily.sharedColumn = getSharedID(entityAcross)
           }
         }
       }
@@ -476,7 +471,7 @@ const findParentKey = (entity, logicalSchema) => {
   return key
 }
 
-const findRelationshipKey = (relationship, logicalSchema) => {
+const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
   let i = 0;
   let found = false;
   let key = []
@@ -486,8 +481,7 @@ const findRelationshipKey = (relationship, logicalSchema) => {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
       key = getArrayKey(parent.attributes)
-      sharedColumn = parent
-      isSharedKey = true
+      columnFamily.sharedColumn = getSharedID(parent);
     }
     i += 1
   }
@@ -675,14 +669,15 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     // console.log('Process', entityRelation.label)
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
-    const attributes = [...defineKey(entityRelation, columnFamilySet)];
+    const attributes = [...defineKey(entityRelation, columnFamilySet, columnFamily)];
     columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
 
-    if (isSharedKey) {
-      columnFamily.sharedColumn = getSharedID(sharedColumn);
-      columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.sharedColumn?.attributes) || [])
-      isSharedKey = false;
-    }
+    // if (isSharedKey) {
+    //   // columnFamily.sharedColumn = getSharedID(sharedColumn);
+    //   // columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.sharedColumn?.attributes) || []))
+    //   isSharedKey = false;
+    // }
+    
     if (!columnFamily.attributes) {
       columnFamily.attributes = [];
     }
@@ -876,7 +871,7 @@ const convertAttribute = (columnFamily, attribute) => {
   return additionalColumnFamily
 }
 
-const defineKey = (entityRelation, logicalSchema) => {
+const defineKey = (entityRelation, logicalSchema, columnFamily) => {
   let key = [];
   let ERKeys = getArrayKey(entityRelation.attributes)
 
@@ -884,13 +879,13 @@ const defineKey = (entityRelation, logicalSchema) => {
     key = duplicateArray(ERKeys)
   }
   if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-    key = [...ERKeys, ...findParentKey(entityRelation, logicalSchema)]
+    key = [...ERKeys, ...findParentKey(entityRelation, logicalSchema, columnFamily)]
   }
   else { // if thre type is Relationship
-    key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema)]
+    key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema, columnFamily)]
     // console.log(key, 'keyy')
   }
-  if (key.length < 1 && !isSharedKey) {
+  if (key.length < 1 && !entityRelation.isTemporaryEntity) {
     key = [`id_${entityRelation.label}`]
   }
   return arrayKeysToAttribute(key)
