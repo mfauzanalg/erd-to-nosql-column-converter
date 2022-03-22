@@ -432,7 +432,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
       specializationShape = connectors[i].fromER
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
-        key = getArrayKey(parentEntity.attributes)
+        // key = getArrayKey(parentEntity.attributes)
         columnFamily.sharedColumn = getSharedID(specializationShape.superER, logicalSchema)
         found = true
       }
@@ -458,7 +458,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
   
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (entityAcross) {
-            key = getArrayKey(entityAcross.attributes)
+            // key = getArrayKey(entityAcross.attributes)
             columnFamily.sharedColumn = getSharedID(entityAcross, logicalSchema)
           }
         }
@@ -480,7 +480,7 @@ const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
     if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
-      key = getArrayKey(parent.attributes)
+      // key = getArrayKey(parent.attributes)
       columnFamily.sharedColumn = getSharedID(parent, logicalSchema);
     }
     i += 1
@@ -667,7 +667,6 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
       })
     }
 
-    // console.log('Process', entityRelation.label)
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
     const attributes = [...defineKey(entityRelation, columnFamilySet, columnFamily)];
@@ -713,15 +712,20 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
 
 const isSameKey = (columnFamily1, columnFamily2) => {
   let result = false
-  if (columnFamily1.sharedColumn?.id === columnFamily2.sharedColumn?.id) {
+  if (columnFamily1.sharedColumn && columnFamily1.sharedColumn?.id === columnFamily2.sharedColumn?.id) {
     result = true
   }
+  // console.log("WOWWWW")
+  // console.log(result)
 
   const keysCF1 = getArrayKey(columnFamily1.attributes)
   const keysCF2 = getArrayKey(columnFamily2.attributes)
 
-  result = keysCF2.every(val => keysCF1.includes(val));
-  if (!result) result = keysCF1.every(val => keysCF2.includes(val));
+  if (keysCF1.length > 1 && keysCF2.length > 1) {
+    result = keysCF2.every(val => keysCF1.includes(val));
+    if (!result) result = keysCF1.every(val => keysCF2.includes(val));
+  }
+  
   return result
 }
 
@@ -734,6 +738,10 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
     if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
       newLogicalSchema.push(columFamilyFromRelation)
     }
+
+    // console.log('=============================================================================')
+    // console.log(columnFamily)
+    // console.log(columFamilyFromRelation)
 
     if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
       newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalSchema)]
@@ -780,7 +788,6 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // let withTemporary = false;
   let newLogicalSchema = []
   let newColumnFamily = undefined;
-
 
 
   if (columnFamily1.isFromRelationship) {
@@ -886,7 +893,7 @@ const defineKey = (entityRelation, logicalSchema, columnFamily) => {
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema, columnFamily)]
     // console.log(key, 'keyy')
   }
-  if (key.length < 1 && !entityRelation.isTemporaryEntity) {
+  if (key.length < 1 && !columnFamily.sharedColumn) {
     key = [`id_${entityRelation.label}`]
   }
   return arrayKeysToAttribute(key)
