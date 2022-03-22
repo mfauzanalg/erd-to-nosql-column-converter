@@ -459,13 +459,12 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
       let relation;
       let connectorTo;
       
-      if (entity.id === connectors[i].to) relation = connectors[i].fromER
+      if (entity == connectors[i].toER) relation = connectors[i].fromER
       else relation = connectors[i].toER
-
 
       if (relation.type == 'Relationship' || relation.type == 'WeakRelationship') {
 
-        if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
+        if (relation.connectors[0].toER == entity) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
 
         if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
@@ -496,7 +495,7 @@ const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
   const connectors = relationship.connectors
   while (!found && connectors && i < connectors.length) {
     if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
-      const parent = logicalSchema.find(o => o.id === connectors[i].to)
+      const parent = logicalSchema.find(o => o.id === connectors[i].toER.id)
       found = true
       // key = getArrayKey(parent.attributes)
       columnFamily.sharedColumn = getSharedCF(parent, logicalSchema);
@@ -538,11 +537,11 @@ const findParentArray = (entity) => {
         let relation
         let connectorTo;
 
-        if (entity.id === connector.to) relation = connector.fromER
+        if (entity === connector.toER) relation = connector.fromER
         else relation = connector.toER
 
         if (relation.type == 'Relationship') {
-          if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
+          if (relation.connectors[0].toER === entity) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
@@ -589,7 +588,7 @@ const findRelationArray = (entity) => {
       else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
         let targetRelation
-        if (entity.id === connector.to) targetRelation = connector.fromER
+        if (entity === connector.toER) targetRelation = connector.fromER
         else targetRelation = connector.toER
 
         let relation = structuredClone(targetRelation)
@@ -603,7 +602,7 @@ const findRelationArray = (entity) => {
         }
 
         if (relation.type == 'Relationship') {
-          if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
+          if (relation.connectors[0].toER === entity) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
           // relation.label = `${entity.label}-${relation.label}`
   
