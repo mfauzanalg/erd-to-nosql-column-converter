@@ -408,7 +408,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 2,
         },
@@ -424,7 +424,7 @@ const ERModel = {
     {
       id: 1,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: false,
       isDisjoint: true,
       superID: 0,
@@ -435,12 +435,12 @@ const ERModel = {
           to: 0,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 2,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 3,
         },
@@ -452,7 +452,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 3,
         },
@@ -470,7 +470,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 2,
         },
@@ -510,7 +510,7 @@ const ERModel = {
     {
       id: 1,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: true,
       isDisjoint: true,
       superID: 0,
@@ -521,12 +521,12 @@ const ERModel = {
           to: 0,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 2,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 3,
         },
@@ -538,7 +538,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 1,
           to: 3,
         },
@@ -704,7 +704,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 6,
         },
@@ -744,7 +744,7 @@ const ERModel = {
     {
       id: 12,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: true,
       isDisjoint: true,
       superID: 1,
@@ -755,17 +755,17 @@ const ERModel = {
           to: 1,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 6,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 7,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 4,
         },
@@ -777,7 +777,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 7,
         },
@@ -887,7 +887,7 @@ const ERModel = {
           participation: 'Total',
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 4,
         },
@@ -925,7 +925,7 @@ const ERModel = {
     {
       id: 11,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: false,
       isDisjoint: true,
       superID: 3,
@@ -936,12 +936,12 @@ const ERModel = {
           to: 3,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 9,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 10,
         },
@@ -953,7 +953,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 10,
         },
@@ -965,7 +965,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 9,
         },

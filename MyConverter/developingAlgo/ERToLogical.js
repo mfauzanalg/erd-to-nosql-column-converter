@@ -6,7 +6,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 6,
         },
@@ -46,7 +46,7 @@ const ERModel = {
     {
       id: 12,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: true,
       isDisjoint: true,
       superID: 1,
@@ -57,17 +57,17 @@ const ERModel = {
           to: 1,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 6,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 7,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 4,
         },
@@ -79,7 +79,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 7,
         },
@@ -189,7 +189,7 @@ const ERModel = {
           participation: 'Total',
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 12,
           to: 4,
         },
@@ -227,7 +227,7 @@ const ERModel = {
     {
       id: 11,
       label: 'Special',
-      type: 'Specialization',
+      type: 'SpecialConnector',
       isTotal: false,
       isDisjoint: true,
       superID: 3,
@@ -238,12 +238,12 @@ const ERModel = {
           to: 3,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 9,
         },
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 10,
         },
@@ -255,7 +255,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 10,
         },
@@ -267,7 +267,7 @@ const ERModel = {
       type: 'Entity',
       connectors: [
         {
-          type: 'Specialization',
+          type: 'SpecialConnector',
           from: 11,
           to: 9,
         },
@@ -428,7 +428,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
   }
 
   while (!(found) && connectors && i < connectors.length) {
-    if (connectors[i].type === 'Specialization') {
+    if (connectors[i].type === 'SpecialConnector') {
       specializationShape = connectors[i].fromER
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
@@ -510,7 +510,7 @@ const findParentArray = (entityRelation) => {
   let connectors = entityRelation.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
-      if (connector.type === 'Specialization') {
+      if (connector.type === 'SpecialConnector') {
         specializationShape = connector.fromER
         parentEntity = specializationShape.superER
         parentArray.push(parentEntity);
@@ -561,10 +561,10 @@ const findRelationArray = (entityRelation) => {
   let connectors = entityRelation.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
-      if (connector.type === 'Specialization') {
+      if (connector.type === 'SpecialConnector') {
         specializationShape = connector.fromER
         relationArray.push({
-          type: 'Specialization',
+          type: 'SpecialConnector',
           relation: specializationShape,
           entityAcrossId: specializationShape.superID
         })
@@ -771,7 +771,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
 
   }
   // Case 3
-  else if (['Specialization'].includes(relationDetail.type)) {
+  else if (['SpecialConnector'].includes(relationDetail.type)) {
     if (!relationDetail.relation?.isTotal) {
       // console.log(relationDetail)
       // console.log(columnFamily)
@@ -813,8 +813,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   
   let auxAttribute = {};
   auxAttribute.label = columnFamily2.label
-  auxAttribute.isAuxilary = true;
-  auxAttribute.type = "Key";
+  auxAttribute.type = "Auxiliary";
   auxAttribute.artificialID = artificialID;
   newColumnFamily.attributes.push(auxAttribute)
   
@@ -822,9 +821,8 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   if (relationDetail.type !== 'BinaryManyToMany') {
     let interAttribute = {};
     interAttribute.label = columnFamily1.label
-    interAttribute.isIntermediary = true;
     interAttribute.artificialID = artificialID;
-    interAttribute.type = "Key";
+    interAttribute.type = "Intermediary";
     columnFamily2.attributes.push(interAttribute)
   }
   
