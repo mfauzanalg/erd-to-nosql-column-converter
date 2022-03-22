@@ -300,9 +300,27 @@ const createReference = (ERSchema) => {
   })
 }
 
+const splitER = (ERSchema) => {
+  let Entity = []
+  let Relationship = []
+
+  ERSchema.entityRelations.forEach(er => {
+    if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(er.type)) {
+      Entity.push(er)
+    }
+    else {
+      Relationship.push(er)
+    }
+  })
+  
+  ERSchema.entities = Entity
+  ERSchema.relationships = Relationship
+  ERSchema.entityRelations = []
+
+}
+
 let visited = []
 let artificialID = 0;
-
 
 const getArrayKey = (attributes) => {
   let arrayKeys = []
@@ -494,10 +512,10 @@ const isVisited = (entityRelation, visited) => {
 
 const convertERToLogical = (ERModel) => {
   let logicalSchema = []
-  const entityRelations = ERModel.entityRelations
-  for (let i = 0; i < entityRelations.length; i++) {
-    if (['Entity', 'WeakEntity'].includes(entityRelations[i].type)) {
-      const columnFamilySet = createFamily(entityRelations[i],logicalSchema)
+  const entities = ERModel.entities
+  for (let i = 0; i < entities.length; i++) {
+    if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
+      const columnFamilySet = createFamily(entities[i],logicalSchema)
       logicalSchema = mergeLogicalSchema(columnFamilySet, logicalSchema)
     }
   }
@@ -505,9 +523,9 @@ const convertERToLogical = (ERModel) => {
   return logicalSchema
 }
 
-const findParentArray = (entityRelation) => {
+const findParentArray = (entity) => {
   let parentArray = []
-  let connectors = entityRelation.connectors
+  let connectors = entity.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'SpecialConnector') {
@@ -520,12 +538,12 @@ const findParentArray = (entityRelation) => {
         let relation
         let connectorTo;
 
-        if (entityRelation.id === connector.to) relation = connector.fromER
+        if (entity.id === connector.to) relation = connector.fromER
         else relation = connector.toER
 
 
         if (relation.type == 'Relationship') {
-          if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
+          if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
 
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
@@ -544,10 +562,10 @@ const findParentArray = (entityRelation) => {
   return parentArray
 }
 
-const getSharedID = (entityRelation, logicalSchema) => {
-  const columnfamily = logicalSchema.find(o => o.id == entityRelation.id)
-  if (entityRelation && entityRelation.sharedColumn) {
-    return getSharedID(entityRelation.sharedColumn, logicalSchema)
+const getSharedID = (columnFamily, logicalSchema) => {
+  const columnfamily = logicalSchema.find(o => o.id == columnFamily.id)
+  if (columnFamily && columnFamily.sharedColumn) {
+    return getSharedID(columnFamily.sharedColumn, logicalSchema)
   } 
   else return columnfamily
 }
@@ -556,9 +574,9 @@ const duplicateArray = (array) => {
   return structuredClone(array)
 }
 
-const findRelationArray = (entityRelation) => {
+const findRelationArray = (entity) => {
   let relationArray = []
-  let connectors = entityRelation.connectors
+  let connectors = entity.connectors
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'SpecialConnector') {
@@ -573,7 +591,7 @@ const findRelationArray = (entityRelation) => {
       else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
         let targetRelation
-        if (entityRelation.id === connector.to) targetRelation = connector.fromER
+        if (entity.id === connector.to) targetRelation = connector.fromER
         else targetRelation = connector.toER
 
         let relation = structuredClone(targetRelation)
@@ -587,9 +605,9 @@ const findRelationArray = (entityRelation) => {
         }
 
         if (relation.type == 'Relationship') {
-          if (relation.connectors[0].to === entityRelation.id) connectorTo = relation.connectors[1]
+          if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
-          // relation.label = `${entityRelation.label}-${relation.label}`
+          // relation.label = `${entity.label}-${relation.label}`
   
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             relationArray.push ({
@@ -906,6 +924,8 @@ const print2 = (myObject) => {
 }
 
 createReference(ERModel)
+splitER(ERModel)
+// print2(ERModel)
 // console.log(ERModel)
 // convertERToLogical(ERModel);
 // print(convertERToLogical(ERModel));
