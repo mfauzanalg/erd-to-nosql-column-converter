@@ -442,7 +442,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
   let i = 0
   let found = false
   if (entity.isTemporaryEntity) {
-    columnFamily.sharedColumn = getSharedID(entity.sharedColumn, logicalSchema)
+    columnFamily.sharedColumn = getSharedCF(entity.sharedColumn, logicalSchema)
   }
 
   while (!(found) && connectors && i < connectors.length) {
@@ -451,7 +451,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
         // key = getArrayKey(parentEntity.attributes)
-        columnFamily.sharedColumn = getSharedID(specializationShape.superER, logicalSchema)
+        columnFamily.sharedColumn = getSharedCF(specializationShape.superER, logicalSchema)
         found = true
       }
     }
@@ -471,13 +471,13 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
         if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
           || (relation.type === 'WeakRelationship' && connectorTo.cardinality === 'One')) {
           
-          const entityAcrossID = connectorTo.to
-          const entityAcross = logicalSchema.find(o => o.id === entityAcrossID)
+          const entityAcrossID = connectorTo.toER.id
+          const columnFamilyAcross = logicalSchema.find(o => o.id === entityAcrossID)
   
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
-          if (entityAcross) {
+          if (columnFamilyAcross) {
             // key = getArrayKey(entityAcross.attributes)
-            columnFamily.sharedColumn = getSharedID(entityAcross, logicalSchema)
+            columnFamily.sharedColumn = getSharedCF(columnFamilyAcross, logicalSchema)
           }
         }
       }
@@ -499,7 +499,7 @@ const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
       const parent = logicalSchema.find(o => o.id === connectors[i].to)
       found = true
       // key = getArrayKey(parent.attributes)
-      columnFamily.sharedColumn = getSharedID(parent, logicalSchema);
+      columnFamily.sharedColumn = getSharedCF(parent, logicalSchema);
     }
     i += 1
   }
@@ -541,7 +541,6 @@ const findParentArray = (entity) => {
         if (entity.id === connector.to) relation = connector.fromER
         else relation = connector.toER
 
-
         if (relation.type == 'Relationship') {
           if (relation.connectors[0].to === entity.id) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
@@ -562,10 +561,10 @@ const findParentArray = (entity) => {
   return parentArray
 }
 
-const getSharedID = (columnFamily, logicalSchema) => {
+const getSharedCF = (columnFamily, logicalSchema) => {
   const columnfamily = logicalSchema.find(o => o.id == columnFamily.id)
   if (columnFamily && columnFamily.sharedColumn) {
-    return getSharedID(columnFamily.sharedColumn, logicalSchema)
+    return getSharedCF(columnFamily.sharedColumn, logicalSchema)
   } 
   else return columnfamily
 }
@@ -584,7 +583,6 @@ const findRelationArray = (entity) => {
         relationArray.push({
           type: 'SpecialConnector',
           relation: specializationShape,
-          entityAcrossId: specializationShape.superID
         })
       } 
 
@@ -613,14 +611,12 @@ const findRelationArray = (entity) => {
             relationArray.push ({
               type: 'BinaryManyToOne',
               relation: relation,
-              entityAcrossId: connectorTo.to
             })
           }
           else if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'Many') {
             relationArray.push ({
               type: 'BinaryManyToMany',
               relation: relation,
-              entityAcrossId: connectorTo.to
             })
           }
           else if (entityFromCardinality === 'One' 
@@ -629,7 +625,6 @@ const findRelationArray = (entity) => {
               relationArray.push ({
                 type: 'BinaryOneToOne',
                 relation: relation,
-                entityAcrossId: connectorTo.to
               })
             }
           }
@@ -645,7 +640,6 @@ const findRelationArray = (entity) => {
       }
     })
   }
-
 
   return removeDuplicate(relationArray)
 }
@@ -691,7 +685,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
 
     // if (isSharedKey) {
-    //   // columnFamily.sharedColumn = getSharedID(sharedColumn);
+    //   // columnFamily.sharedColumn = getSharedCF(sharedColumn);
     //   // columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.sharedColumn?.attributes) || []))
     //   isSharedKey = false;
     // }
