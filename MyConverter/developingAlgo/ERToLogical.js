@@ -354,21 +354,21 @@ const arrayKeysToAttribute = (keys) => {
 }
 
 const stringifyCircularObject = (key, value) => {
-  if (key == 'fromER' || key == 'toER' || key == 'super' || key == 'sharedColumn') { return `reference to id ${value.id}`;}
+  if (key == 'fromER' || key == 'toER' || key == 'super' || key == 'parentColumnFam') { return `reference to id ${value.id}`;}
   else {return value;}
 }
 
-const mergeLogicalSchema = (logical1, logical2) => {
-  let newLogicalSchema = [...logical1, ...logical2]
+const mergelogicalCF = (logical1, logical2) => {
+  let newlogicalCF = [...logical1, ...logical2]
   
-  newLogicalSchema = newLogicalSchema.filter((value, index) => {
+  newlogicalCF = newlogicalCF.filter((value, index) => {
     const _value = JSON.stringify(value, stringifyCircularObject);
-    return index === newLogicalSchema.findIndex(newLogicalSchema => {
-      return JSON.stringify(newLogicalSchema, stringifyCircularObject) === _value;
+    return index === newlogicalCF.findIndex(newlogicalCF => {
+      return JSON.stringify(newlogicalCF, stringifyCircularObject) === _value;
     });
   });
 
-  return newLogicalSchema
+  return newlogicalCF
 }
 
 const mergeArray = (arr1, arr2) => {
@@ -385,23 +385,23 @@ const mergeArray = (arr1, arr2) => {
 }
 
 // Unused
-const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
+const findPreexistentColumnFamily = (entityRelation, logicalCF) => {
   let found = false;
   let i = 0;
   let columnFamilySet = []
 
-  while (!found && i < logicalSchema.length) {
+  while (!found && i < logicalCF.length) {
     let j = 0;
-    if (logicalSchema[i].label === entityRelation.label) {
+    if (logicalCF[i].label === entityRelation.label) {
       found = true
-      columnFamilySet.push(logicalSchema[i])
+      columnFamilySet.push(logicalCF[i])
     }
 
-    if (!found && logicalSchema[i].children) {
-      while (j < logicalSchema[i].children.length) {
-        if (logicalSchema[i].children[j].label === entityRelation.label) {
+    if (!found && logicalCF[i].children) {
+      while (j < logicalCF[i].children.length) {
+        if (logicalCF[i].children[j].label === entityRelation.label) {
           found = true
-          columnFamilySet.push(logicalSchema[i].children[j])
+          columnFamilySet.push(logicalCF[i].children[j])
         }
         j += 1;
       }
@@ -412,21 +412,21 @@ const findPreexistentColumnFamily = (entityRelation, logicalSchema) => {
 }
 
 // Unused
-const findColumnFamilyByID = (id, logicalSchema) => {
+const findColumnFamilyByID = (id, logicalCF) => {
   let found = false;
   let i = 0;
   let key = []
-  while (!found && i < logicalSchema.length) {
+  while (!found && i < logicalCF.length) {
     let j = 0;
-    if (logicalSchema[i].id === id) {
+    if (logicalCF[i].id === id) {
       found = true
-      key = [...logicalSchema[i].key]
+      key = [...logicalCF[i].key]
     }
-    if (!found && logicalSchema[i].children) {
-      while (j < logicalSchema[i].children.length) {
-        if (logicalSchema[i].children[j].label === id) {
+    if (!found && logicalCF[i].children) {
+      while (j < logicalCF[i].children.length) {
+        if (logicalCF[i].children[j].label === id) {
           found = true
-          key = logicalSchema[i].children[j].key
+          key = logicalCF[i].children[j].key
         }
         j += 1;
       }
@@ -436,13 +436,13 @@ const findColumnFamilyByID = (id, logicalSchema) => {
   return key
 }
 
-const findParentKey = (entity, logicalSchema, columnFamily) => {
+const findParentKey = (entity, logicalCF, columnFamily) => {
   let connectors = entity.connectors
   let key = []
   let i = 0
   let found = false
   if (entity.isTemporaryEntity) {
-    columnFamily.sharedColumn = getSharedCF(entity.sharedColumn, logicalSchema)
+    columnFamily.parentColumnFam = getParentCF(entity.parentColumnFam, logicalCF)
   }
 
   while (!(found) && connectors && i < connectors.length) {
@@ -451,7 +451,7 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
       if (specializationShape.isTotal) {
         parentEntity = specializationShape.superER
         // key = getArrayKey(parentEntity.attributes)
-        columnFamily.sharedColumn = getSharedCF(specializationShape.superER, logicalSchema)
+        columnFamily.parentColumnFam = getParentCF(specializationShape.superER, logicalCF)
         found = true
       }
     }
@@ -471,12 +471,12 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
           || (relation.type === 'WeakRelationship' && connectorTo.cardinality === 'One')) {
           
           const entityAcrossID = connectorTo.toER.id
-          const columnFamilyAcross = logicalSchema.find(o => o.id === entityAcrossID)
+          const columnFamilyAcross = logicalCF.find(o => o.id === entityAcrossID)
   
           // If not in logical then do nothing, will be processed for the next entity (for one-to-one both total)
           if (columnFamilyAcross) {
             // key = getArrayKey(entityAcross.attributes)
-            columnFamily.sharedColumn = getSharedCF(columnFamilyAcross, logicalSchema)
+            columnFamily.parentColumnFam = getParentCF(columnFamilyAcross, logicalCF)
           }
         }
       }
@@ -488,17 +488,17 @@ const findParentKey = (entity, logicalSchema, columnFamily) => {
   return key
 }
 
-const findRelationshipKey = (relationship, logicalSchema, columnFamily) => {
+const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
   let i = 0;
   let found = false;
   let key = []
   const connectors = relationship.connectors
   while (!found && connectors && i < connectors.length) {
     if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
-      const parent = logicalSchema.find(o => o.id === connectors[i].toER.id)
+      const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
       found = true
       // key = getArrayKey(parent.attributes)
-      columnFamily.sharedColumn = getSharedCF(parent, logicalSchema);
+      columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
     }
     i += 1
   }
@@ -510,16 +510,21 @@ const isVisited = (entityRelation, visited) => {
 }
 
 const convertERToLogical = (ERModel) => {
-  let logicalSchema = []
+  let logicalCF = []
   const entities = ERModel.entities
   for (let i = 0; i < entities.length; i++) {
     if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
-      const columnFamilySet = createFamily(entities[i],logicalSchema)
-      logicalSchema = mergeLogicalSchema(columnFamilySet, logicalSchema)
+      const columnFamilySet = createFamily(entities[i],logicalCF)
+      logicalCF = mergelogicalCF(columnFamilySet, logicalCF)
     }
   }
+
+  const logicalModel = {
+    label: ERModel.label,
+    columnFamilies: logicalCF
+  }
   
-  return logicalSchema
+  return logicalModel
 }
 
 const findParentArray = (entity) => {
@@ -560,10 +565,10 @@ const findParentArray = (entity) => {
   return parentArray
 }
 
-const getSharedCF = (columnFamily, logicalSchema) => {
-  const columnfamily = logicalSchema.find(o => o.id == columnFamily.id)
-  if (columnFamily && columnFamily.sharedColumn) {
-    return getSharedCF(columnFamily.sharedColumn, logicalSchema)
+const getParentCF = (columnFamily, logicalCF) => {
+  const columnfamily = logicalCF.find(o => o.id == columnFamily.id)
+  if (columnFamily && columnFamily.parentColumnFam) {
+    return getParentCF(columnFamily.parentColumnFam, logicalCF)
   } 
   else return columnfamily
 }
@@ -654,10 +659,10 @@ const removeDuplicate = (arr) => {
   return uniqueArray
 }
 
-const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
-  // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalSchema)
-  let columnFamilySet = [...logicalSchema]
-  let columnFamily = logicalSchema.find(o => o.id === entityRelation.id);
+const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
+  // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalCF)
+  let columnFamilySet = [...logicalCF]
+  let columnFamily = logicalCF.find(o => o.id === entityRelation.id);
 
   // Soalnya ngedouble kalo relation
   if (!columnFamily || entityRelation.type == 'Relationship') {
@@ -674,7 +679,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
       // console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
-        columnFamilySet = mergeLogicalSchema(columnFamilySet, createFamily(entity, logicalSchema))
+        columnFamilySet = mergelogicalCF(columnFamilySet, createFamily(entity, logicalCF))
       })
     }
 
@@ -684,8 +689,8 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
     columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
 
     // if (isSharedKey) {
-    //   // columnFamily.sharedColumn = getSharedCF(sharedColumn);
-    //   // columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.sharedColumn?.attributes) || []))
+    //   // columnFamily.parentColumnFam = getParentCF(parentColumnFam);
+    //   // columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.parentColumnFam?.attributes) || []))
     //   isSharedKey = false;
     // }
     
@@ -711,7 +716,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
       // console.log('relation array detail')
       // console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
-        columnFamilySet = mergeLogicalSchema(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
+        columnFamilySet = mergelogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
     }
   }
@@ -723,7 +728,7 @@ const createFamily = (entityRelation, logicalSchema, returnNewCF = false) => {
 
 const isSameKey = (columnFamily1, columnFamily2) => {
   let result = false
-  if (columnFamily1.sharedColumn && columnFamily1.sharedColumn?.id === columnFamily2.sharedColumn?.id) {
+  if (columnFamily1.parentColumnFam && columnFamily1.parentColumnFam?.id === columnFamily2.parentColumnFam?.id) {
     result = true
   }
   // console.log("WOWWWW")
@@ -740,14 +745,14 @@ const isSameKey = (columnFamily1, columnFamily2) => {
   return result
 }
 
-const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
+const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
   // Baru case 1 doang yang diimplement
-  let newLogicalSchema = [];
+  let newlogicalCF = [];
   if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
-    const columFamilyFromRelation = createFamily(relationDetail.relation, logicalSchema, true)
+    const columFamilyFromRelation = createFamily(relationDetail.relation, logicalCF, true)
 
     if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
-      newLogicalSchema.push(columFamilyFromRelation)
+      newlogicalCF.push(columFamilyFromRelation)
     }
 
     // console.log('=============================================================================')
@@ -755,13 +760,13 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
     // console.log(columFamilyFromRelation)
 
     if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
-      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalSchema)]
+      newlogicalCF = [...newlogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
   }
   // Case 2 
   else if (['AssociativeEntity'].includes(relationDetail.type)) {
-    const columFamilyFromAssociative = createFamily(relationDetail.relation, logicalSchema)
-    newLogicalSchema = mergeLogicalSchema(newLogicalSchema, columFamilyFromAssociative)
+    const columFamilyFromAssociative = createFamily(relationDetail.relation, logicalCF)
+    newlogicalCF = mergelogicalCF(newlogicalCF, columFamilyFromAssociative)
 
     let type = 'BinaryManyToOne'
     if (relationDetail.connector.cardinality === 'One') {
@@ -777,8 +782,8 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
       }
     }
 
-    const hasil = convertRelationship(temporaryRelationDetail, columnFamily, newLogicalSchema)
-    newLogicalSchema = mergeLogicalSchema(hasil, newLogicalSchema)
+    const hasil = convertRelationship(temporaryRelationDetail, columnFamily, newlogicalCF)
+    newlogicalCF = mergelogicalCF(hasil, newlogicalCF)
 
   }
   // Case 3
@@ -786,18 +791,18 @@ const convertRelationship = (relationDetail, columnFamily, logicalSchema) => {
     if (!relationDetail.relation?.isTotal) {
       // console.log(relationDetail)
       // console.log(columnFamily)
-      // console.log(logicalSchema)
-      const parentColumnFamily = logicalSchema.find(o => o.id === relationDetail.relation.superID);
-      newLogicalSchema = [...newLogicalSchema, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalSchema)]
+      // console.log(logicalCF)
+      const parentColumnFamily = logicalCF.find(o => o.id === relationDetail.relation.superID);
+      newlogicalCF = [...newlogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
     }
   }
-  return newLogicalSchema
+  return newlogicalCF
 }
 
-const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, logicalSchema) => {
+const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, logicalCF) => {
   // let relation = relationDetail.relation
   // let withTemporary = false;
-  let newLogicalSchema = []
+  let newlogicalCF = []
   let newColumnFamily = undefined;
 
 
@@ -805,7 +810,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
     newColumnFamily = duplicateArray(columnFamily1)
   }
   else {
-    const preexistentColumnFamily = logicalSchema.find(o => o.id === columnFamily1.id);
+    const preexistentColumnFamily = logicalCF.find(o => o.id === columnFamily1.id);
     if (preexistentColumnFamily.isAssociativeEntity) newColumnFamily = preexistentColumnFamily
   }
 
@@ -815,11 +820,11 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
       label: `${columnFamily1.label}-${columnFamily2.label}`,
       type: 'Entity',
       isTemporaryEntity: true,
-      sharedColumn: columnFamily1,
+      parentColumnFam: columnFamily1,
       attributes: []
     }
   
-    newColumnFamily = createFamily(temporaryEntity, logicalSchema, true)
+    newColumnFamily = createFamily(temporaryEntity, logicalCF, true)
   }
   
   let auxAttribute = {};
@@ -841,7 +846,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
-    newColumnFamily.sharedColumn = columnFamily2
+    newColumnFamily.parentColumnFam = columnFamily2
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
@@ -849,10 +854,10 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // if (relationDetail.type === 'BinaryOneToOne') {
   //   newColumnFamily.key = [...columnFamily2.key]
   // }
-  newLogicalSchema = mergeLogicalSchema(newLogicalSchema, [newColumnFamily, columnFamily2])
-  // [...newLogicalSchema, newColumnFamily, columnFamily2]
+  newlogicalCF = mergelogicalCF(newlogicalCF, [newColumnFamily, columnFamily2])
+  // [...newlogicalCF, newColumnFamily, columnFamily2]
 
-  return newLogicalSchema
+  return newlogicalCF
 }
 
 // Masih harus dikerjain yaaa
@@ -867,7 +872,7 @@ const convertAttribute = (columnFamily, attribute) => {
     let newColumFamily = {}
     newColumFamily.label = `${columnFamily.label}-${attribute.label}`
     newColumFamily.id = `${columnFamily.label}-${attribute.label}`
-    newColumFamily.sharedColumn = columnFamily.sharedColumn || columnFamily
+    newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
     newColumFamily.attributes = filterKey(columnFamily.attributes)
 
     if (attribute.children) {
@@ -888,7 +893,7 @@ const convertAttribute = (columnFamily, attribute) => {
   return additionalColumnFamily
 }
 
-const defineKey = (entityRelation, logicalSchema, columnFamily) => {
+const defineKey = (entityRelation, logicalCF, columnFamily) => {
   let key = [];
   let ERKeys = getArrayKey(entityRelation.attributes)
 
@@ -896,13 +901,13 @@ const defineKey = (entityRelation, logicalSchema, columnFamily) => {
     key = duplicateArray(ERKeys)
   }
   if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-    key = [...ERKeys, ...findParentKey(entityRelation, logicalSchema, columnFamily)]
+    key = [...ERKeys, ...findParentKey(entityRelation, logicalCF, columnFamily)]
   }
   else { // if thre type is Relationship
-    key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalSchema, columnFamily)]
+    key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
     // console.log(key, 'keyy')
   }
-  if (key.length < 1 && !columnFamily.sharedColumn) {
+  if (key.length < 1 && !columnFamily.parentColumnFam) {
     key = [`id_${entityRelation.label}`]
   }
   return arrayKeysToAttribute(key)

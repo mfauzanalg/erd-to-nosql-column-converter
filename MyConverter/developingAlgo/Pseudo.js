@@ -1,22 +1,22 @@
 const {Shape} = require('gojs');
 
-// Convert ER to logicalSchema
-Input:  ERSchema ERSchema
+// Convert ER to logicalSchema (revisi)
+Input:  ERModel ERModel
 Output: logicalShcmea LogicalShema
 
 logicalSchema <- []
-entityRelations <- ERSchema.entityRelations
-FOREACH entityRelation IN entityRelations:
-  IF entityRelation.type == ('Entity' | 'WeakEntity'):
+entities <- ERModel.entities
+FOREACH entity IN entities:
+  IF entity.type == ('Entity' | 'WeakEntity'):
      columnFamilySet <- createFamily(entityRelation, logicalSchema)
-     logicalSchema <- mergeLogicalSchema(columnFamilySet, logicalSchema)
+     logicalSchema <- merge(columnFamilySet, logicalSchema)
   ENDIF
 ENDFOR
 RETURN logicalSchema
 
 
-// createFamily
-Input:  entityRelation Shape,
+// createFamily (revisi)
+Input:  entityRelation EntityRelation,
         logicalSchema LogicalSchema,
 Output: columnFamilySet LogicalSchema,
 
@@ -31,13 +31,13 @@ IF (!isVisited(entityRelation.id)):
     parentArray <- findParentArray(entityRelation)
     FOREACH entity in parentArray:
       newColumnFamily <- createFamily(entity, logicalSchema)
-      columnFamilySet <- mergeLogicalSchema(newColumnFamily, columnFamilySet)
+      columnFamilySet <- merge(newColumnFamily, columnFamilySet)
     ENDFOR
   ENDIF
 
   columnFamily.id <- entityRelation.id
   columnFamily.label <- entityRelation.label
-  columnFamily.attributes <- defineKey(entityRelation, columnFamilySet)
+  columnFamily.attributes <- defineKey(entityRelation, columnFamilySet, columnFamily)
 
   IF (isHasParent):
     columnFamily.parentID <- getParentID(parentID, columnFamilySet)
@@ -48,7 +48,7 @@ IF (!isVisited(entityRelation.id)):
 
   FOREACH attribute IN entityRelation.attribues:
     convertedAttributes <- convertAttribute(columnFamily, attribute)
-    columnFamilySet <- mergeLogicalSchema(columnFamilySet, convertedAttributes)
+    columnFamilySet <- merge(columnFamilySet, convertedAttributes)
   ENDFOR
 
   IF (entityRelation.type == ('Relationship' | 'ReflexiveRelationship')):
@@ -61,7 +61,7 @@ IF (!isVisited(entityRelation.id)):
     relationArray <- findRealtionArray(entityRelation)
     FOREACH relation in relationArray:
       convertedRelation <- convertRelationship(entity, logicalSchema)
-      columnFamilySet <- mergeLogicalSchema(convertedRelation, columnFamilySet)
+      columnFamilySet <- merge(convertedRelation, columnFamilySet)
     ENDFOR
   ENDIF
 ENDIF
@@ -81,7 +81,7 @@ IF (attribute.type == 'Composite'):
   newCF.attribues = CF.attributes.keys
   IF (attribute.children):
     FOREACH child IN children:
-     additionalCF <- mergeLogicalSchema(additionalCF,
+     additionalCF <- merge(additionalCF,
                       convertAttribute(newCF, child))
     additionalCF.add(newCF)
   ENDIF
@@ -219,12 +219,12 @@ parentArray <- []
 connecotrs <- entityRelation.connecotrs
 FOREACH connectorFrom IN connectors:
   IF (connectorFrom.type == 'ChildrenSpecialization'):
-    specializationShape <- ERSchema.find(connector.from)
-    parentEntity <- ERSchema.find(specializationShape.parentID)
+    specializationShape <- ERModel.find(connector.from)
+    parentEntity <- ERModel.find(specializationShape.parentID)
     parentArray.add(parentEntity)
   ENDIF
   ELSE IF (connector.type == 'RelationConnector'):
-    relation <- ERSchema.find(connector.to)
+    relation <- ERModel.find(connector.to)
     connectorTo <- relation.connector //different from connectorFrom
     IF (relation.type == 'Relationship'):
       IF ((connectorFrom.cardinality == 'Many' & 
@@ -233,7 +233,7 @@ FOREACH connectorFrom IN connectors:
           connectorFrom.participation == 'Partial' &
           connectorTo.cardinality == 'One' &
           connectorTo.participation == 'Total' )):
-        parentArray.add(ERSchema.find(connectorTo.to))
+        parentArray.add(ERModel.find(connectorTo.to))
       ENDIF
     ENDIF
   ENDIF
@@ -253,7 +253,7 @@ relationDArray <- []
 connecotrs <- entityRelation.connecotrs
 FOREACH connectorFrom IN connectors:
   IF (connectorFrom.type == 'ChildrenSpecialization'):
-    specializationShape <- ERSchema.find(connector.from)
+    specializationShape <- ERModel.find(connector.from)
     relationArray.add({
       type: 'Specialization',
       relation: specializationShape,
@@ -261,7 +261,7 @@ FOREACH connectorFrom IN connectors:
     })
   ENDIF
   ELSE IF (connector.type == 'RelationConnector'):
-    relation <- ERSchema.find(connector.to)
+    relation <- ERModel.find(connector.to)
     connectorTo <- relation.connector //different from connectorFrom
     IF (relation.type == 'Relationship'):
       IF ((connectorFrom.cardinality == 'Many' & 
