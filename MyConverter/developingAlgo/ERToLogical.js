@@ -1,4 +1,4 @@
-const ERModel = {
+export const ERModel = {
   entityRelations: [
     {
       id: 6,
@@ -282,11 +282,11 @@ const ERModel = {
   ],
 }
 
-const v8 = require('v8');
+// import v8 from 'v8'
 
-const structuredClone = obj => {
-  return v8.deserialize(v8.serialize(obj));
-};
+// const structuredClone = obj => {
+//   return v8.deserialize(v8.serialize(obj));
+// };
 
 const createReference = (ERSchema) => {
   ERSchema.entityRelations.forEach(er => {
@@ -322,7 +322,7 @@ const splitER = (ERSchema) => {
 let visited = []
 let artificialID = 0;
 
-const getArrayKey = (attributes) => {
+export const getArrayKey = (attributes) => {
   let arrayKeys = []
   attributes?.forEach(attr => {
     if (attr.type == "Key" || attr.isKey) {
@@ -358,17 +358,17 @@ const stringifyCircularObject = (key, value) => {
   else {return value;}
 }
 
-const mergelogicalCF = (logical1, logical2) => {
-  let newlogicalCF = [...logical1, ...logical2]
+const mergeLogicalCF = (logical1, logical2) => {
+  let newLogicalCF = [...logical1, ...logical2]
   
-  newlogicalCF = newlogicalCF.filter((value, index) => {
+  newLogicalCF = newLogicalCF.filter((value, index) => {
     const _value = JSON.stringify(value, stringifyCircularObject);
-    return index === newlogicalCF.findIndex(newlogicalCF => {
-      return JSON.stringify(newlogicalCF, stringifyCircularObject) === _value;
+    return index === newLogicalCF.findIndex(newLogicalCF => {
+      return JSON.stringify(newLogicalCF, stringifyCircularObject) === _value;
     });
   });
 
-  return newlogicalCF
+  return newLogicalCF
 }
 
 const mergeArray = (arr1, arr2) => {
@@ -447,9 +447,9 @@ const findParentKey = (entity, logicalCF, columnFamily) => {
 
   while (!(found) && connectors && i < connectors.length) {
     if (connectors[i].type === 'SpecialConnector') {
-      specializationShape = connectors[i].fromER
+      let specializationShape = connectors[i].fromER
       if (specializationShape.isTotal) {
-        parentEntity = specializationShape.superER
+        let parentEntity = specializationShape.superER
         // key = getArrayKey(parentEntity.attributes)
         columnFamily.parentColumnFam = getParentCF(specializationShape.superER, logicalCF)
         found = true
@@ -509,13 +509,13 @@ const isVisited = (entityRelation, visited) => {
   return visited.includes(entityRelation.id)
 }
 
-const convertERToLogical = (ERModel) => {
+export const convertERToLogical = (ERModel) => {
   let logicalCF = []
   const entities = ERModel.entities
   for (let i = 0; i < entities.length; i++) {
     if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
       const columnFamilySet = createFamily(entities[i],logicalCF)
-      logicalCF = mergelogicalCF(columnFamilySet, logicalCF)
+      logicalCF = mergeLogicalCF(columnFamilySet, logicalCF)
     }
   }
 
@@ -533,8 +533,8 @@ const findParentArray = (entity) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'SpecialConnector') {
-        specializationShape = connector.fromER
-        parentEntity = specializationShape.superER
+        const specializationShape = connector.fromER
+        const parentEntity = specializationShape.superER
         parentArray.push(parentEntity);
       }
       else if (connector.type === 'RelationConnector') {
@@ -583,7 +583,7 @@ const findRelationArray = (entity) => {
   if (connectors && connectors.length > 0) {
     connectors.forEach((connector) => {
       if (connector.type === 'SpecialConnector') {
-        specializationShape = connector.fromER
+        const specializationShape = connector.fromER
         relationArray.push({
           type: 'SpecialConnector',
           relation: specializationShape,
@@ -679,7 +679,7 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
       // console.log(parentArray)
       parentArray.forEach((entity) => {
         // this is migrate to merge
-        columnFamilySet = mergelogicalCF(columnFamilySet, createFamily(entity, logicalCF))
+        columnFamilySet = mergeLogicalCF(columnFamilySet, createFamily(entity, logicalCF))
       })
     }
 
@@ -716,7 +716,7 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
       // console.log('relation array detail')
       // console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
-        columnFamilySet = mergelogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
+        columnFamilySet = mergeLogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
     }
   }
@@ -747,12 +747,12 @@ const isSameKey = (columnFamily1, columnFamily2) => {
 
 const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
   // Baru case 1 doang yang diimplement
-  let newlogicalCF = [];
+  let newLogicalCF = [];
   if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
     const columFamilyFromRelation = createFamily(relationDetail.relation, logicalCF, true)
 
     if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
-      newlogicalCF.push(columFamilyFromRelation)
+      newLogicalCF.push(columFamilyFromRelation)
     }
 
     // console.log('=============================================================================')
@@ -760,13 +760,13 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
     // console.log(columFamilyFromRelation)
 
     if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
-      newlogicalCF = [...newlogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
+      newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
   }
   // Case 2 
   else if (['AssociativeEntity'].includes(relationDetail.type)) {
     const columFamilyFromAssociative = createFamily(relationDetail.relation, logicalCF)
-    newlogicalCF = mergelogicalCF(newlogicalCF, columFamilyFromAssociative)
+    newLogicalCF = mergeLogicalCF(newLogicalCF, columFamilyFromAssociative)
 
     let type = 'BinaryManyToOne'
     if (relationDetail.connector.cardinality === 'One') {
@@ -782,8 +782,8 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
       }
     }
 
-    const hasil = convertRelationship(temporaryRelationDetail, columnFamily, newlogicalCF)
-    newlogicalCF = mergelogicalCF(hasil, newlogicalCF)
+    const hasil = convertRelationship(temporaryRelationDetail, columnFamily, newLogicalCF)
+    newLogicalCF = mergeLogicalCF(hasil, newLogicalCF)
 
   }
   // Case 3
@@ -793,16 +793,16 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
       // console.log(columnFamily)
       // console.log(logicalCF)
       const parentColumnFamily = logicalCF.find(o => o.id === relationDetail.relation.superID);
-      newlogicalCF = [...newlogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
+      newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
     }
   }
-  return newlogicalCF
+  return newLogicalCF
 }
 
 const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, logicalCF) => {
   // let relation = relationDetail.relation
   // let withTemporary = false;
-  let newlogicalCF = []
+  let newLogicalCF = []
   let newColumnFamily = undefined;
 
 
@@ -854,10 +854,10 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // if (relationDetail.type === 'BinaryOneToOne') {
   //   newColumnFamily.key = [...columnFamily2.key]
   // }
-  newlogicalCF = mergelogicalCF(newlogicalCF, [newColumnFamily, columnFamily2])
-  // [...newlogicalCF, newColumnFamily, columnFamily2]
+  newLogicalCF = mergeLogicalCF(newLogicalCF, [newColumnFamily, columnFamily2])
+  // [...newLogicalCF, newColumnFamily, columnFamily2]
 
-  return newlogicalCF
+  return newLogicalCF
 }
 
 // Masih harus dikerjain yaaa
@@ -927,7 +927,7 @@ splitER(ERModel)
 // console.log(ERModel)
 // convertERToLogical(ERModel);
 // print(convertERToLogical(ERModel));
-print2(convertERToLogical(ERModel));
+// print2(convertERToLogical(ERModel));
 // console.log(convertERToLogical(ERModel));
 
 
@@ -941,3 +941,4 @@ print2(convertERToLogical(ERModel));
 // Weak entity kalo many to many emng gabisa
 // N-ary SKIP
 // Refelxive udah tapi masih aneh
+

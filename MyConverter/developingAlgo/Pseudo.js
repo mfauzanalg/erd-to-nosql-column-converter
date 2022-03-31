@@ -1,4 +1,51 @@
-const {Shape} = require('gojs');
+// LogicalToDDL
+Input:  logicalModel logicalModel
+Output: DDL string[]
+
+stringQuery <- []
+FOREACH cf IN logicalModel.columnFamiles:
+  parentKeys <- []
+  cfKeys <- []
+  stringQuery.add('DROP TABLE IF EXISTS' + cf.label)
+  stringQuery.add('CREATE TABLE' + cf.label + '(')
+  IF (cf.parentColumnFam):
+    parentAttributes <- cf.parentColumnFam.attributes
+    FOREACH attr IN parentAttributes:
+      IF (attr.type == 'Key' | 'Auxiliary'):
+        stringQuery.add(attr.label)
+        parentKeys.add(attr.label)
+      ENDIF
+    ENDFOR
+  ENDIF
+  IF (cf.attributes):
+    parentAttributes <- cf.parentColumnFam.attributes
+    FOREACH attr IN parentAttributes:
+      stringQuery.add(attr.label)
+      IF (attr.type == 'Key' | 'Auxiliary'):
+        cfKeys.add(attr.label)
+      ENDIF
+    ENDFOR
+  ENDIF
+  createPrimaryKey(parentKeys, cfKeys, stringQuery)
+  stringQuery.push(')')
+ENDFOR
+
+// createPrimaryKey
+Input:  parentKeys string[],
+        cfKeys string[],
+        stringQuery string[]
+
+primaryKey <- ''
+IF (parentKeys.length > 0):
+  primaryKey <- `(` + parentKeys.toString() + `)`
+ENDIF
+IF (cfKeys.length > 0):
+  primaryKey <- primaryKey + cfKeys.toString()
+ENDIF
+
+stringQuery.add(`PRIMARY KEY (` + primaryKey + `)`)
+
+// =================================================================================
 
 // Convert ER to logicalSchema (revisi)
 Input:  ERModel ERModel
