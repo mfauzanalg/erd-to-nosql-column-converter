@@ -62,5 +62,59 @@ const logicalToDDL = (logicalModel) => {
 const logicalModel = convertERToLogical(ERModel)
 console.log(logicalModel)
 
-const DDL = logicalToDDL(logicalModel)
-printDDL(DDL)
+// const DDL = logicalToDDL(logicalModel)
+// printDDL(DDL)
+
+// ============================================================================================
+// Visualize logical schema
+
+const getGroup = (cf) => {
+  if (cf.parentColumnFam) {
+    return cf.id
+  }
+  else return `${cf.id}-attr`
+}
+
+const visualizeLogicalModel = (columnFamilies) => {
+  const gojs = {
+    "class": "go.GraphLinksModel",
+    "nodeDataArray": [],
+    "linkDataArray": [], 
+  }
+
+  columnFamilies.forEach(cf => {
+    let groupData = {
+      key: cf.id,
+      isGroup: true,
+      text: cf.label
+    }
+    if (cf.parentColumnFam) {
+      groupData.group = cf.parentColumnFam.id
+    } else {
+      groupData.horiz = true
+      let verticalData = {
+        key: `${cf.id}-attr`,
+        isGroup: true,
+        text: '',
+        group: cf.id
+      }
+      gojs.nodeDataArray.push(verticalData)
+    }
+
+    cf.attributes.forEach(attr => {
+      let nodeData = {
+        key: `${cf.id}-${attr.label}`,
+        text: attr.label,
+        group: getGroup(cf)
+      }
+      gojs.nodeDataArray.push(nodeData)
+    })
+
+    gojs.nodeDataArray.push(groupData)
+  })
+
+  return gojs
+}
+
+const gojs = visualizeLogicalModel(logicalModel.columnFamilies)
+console.log(gojs)
