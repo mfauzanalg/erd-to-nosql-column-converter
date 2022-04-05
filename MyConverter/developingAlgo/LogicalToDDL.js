@@ -75,8 +75,18 @@ const getGroup = (cf) => {
   else return `${cf.id}-attr`
 }
 
+const getSymbol = (attr) => {
+  if (["Key", "Auxiliary"].includes(attr.type)) {
+    return `# ${attr.label}`
+  }
+  else if (attr.type == 'Intermediary') {
+    return `^ ${attr.label}`
+  }
+  return attr.label
+}
+
 const visualizeLogicalModel = (columnFamilies) => {
-  const gojs = {
+  let gojs = {
     "class": "go.GraphLinksModel",
     "nodeDataArray": [],
     "linkDataArray": [], 
@@ -104,17 +114,45 @@ const visualizeLogicalModel = (columnFamilies) => {
     cf.attributes.forEach(attr => {
       let nodeData = {
         key: `${cf.id}-${attr.label}`,
-        text: attr.label,
+        text: getSymbol(attr),
         group: getGroup(cf)
       }
+      if (attr.artificialID || attr.artificialID == 0) {
+        nodeData.type = attr.type
+        nodeData.artificialID = attr.artificialID
+      } 
       gojs.nodeDataArray.push(nodeData)
     })
 
     gojs.nodeDataArray.push(groupData)
   })
 
+  drawArtificialRelation(gojs)
+
   return gojs
 }
 
-const gojs = visualizeLogicalModel(logicalModel.columnFamilies)
-console.log(gojs)
+const drawArtificialRelation = (gojs) => {
+  let artificialMap = {}
+  gojs.nodeDataArray.forEach(node => {
+    if (!node.isGroup) {
+      if ((node.artificialID || node.artificialID == 0) && node.type == "Auxiliary") {
+        artificialMap[node.artificialID] = node.key
+      }
+    }
+  })
+
+  gojs.nodeDataArray.forEach(node => {
+    if (!node.isGroup) {
+      if ((node.artificialID || node.artificialID == 0) && node.type == "Intermediary") {
+        let linkData = {}
+        linkData.from = artificialMap[node.artificialID]
+        linkData.to = node.key
+        gojs.linkDataArray.push(linkData)
+      }
+    }
+  })
+}
+
+const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+console.log(logicalSchema)
