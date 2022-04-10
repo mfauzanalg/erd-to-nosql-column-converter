@@ -11,15 +11,17 @@
         <!-- Styles -->
         <link rel="stylesheet" href="../helpers/DataInspector.css" />
         <link rel="stylesheet" href="./style.css" />
+        <!-- Algorithm -->
+        <script src="./convertingAlgo/ERClasses.js"></script>
         <!-- Components -->
         <script src="../helpers/Figures.js"></script>
         <script src="../helpers/DataInspector.js"></script>
-        <script src="./components/global.js"></script>
         <script src="./components/customShapes.js"></script>
         <script src="./components/erInspector.js"></script>
         <script src="./components/erPalette.js"></script>
         <script src="./components/erDiagram.js"></script>
         <script src="./app.js" id="code"></script>
+        <script src="./components/global.js"></script>
 
         <!-- ERD Canvas -->
         <div id="sample">
@@ -39,33 +41,25 @@
           <div class="button-container">
             <button id="loadModel" onclick="load()">Load</button>
             <button id="saveModel" onclick="save()">Save</button>
+            <button id="convert" onclick="convert()">Convert</button> 
             Diagram model:
           </div>
           <textarea id="mySavedModel" style="width: 100%; height: 200px">
             { "class": "GraphLinksModel",
               "nodeDataArray": [
-            {"text":"Player","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-10,"location":"-6.5 16.5"},
-            {"text":"Second","color":"black","figure":"Diamond","width":110,"height":50,"key":-8,"location":"-194 15"},
-            {"text":"Game","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-3,"location":"-196.78449375000002 138.64651874999998"},
-            {"text":"First","color":"black","figure":"Diamond","width":110,"height":50,"key":-4,"location":"-7.508543750000001 138.64651874999998"},
-            {"text":"Rounds","color":"black","figure":"Diamond","width":110,"height":50,"key":-5,"location":"-198.78449375000002 257.38765624999996"},
-            {"text":"Round","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-6,"location":"-14.586074999999937 256.4718187500001"},
-            {"text":"Moves","color":"black","figure":"Ellipse","width":80,"height":40,"key":-7,"location":"155.5848000000001 258.9028312500001"},
-            {"text":"username","color":"black","figure":"Ellipse","underline":true,"width":80,"height":40,"key":-11,"location":"130.63669999999985 -48.85093125000007"},
-            {"text":"firstname","color":"black","figure":"Ellipse","width":80,"height":40,"key":-9,"location":"162.87783749999994 18.232593749999978"},
-            {"text":"lastname","color":"black","figure":"Ellipse","width":80,"height":40,"key":-12,"location":"147.07625625000003 85.08543749999998"}
+            {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-10,"location":"-218 155"},
+            {"text":"Have","color":"black","figure":"Diamond","width":110,"height":50,"key":-8,"location":"-46 157"},
+            {"text":"Car","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-3,"location":"135 155"},
+            {"text":"name","color":"black","figure":"Ellipse","underline":true,"width":80,"height":40,"key":-4,"location":"-332.79647460937537 100.62338776562474"},
+            {"text":"plat","color":"black","figure":"Ellipse","underline":true,"width":80,"height":40,"key":-5,"location":"243.10125000000016 99.67151250000005"},
+            {"text":"color","color":"black","figure":"Ellipse","width":80,"height":40,"key":-6,"location":"251.60979375000022 213.92910000000006"}
             ],
               "linkDataArray": [
             {"from":-8,"to":-10,"isOne":true,"isTotal":false},
-            {"from":-8,"to":-3,"isOne":false,"isTotal":false},
-            {"from":-4,"to":-10,"isOne":true,"isTotal":false},
-            {"from":-4,"to":-3,"isOne":false,"isTotal":false},
-            {"from":-5,"to":-3,"isOne":true,"isTotal":false},
-            {"from":-5,"to":-6,"isOne":false,"isTotal":false},
-            {"from":-7,"to":-6},
-            {"from":-11,"to":-10},
-            {"from":-9,"to":-10},
-            {"from":-12,"to":-10}
+            {"from":-8,"to":-3},
+            {"from":-4,"to":-10},
+            {"from":-5,"to":-3},
+            {"from":-6,"to":-3}
             ]}
           </textarea>
         </div>
