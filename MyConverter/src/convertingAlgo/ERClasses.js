@@ -12,6 +12,7 @@ class Entity {
         this.label = label
         this.type = type
         this.connectors = []
+        this.attributes = []
     }
 }
 
@@ -21,6 +22,7 @@ class Relationship {
         this.label = label
         this.type = type
         this.connectors = []
+        this.attributes = []
     }
 }
 
@@ -35,19 +37,19 @@ class Specialization extends Relationship {
 }
 
 class Connector {
-    constructor(ER, type, cardinality, participation, from, to) {
-        this.ER = ER,
-        this.id = `${ER}-${from}-${to}`
+    constructor(ERModel, from, to, cardinality, participation, type) {
+        this.ERModel = ERModel,
+        this.id = `${ERModel}-${from}-${to}`
         this.type = type
         this.cardinality = cardinality
-        this. participation = participation
+        this.participation = participation
         this.from = from
         this.to = to
     }
 }
 
 class Attribute {
-    constructor(ER, label, type) {
+    constructor(label, type, ER) {
         this.ER = ER
         this. label = label
         this. type = type

@@ -93,6 +93,12 @@ function Inspector(divid, diagram, options) {
     if (e.isTransactionFinished) self.inspectObject();
   });
   if (this.inspectsSelection) {
+    diagram.addDiagramListener("ChangedSelection", function(e) {
+      if (self._diagram.selection.first()) {
+        getIsShowTotalOne(self._diagram.selection.first().ob)
+        getIsSpecialization(self._diagram.selection.first().ob)
+      }
+    });
     diagram.addDiagramListener("ChangedSelection", function(e) { self.inspectObject(); });
   }
 }
