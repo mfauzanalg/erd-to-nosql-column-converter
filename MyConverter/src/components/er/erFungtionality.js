@@ -4,22 +4,16 @@
 var $ = go.GraphObject.make;
 let contents = {}
 
-function readSingleFile(evt) {
-  var f = evt.target.files[0];
-  if (f) {
-      var r = new FileReader();
-      r.onload = function(e) { 
-        contents = e.target.result;
-        myDiagram.model = go.Model.fromJson(contents)
-      }
-      r.readAsText(f);
-  } else {
-      alert("Failed to load file");
-  }
+// Clear Diagram
+const clearDiagram = () => {
+  myDiagram.model = go.Model.fromJson(
+  { "class": "GraphLinksModel",
+  "nodeDataArray": [],
+  "linkDataArray": []})
 }
-document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
 
-function download(filename, text) {
+// Save Diagram
+const download = (filename, text) => {
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', filename);
@@ -32,17 +26,38 @@ function download(filename, text) {
   document.body.removeChild(element);
 }
 
-function save() {
+const save = () => {
   document.getElementById('mySavedModel').value = myDiagram.model.toJson();
   download("hello.json", myDiagram.model.toJson());
   myDiagram.isModified = false;
 }
 
-function load() {
+// Load Diagram
+const readSingleFile = (evt) => {
+  var f = evt.target.files[0];
+  if (f) {
+      var r = new FileReader();
+      r.onload = function(e) { 
+        contents = e.target.result;
+        myDiagram.model = go.Model.fromJson(contents)
+      }
+      r.readAsText(f);
+  } else {
+      alert("Failed to load file");
+  }
+}
+document.getElementById('load-input').addEventListener('change', readSingleFile, false);
+
+const load = () => {
+  document.getElementById('load-input').click();
+}
+
+const loadDefault = () => {
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
 }
 
-const convert = () => {
+// Convert Diagram
+const convertToERModel = () => {
   const ERModelName = "Car and Person"
   const ERSchema = JSON.parse(myDiagram.model.toJson());
   
@@ -101,6 +116,7 @@ const convert = () => {
 
     // Relation between Entity and Relationship
     if (ERFrom && ERTo) {
+      newConnector.type = "RelationConnector"
       ERFrom.connectors.push(newConnector)
       ERTo.connectors.push(newConnector)
     }
@@ -117,9 +133,95 @@ const convert = () => {
     }
   })
 
-  console.log(newERModel)
-  console.log(attributeArray)
+  return newERModel
 }
+
+const convertToLogical = () => {
+  const newERModel123 = {
+    entityRelations: [
+      {
+        id: 0,
+        label: 'Person',
+        type: 'Entity',
+        attributes: [
+          {
+            type: 'Key',
+            label: 'Name'
+          },
+        ],
+        connectors: [
+          {
+            type: 'RelationConnector',
+            from: 2,
+            to: 0,
+            cardinality: 'One',
+            participation: 'Total'
+          },
+        ]
+      },
+      {
+        id: 2,
+        label: 'Have',
+        type: 'Relationship',
+        connectors: [
+          {
+            type: 'RelationConnector',
+            from: 2,
+            to: 0,
+            cardinality: 'One',
+            participation: 'Total'
+          },
+          {
+            type: 'RelationConnector',
+            from: 2,
+            to: 3,
+            cardinality: 'Many',
+            participation: 'Total'
+          }
+        ]
+      },
+      {
+        id: 3,
+        label: 'Car',
+        type: 'Entity',
+        connectors: [
+          {
+            type: 'RelationConnector',
+            from: 2,
+            to: 3,
+            cardinality: 'Many',
+            participation: 'Total'
+          },
+        ],
+        attributes: [
+          {
+            type: 'Key',
+            label: 'Plat'
+          },
+          {
+            type: 'Regular',
+            label: 'Color'
+          }
+        ],
+      },
+    ],
+  }
+  const newERModel = convertToERModel()
+  console.log(newERModel)
+  createReference(newERModel)
+  splitER(newERModel)
+  const logicalModel = convertERToLogical(newERModel)
+
+  // print2(logicalModel)
+
+  const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+  console.log(logicalSchema)
+}
+
+// createReference(ERModel)
+// splitER(ERModel)
+
+
 
 // Kekurangan
 // Type di connector blm implement

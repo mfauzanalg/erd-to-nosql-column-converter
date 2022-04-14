@@ -1,78 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>ERD To DDL CQL Converter</title>
-  </head>
-  <body>
-    <div class="outer-container">
-      <div class="title">
-        ERD To DDL CQL Converter
+
+<head>
+  <title>ERD To DDL CQL Converter</title>
+</head>
+
+<body>
+  <div class="outer-container">
+    <div class="title">
+      ERD To DDL CQL Converter
+    </div>
+    <div class="subtitle-container">
+      <div class="subtitle">
+        This application converts Entity-Relationship Diagram to Data Defenition Language for Cassandra.
+        First Entity-Relationship Diagram will be converted to Logical Schema. And then the logical schema ill be
+        conevrted to DDL.
       </div>
-      <div class="subtitle-container">
-        <div class="subtitle">
-          This application converts Entity-Relationship Diagram to Data Defenition Language for Cassandra.
-          First Entity-Relationship Diagram will be converted to Logical Schema. And then the logical schema ill be conevrted to DDL.
+    </div>
+    <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
+      <script src="../gojs/go2.js"></script>
+      <div>
+        <!-- Styles -->
+        <link rel="stylesheet" href="../helpers/DataInspector.css" />
+        <link rel="stylesheet" href="./style.css" />
+        <!-- Algorithm -->
+        <script src="./convertingAlgo/erClasses.js"></script>
+        <script src="./convertingAlgo/erToLogical.js"></script>
+        <script src="./convertingAlgo/logicalToDDL.js"></script>
+        <!-- Components -->
+        <script src="../helpers/Figures.js"></script>
+        <script src="../helpers/DataInspector.js"></script>
+        <script src="./components/er/customShapes.js"></script>
+        <script src="./components/er/erInspector.js"></script>
+        <script src="./components/er/erPalette.js"></script>
+        <script src="./components/er/erDiagram.js"></script>
+        <script src="./components/logical/logicalSchema.js"></script>
+        <script src="./app.js" id="code"></script>
+
+
+        <!-- ERD Schema -->
+        <div class="header">
+          Entity-Relationship Diagram
         </div>
-      </div>
-      <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
-        <script src="../gojs/go.js"></script>
-        <div>
-          <!-- Styles -->
-          <link rel="stylesheet" href="../helpers/DataInspector.css" />
-          <link rel="stylesheet" href="./style.css" />
-          <!-- Algorithm -->
-          <script src="./convertingAlgo/ERClasses.js"></script>
-          <!-- Components -->
-          <script src="./components/globalVariable.js"></script>
-          <script src="../helpers/Figures.js"></script>
-          <script src="../helpers/DataInspector.js"></script>
-          <script src="./components/customShapes.js"></script>
-          <script src="./components/erInspector.js"></script>
-          <script src="./components/erPalette.js"></script>
-          <script src="./components/erDiagram.js"></script>
-          <script src="./app.js" id="code"></script>
-          
-  
-          <!-- ERD Canvas -->
-          <div class="header">
-            Entity-Relationship Diagram
+        <div class="step-container">
+          <div class="input-name-container">
+            <div class="ername">
+              Entity Relationship Name:
+            </div>
+            <div>
+              <input class="input-name" />
+            </div>
           </div>
-          <div class="step-container">
-            <div class="input-name-container">
-              <div class="ername">
-                Entity Relationship Name:
-              </div>
-              <div>
-                <input class="input-name"/>
-                <input type="file" id="fileinput" class="input-name"/>
-              </div>
+          <div class="er-button-container">
+            <button class="er-button" onclick="clearDiagram()">Clear</button>
+            <button class="er-button" onclick="save()">Save</button>
+            <button id="load-btn" class="er-button" onclick="load()">Load</button>
+            <input type="file" id="load-input" class="input-name" style="display:none" />
+            <button class="er-button" onclick="convertToLogical()">Convert to Logical Schema</button>
+          </div>
+          <div class="main-container">
+            <div class="palette-container">
+              <div id="myPaletteDiv"></div>
             </div>
-            <div class="er-button-container">
-              <button class="er-button">Clear</button>
-              <button class="er-button">Save</button>
-              <button class="er-button">Load</button>
-              <button class="er-button">Convert to Logical Schema</button>
+            <div class="diagram-container">
+              <div id="myDiagramDiv"></div>
             </div>
-            <div id="sample">
-              <div class="main-container">
-                <div class="palette-container">
-                  <div id="myPaletteDiv"></div>
-                </div>
-                <div class="diagram-container">
-                  <div id="myDiagramDiv" style="border: solid 1px black; height: 500px"></div>
-                </div>
-                <div class="inspector-container">
-                  <div id="myInspectorDiv" class="inspector"></div>
-                </div>
-              </div>
-    
-              <!-- ERD Functionality -->
-              <div class="button-container">
-                <button id="loadModel" onclick="load()">Load</button>
-                <button id="saveModel" onclick="save()">Save</button>
-                <button id="convert" onclick="convert()">Convert</button> 
-              </div>
-              <textarea id="mySavedModel" style="width: 100%; height: 200px">
+            <div class="inspector-container">
+              <div id="myInspectorDiv" class="inspector"></div>
+            </div>
+          </div>
+
+          <textarea id="mySavedModel" style="width: 100%; height: 200px; margin-top: 20px; display: none;">
                 { "class": "GraphLinksModel",
                   "nodeDataArray": [
                 {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-10,"location":"-218 155"},
@@ -83,18 +81,55 @@
                 {"text":"color","color":"black","figure":"Ellipse","width":80,"height":40,"key":-6,"location":"251.60979375000022 213.92910000000006"}
                 ],
                   "linkDataArray": [
-                {"from":-8,"to":-10,"isOne":true,"isTotal":false},
-                {"from":-8,"to":-3},
+                {"from":-8,"to":-10,"isOne":true,"isTotal":true},
+                {"from":-8,"to":-3,"isTotal":true},
                 {"from":-4,"to":-10},
                 {"from":-5,"to":-3},
                 {"from":-6,"to":-3}
                 ]}
               </textarea>
-            </div>
-          </div>
-          <script src="./components/global.js"></script>
         </div>
+
+
+        <!-- Logical Schema -->
+        <div class="header" style="margin-top: 30px;">
+          Logical Schema
+        </div>
+        <div class="step-container">
+          <div id="myLogicalDiagramDiv"
+            style="flex-grow: 1; height: 500px; background-color: rgb(255, 255, 255); border: solid 1px black"></div>
+          <input id="levelSlider" type="range" min="0" max="5" value="5" style="display: none;" />
+        </div>
+
+        <textarea id="myLogicalSavedModel" style="width:100%;height:300px;margin-top: 30px;">
+            { "class": "go.GraphLinksModel",
+              "nodeDataArray": [
+            {"key":1, "isGroup":true, "text":"Main 1", "horiz":true},
+            {"key":2, "isGroup":true, "text":"Main 2", "horiz":true},
+            {"key":3, "isGroup":true, "text":"Group A", "group":1},
+            {"key":4, "isGroup":true, "text":"Group B", "group":1},
+            {"key":5, "isGroup":true, "text":"Group C", "group":2},
+            {"key":6, "isGroup":true, "text":"Group D", "group":2},
+            {"key":7, "isGroup":true, "text":"Group E", "group":6},
+            {"text":"first A", "group":3, "key":-7},
+            {"text":"second A", "group":3, "key":-8},
+            {"text":"first B", "group":4, "key":-9},
+            {"text":"second B", "group":4, "key":-10},
+            {"text":"third B", "group":4, "key":-11},
+            {"text":"first C", "group":5, "key":-12},
+            {"text":"second C", "group":5, "key":-13},
+            {"text":"first D", "group":6, "key":-14},
+            {"text":"first E", "group":7, "key":-15}
+            ],
+              "linkDataArray": [  ]}
+          </textarea>
+
+
+        <script src="./components/er/erFungtionality.js"></script>
+        <script src="./components/logical/logicalFunctionality.js"></script>
       </div>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

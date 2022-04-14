@@ -1,5 +1,3 @@
-// import { ERModel, convertERToLogical, getArrayKey } from './ERToLogical.js';
-
 const printDDL = (DDL) => {
   DDL.forEach(row => {
     console.log(row)
@@ -59,8 +57,8 @@ const logicalToDDL = (logicalModel) => {
   return stringQuery
 }
 
-const logicalModel = convertERToLogical(ERModel)
-console.log(logicalModel)
+// const logicalModel = (ERModel)
+// console.log(logicalModel)
 
 // const DDL = logicalToDDL(logicalModel)
 // printDDL(DDL)
@@ -153,6 +151,3 @@ const drawArtificialRelation = (gojs) => {
     }
   })
 }
-
-const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-console.log(logicalSchema)

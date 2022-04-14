@@ -8,7 +8,7 @@ function init() {
   initERDiagram();
   initERPalette();
   initERInspector();
-  load();
+  loadDefault();
 }
 
 window.addEventListener('DOMContentLoaded', init);

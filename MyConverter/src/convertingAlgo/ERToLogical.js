@@ -1,83 +1,3 @@
-const ERModel = {
-  entityRelations: [
-    {
-      id: 0,
-      label: 'Person',
-      type: 'Entity',
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Name'
-        },
-        {
-          type: 'Regular',
-          label: 'Address'
-        }
-      ],
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-      ]
-    },
-    {
-      id: 2,
-      label: 'Have',
-      type: 'Relationship',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 0,
-          cardinality: 'One',
-          participation: 'Total'
-        },
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        }
-      ]
-    },
-    {
-      id: 3,
-      label: 'Car',
-      type: 'Entity',
-      connectors: [
-        {
-          type: 'RelationConnector',
-          from: 2,
-          to: 3,
-          cardinality: 'Many',
-          participation: 'Total'
-        },
-      ],
-      attributes: [
-        {
-          type: 'Key',
-          label: 'Plat'
-        },
-        {
-          type: 'Regular',
-          label: 'Color'
-        }
-      ],
-    },
-  ],
-}
-
-// import v8 from 'v8'
-
-// const structuredClone = obj => {
-//   return v8.deserialize(v8.serialize(obj));
-// };
-
 const createReference = (ERSchema) => {
   ERSchema.entityRelations.forEach(er => {
     if (er.superID || er.superID == 0) {
@@ -518,11 +438,12 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
 
 const isSameKey = (columnFamily1, columnFamily2) => {
   let result = false
-  if (columnFamily1.parentColumnFam && columnFamily1.parentColumnFam?.id === columnFamily2.parentColumnFam?.id) {
+  if (columnFamily1.parentColumnFam && columnFamily1.parentColumnFam?.id === columnFamily2.id) {
     result = true
   }
-  // console.log("WOWWWW")
-  // console.log(result)
+  if (columnFamily2.parentColumnFam && columnFamily2.parentColumnFam?.id === columnFamily1?.id) {
+    result = true
+  }
 
   const keysCF1 = getArrayKey(columnFamily1.attributes)
   const keysCF2 = getArrayKey(columnFamily2.attributes)
@@ -548,7 +469,6 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
     // console.log('=============================================================================')
     // console.log(columnFamily)
     // console.log(columFamilyFromRelation)
-
     if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
@@ -711,13 +631,15 @@ const print2 = (myObject) => {
   console.log(JSON.stringify(myObject, stringifyCircularObject, 2));
 }
 
-createReference(ERModel)
-splitER(ERModel)
+// createReference(ERModel)
+// splitER(ERModel)
+
+
 // print2(ERModel)
 // console.log(ERModel)
 // convertERToLogical(ERModel)
 // print(convertERToLogical(ERModel));
-print2(convertERToLogical(ERModel));
+// print2(convertERToLogical(ERModel));
 // console.log(convertERToLogical(ERModel));
 
 

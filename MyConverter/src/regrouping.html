@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+  <!-- Copyright 1998-2022 by Northwoods Software Corporation. -->
+  <title>Regrouping Demo</title>
+</head>
+
+<body>
+  <!-- This top nav is not part of the sample code -->
+  <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
+
+    <!-- * * * * * * * * * * * * * -->
+    <!-- Start of GoJS sample code -->
+
+    <script src="../gojs/go2.js"></script>
+    <script src="./components/logical/logicalSchema.js"></script>
+    <div id="allSampleContent" class="p-4 w-full">
+      <div id="sample">
+        <div id="myLogicalDiagramDiv" style="flex-grow: 1; height: 500px; background-color: rgb(0, 0, 0); border: solid 1px black"></div>
+        <p>
+          <input id="levelSlider" type="range" min="0" max="5" value="5" style="display: none;" />
+        </p>
+
+        <div id="buttons">
+          <button id="saveModel" onclick="saveLogical()">Save</button>
+          <button id="loadModel" onclick="loadLogical()">Load</button>
+          Diagram Model saved in JSON format:
+        </div>
+        <textarea id="mySavedModel" style="width:100%;height:300px">
+          { "class": "go.GraphLinksModel",
+            "nodeDataArray": [
+          {"key":1, "isGroup":true, "text":"Main 1", "horiz":true},
+          {"key":2, "isGroup":true, "text":"Main 2", "horiz":true},
+          {"key":3, "isGroup":true, "text":"Group A", "group":1},
+          {"key":4, "isGroup":true, "text":"Group B", "group":1},
+          {"key":5, "isGroup":true, "text":"Group C", "group":2},
+          {"key":6, "isGroup":true, "text":"Group D", "group":2},
+          {"key":7, "isGroup":true, "text":"Group E", "group":6},
+          {"text":"first A", "group":3, "key":-7},
+          {"text":"second A", "group":3, "key":-8},
+          {"text":"first B", "group":4, "key":-9},
+          {"text":"second B", "group":4, "key":-10},
+          {"text":"third B", "group":4, "key":-11},
+          {"text":"first C", "group":5, "key":-12},
+          {"text":"second C", "group":5, "key":-13},
+          {"text":"first D", "group":6, "key":-14},
+          {"text":"first E", "group":7, "key":-15}
+          ],
+            "linkDataArray": [  ]}
+        </textarea>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -95,8 +95,8 @@ function Inspector(divid, diagram, options) {
   if (this.inspectsSelection) {
     diagram.addDiagramListener("ChangedSelection", function(e) {
       if (self._diagram.selection.first()) {
-        getIsShowTotalOne(self._diagram.selection.first().ob)
-        getIsSpecialization(self._diagram.selection.first().ob)
+        getIsShowTotalOne(self._diagram.selection.first().jb)
+        getIsSpecialization(self._diagram.selection.first().jb)
       }
     });
     diagram.addDiagramListener("ChangedSelection", function(e) { self.inspectObject(); });
