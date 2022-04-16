@@ -220,6 +220,8 @@ const isVisited = (entityRelation, visited) => {
 }
 
 const convertERToLogical = (ERModel) => {
+  visited = []
+  artificialID = 0;
   let logicalCF = []
   const entities = ERModel.entities
   for (let i = 0; i < entities.length; i++) {

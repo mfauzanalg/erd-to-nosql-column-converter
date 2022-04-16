@@ -128,8 +128,6 @@ function init() {
   var slider = document.getElementById("levelSlider");
   slider.addEventListener('change', reexpand);
   slider.addEventListener('input', reexpand);
-
-  loadLogical();
 }
 
 function reexpand(e) {
@@ -149,7 +147,5 @@ function saveLogical() {
   document.getElementById("mySavedModel").value = myLogicalDiagram.model.toJson();
   myLogicalDiagram.isModified = false;
 }
-function loadLogical() {
-  myLogicalDiagram.model = go.Model.fromJson(document.getElementById("myLogicalSavedModel").value);
-}
+
 window.addEventListener('DOMContentLoaded', init);

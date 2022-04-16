@@ -3,6 +3,10 @@
 
 var $ = go.GraphObject.make;
 let contents = {}
+const ername = document.getElementById("er-name-input")
+const logicalName = document.getElementById("logical-schema-name")
+const logicalSection = document.getElementById("logical-schema-section")
+let logicalModel
 
 // Clear Diagram
 const clearDiagram = () => {
@@ -10,6 +14,14 @@ const clearDiagram = () => {
   { "class": "GraphLinksModel",
   "nodeDataArray": [],
   "linkDataArray": []})
+  ername.value = ""
+  logicalName.innerHTML = ""
+  logicalSection.style.display = "none"
+
+  document.getElementById("convertDDL-btn").style.display = "inline-block"
+  document.getElementById("button-container-logical").style.display = "block"
+  // document.getElementById("data-type-input").innerHTML = ""
+  // document.getElementById("data-type-input").style.display = "none"
 }
 
 // Save Diagram
@@ -54,11 +66,17 @@ const load = () => {
 
 const loadDefault = () => {
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
+  ername.value = "Car and Person"
+  logicalSection.style.display = "none"
+
+  // development
+  document.getElementById("convert-logical-btn").click()
+  document.getElementById("convertDDL-btn").click()
 }
 
 // Convert Diagram
-const convertToERModel = () => {
-  const ERModelName = "Car and Person"
+const convertToERModel = (ername) => {
+  const ERModelName = ername
   const ERSchema = JSON.parse(myDiagram.model.toJson());
   
   let newERModel = new ERModel(ERModelName)
@@ -137,85 +155,33 @@ const convertToERModel = () => {
 }
 
 const convertToLogical = () => {
-  const newERModel123 = {
-    entityRelations: [
-      {
-        id: 0,
-        label: 'Person',
-        type: 'Entity',
-        attributes: [
-          {
-            type: 'Key',
-            label: 'Name'
-          },
-        ],
-        connectors: [
-          {
-            type: 'RelationConnector',
-            from: 2,
-            to: 0,
-            cardinality: 'One',
-            participation: 'Total'
-          },
-        ]
-      },
-      {
-        id: 2,
-        label: 'Have',
-        type: 'Relationship',
-        connectors: [
-          {
-            type: 'RelationConnector',
-            from: 2,
-            to: 0,
-            cardinality: 'One',
-            participation: 'Total'
-          },
-          {
-            type: 'RelationConnector',
-            from: 2,
-            to: 3,
-            cardinality: 'Many',
-            participation: 'Total'
-          }
-        ]
-      },
-      {
-        id: 3,
-        label: 'Car',
-        type: 'Entity',
-        connectors: [
-          {
-            type: 'RelationConnector',
-            from: 2,
-            to: 3,
-            cardinality: 'Many',
-            participation: 'Total'
-          },
-        ],
-        attributes: [
-          {
-            type: 'Key',
-            label: 'Plat'
-          },
-          {
-            type: 'Regular',
-            label: 'Color'
-          }
-        ],
-      },
-    ],
+  const ername = document.getElementById("er-name-input")
+  document.getElementById("convertDDL-btn").style.display = "inline-block"
+  document.getElementById("button-container-logical").style.display = "block"
+  // document.getElementById("data-type-input").innerHTML = ""
+  // document.getElementById("data-type-input").style.display = "none"
+
+
+  if (ername.value == "") {
+    alert("Please fill yhe entity relationship name")
   }
-  const newERModel = convertToERModel()
-  console.log(newERModel)
-  createReference(newERModel)
-  splitER(newERModel)
-  const logicalModel = convertERToLogical(newERModel)
+  else {
+    logicalSection.style.display = "block"
+    logicalName.innerHTML = `for ${ername.value}`
 
-  // print2(logicalModel)
-
-  const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-  console.log(logicalSchema)
+    const logicalTitle = document.getElementById("logical-schema-title")
+    logicalTitle.scrollIntoView()
+  
+    const newERModel = convertToERModel(ername.value)
+  
+    createReference(newERModel)
+    splitER(newERModel)
+  
+    logicalModel = convertERToLogical(newERModel)
+    const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+  
+    loadLogical(logicalSchema);
+  }
 }
 
 // createReference(ERModel)
