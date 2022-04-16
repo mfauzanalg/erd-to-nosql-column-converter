@@ -14,65 +14,64 @@
           the logical schema ill be conevrted to DDL.
         </div>
       </div>
-      <div class="md:flex flex-col md:flex-row md:min-h-screen w-full max-w-screen-xl mx-auto">
-        <script src="../gojs/go2.js"></script>
-        <div>
-          <!-- Styles -->
-          <link rel="stylesheet" href="../helpers/DataInspector.css" />
-          <link rel="stylesheet" href="./style.css" />
-          <!-- Algorithm -->
-          <script src="./convertingAlgo/erClasses.js"></script>
-          <script src="./convertingAlgo/erToLogical.js"></script>
-          <script src="./convertingAlgo/logicalToDDL.js"></script>
-          <!-- Components -->
-          <script src="../helpers/Figures.js"></script>
-          <script src="../helpers/DataInspector.js"></script>
-          <script src="./components/er/customShapes.js"></script>
-          <script src="./components/er/erInspector.js"></script>
-          <script src="./components/er/erPalette.js"></script>
-          <script src="./components/er/erDiagram.js"></script>
-          <script src="./components/logical/logicalSchema.js"></script>
-          <script src="./app.js" id="code"></script>
 
-          <!-- ERD Schema -->
-          <div class="header">Entity-Relationship Diagram</div>
-          <div class="step-container">
-            <div class="input-name-container">
-              <div class="ername">Entity Relationship Name:</div>
-              <div>
-                <input id="er-name-input" class="input-name" />
-              </div>
-            </div>
-            <div class="button-container">
-              <button class="button" onclick="clearDiagram()">Clear</button>
-              <button class="button" onclick="save()">Save</button>
-              <button id="load-btn" class="button" onclick="load()">Load</button>
-              <input type="file" id="load-input" class="input-name" style="display: none" />
-              <button
-                class="button"
-                id="convert-logical-btn"
-                href="#logical-schema-section"
-                onclick="convertToLogical()"
-              >
-                Convert to Logical Schema
-              </button>
-            </div>
-            <div class="main-container">
-              <div class="palette-container">
-                <div id="myPaletteDiv"></div>
-              </div>
-              <div class="diagram-container">
-                <div id="myDiagramDiv"></div>
-              </div>
-              <div class="inspector-container">
-                <div id="myInspectorDiv" class="inspector"></div>
-              </div>
-            </div>
+      <script src="../gojs/go2.js"></script>
+      <div>
+        <!-- Styles -->
+        <link rel="stylesheet" href="../helpers/DataInspector.css" />
+        <link rel="stylesheet" href="./style.css" />
+        <!-- Algorithm -->
+        <script src="./convertingAlgo/erClasses.js"></script>
+        <script src="./convertingAlgo/erToLogical.js"></script>
+        <script src="./convertingAlgo/logicalToDDL.js"></script>
+        <!-- Components -->
+        <script src="../helpers/Figures.js"></script>
+        <script src="../helpers/DataInspector.js"></script>
+        <script src="./components/er/customShapes.js"></script>
+        <script src="./components/er/erInspector.js"></script>
+        <script src="./components/er/erPalette.js"></script>
+        <script src="./components/er/erDiagram.js"></script>
+        <script src="./components/logical/logicalSchema.js"></script>
+        <script src="./app.js" id="code"></script>
 
-            <textarea
-              id="mySavedModel"
-              style="width: 100%; height: 200px; margin-top: 20px; display: none"
+        <!-- ERD Schema -->
+        <div class="header">Entity-Relationship Diagram</div>
+        <div class="step-container" id="step-container-er">
+          <div class="input-name-container">
+            <div class="ername">Entity Relationship Name:</div>
+            <div>
+              <input id="er-name-input" class="input-name" />
+            </div>
+          </div>
+          <div class="button-container">
+            <button class="button" onclick="clearDiagram()">Clear</button>
+            <button class="button" onclick="save()">Save</button>
+            <button id="load-btn" class="button" onclick="load()">Load</button>
+            <input type="file" id="load-input" class="input-name" style="display: none" />
+            <button
+              class="button"
+              id="convert-logical-btn"
+              href="#logical-schema-section"
+              onclick="convertToLogical()"
             >
+              Convert to Logical Schema
+            </button>
+          </div>
+          <div class="main-container">
+            <div class="palette-container">
+              <div id="myPaletteDiv"></div>
+            </div>
+            <div class="diagram-container">
+              <div id="myDiagramDiv"></div>
+            </div>
+            <div class="inspector-container">
+              <div id="myInspectorDiv" class="inspector"></div>
+            </div>
+          </div>
+
+          <textarea
+            id="mySavedModel"
+          >
                 { "class": "GraphLinksModel",
                   "nodeDataArray": [
                 {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-10,"location":"-218 155"},
@@ -90,61 +89,47 @@
                 {"from":-6,"to":-3}
                 ]}
               </textarea
-            >
-          </div>
-
-          <!-- Logical Schema -->
-          <div id="logical-schema-section">
-            <div id="logical-schema-title" class="header" style="margin-top: 40px">
-              Logical Schema
-              <span id="logical-schema-name"></span>
-            </div>
-            <div class="step-container">
-              <div class="button-container" id="button-container-logical" style="margin-top: 0">
-                <a
-                  id="convertDDL-btn"
-                  href="#data-type-input"
-                  class="button-a"
-                  onclick="showDataTypeForm()"
-                  >Convert to DDL CQL</a
-                >
-              </div>
-              <div
-                id="myLogicalDiagramDiv"
-                style="
-                  flex-grow: 1;
-                  height: 500px;
-                  background-color: rgb(255, 255, 255);
-                  border: solid 1px black;
-                "
-              ></div>
-              <input
-                id="levelSlider"
-                type="range"
-                min="0"
-                max="5"
-                value="5"
-                style="display: none"
-              />
-            </div>
-          </div>
-
-          <!-- Input the data type -->
-          <div id="data-type-input-container" style="display: none">
-            <div id="data-type-input"></div>
-            <a href="#ddl-section" class="button-a" onclick="convertToDDL()">Convert to DDL CQL</a>
-          </div>
-
-          <div id="ddl-section" class="header">
-            <div class="ddl-title">Data Defenition Language in CQL</div>
-            <div class="step-container">
-              <div id="ddl-content">Hello</div>
-            </div>
-          </div>
-
-          <script src="./components/er/erFungtionality.js"></script>
-          <script src="./components/logical/logicalFunctionality.js"></script>
+          >
         </div>
+
+        <!-- Logical Schema -->
+        <div id="logical-schema-section">
+          <div id="logical-schema-title" class="header">
+            Logical Diagram
+            <span id="logical-schema-name"></span>
+          </div>
+          <div class="step-container" id="step-container-logical">
+            <div class="button-container" id="button-container-logical">
+              <a
+                id="convertDDL-btn"
+                href="#data-type-input"
+                class="button-a"
+                onclick="showDataTypeForm()"
+                >Convert to DDL CQL</a
+              >
+            </div>
+            <div
+              id="myLogicalDiagramDiv"
+            ></div>
+            <input id="levelSlider" type="range" min="0" max="5" value="5" style="display: none" />
+          </div>
+        </div>
+
+        <!-- Input the data type -->
+        <div id="data-type-input-container" style="display: none">
+          <div id="data-type-input"></div>
+          <a href="#ddl-section" class="button-a" onclick="convertToDDL()">Convert to DDL CQL</a>
+        </div>
+
+        <div id="ddl-section">
+          <div class="header">Data Defenition Language in CQL</div>
+          <div class="step-container" id="step-container-ddl">
+            <div id="ddl-content">Hello</div>
+          </div>
+        </div>
+
+        <script src="./components/er/erFungtionality.js"></script>
+        <script src="./components/logical/logicalFunctionality.js"></script>
       </div>
     </div>
   </body>

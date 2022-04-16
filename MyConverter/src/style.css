@@ -27,22 +27,31 @@
   border: 1px solid black;
   width: 200px;
   margin-right: 10px;
-  border-radius: 5px;
+  border-radius: 7px;
+  background-color: white;
 }
 
 #myDiagramDiv {
   height: 500px;
-  /* max-width: 850px; */
   margin: 0 10px;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 7px;
+  background-color: white;
+}
+
+#myLogicalDiagramDiv {
+  flex-grow: 1;
+  height: 500px;
+  background-color: rgb(255, 255, 255);
+  border: solid 1px black;
+  border-radius: 7px;
 }
 
 .title {
   font-size: 35px;
   text-align: center;
   margin-bottom: 15px;
-  margin-top: 20px;
+  margin-top: 40px;
   font-weight: bold;
 }
 
@@ -54,7 +63,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 .subtitle {
@@ -63,7 +72,7 @@
 }
 
 .header {
-  font-size: 20px;
+  font-size: 22px;
   margin-bottom: 10px;
   font-weight: bold;
 }
@@ -75,7 +84,7 @@
 .step-container {
   border: 1px solid black;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 7px;
   margin-bottom: 30px;
 }
 
@@ -84,10 +93,6 @@ body {
   justify-content: center;
   align-items: center;
   scroll-behavior: smooth;
-}
-
-.button-container {
-  margin: 20px 0;
 }
 
 .ername {
@@ -103,6 +108,8 @@ body {
 
 .input-name {
   font-size: 18px;
+  padding: 3px;
+  padding-left: 7px;
 }
 
 .button-container {
@@ -113,10 +120,18 @@ body {
   display: none;
 }
 
+#logical-schema-title {
+  margin-top: 40px;
+}
+
 .button {
   font-size: 15px;
   padding: 8px;
   margin-right: 10px;
+}
+
+#button-container-logical {
+  margin-top: 0;
 }
 
 #data-type-input {
@@ -128,15 +143,21 @@ body {
 
 #data-type-input-container{
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 7px;
   margin-bottom: 20px;
   padding: 20px;
+  background-color: rgb(230, 245, 231);
 }
 
 .table-input-container {
   margin: 0 10px;
   padding: 10px;
-  border: 1px solid blue;
+  border: 1px solid black;
+  border-radius: 7px;
+  margin-bottom: 20px;
+  min-width: 250px;
+  /* background-color: rgb(252, 242, 229); */
+  background-color: white;
 }
 
 .table-title {
@@ -167,7 +188,7 @@ a {
 .button-a {
   border: 1px solid black;
   background-color: rgb(228, 228, 228);
-  border-radius: 4px;
+  border-radius: 7px;
   padding: 7px;
   display: inline-block;
 }
@@ -177,21 +198,37 @@ a {
   display: none;
 }
 
-.ddl-title {
-  margin-bottom: 10px;
-}
-
 
 textarea {
   width: 100%;
   padding: 20px;
+  display: none;
 }
 
 #ddl-content {
   width: 100%;
   padding: 20px;
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 7px;
   font-weight: normal;
   font-size: 16px;
+  background-color: white;
+}
+
+#step-container-er {
+  background-color: rgb(227, 235, 255);
+}
+
+#step-container-logical {
+  background-color: rgb(255, 224, 230);
+}
+
+#step-container-ddl {
+  background-color: rgba(254, 252, 199, 0.808);
+}
+
+button {
+  border-radius: 5px;
+  border: 1px solid black;
+  cursor: pointer;
 }
