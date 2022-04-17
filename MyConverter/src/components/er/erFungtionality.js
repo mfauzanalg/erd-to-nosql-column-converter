@@ -176,10 +176,16 @@ const convertToLogical = () => {
   
     const newERModel = convertToERModel(ername.value)
   
+    console.log("ER MODEL")
+    console.log(newERModel)
+
     createReference(newERModel)
     splitER(newERModel)
   
+    
     logicalModel = convertERToLogical(newERModel)
+    console.log("LOGICAL MODEL")
+    console.log(logicalModel)
     const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
   
     loadLogical(logicalSchema);

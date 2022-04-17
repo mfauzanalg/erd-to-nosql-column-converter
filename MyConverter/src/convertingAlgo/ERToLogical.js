@@ -204,11 +204,16 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
   let key = []
   const connectors = relationship.connectors
   while (!found && connectors && i < connectors.length) {
-    if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
+    // Harusnya memang total
+    // if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
+    if (connectors[i].cardinality == 'One') {
       const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
+      console.log("PARENT")
+      console.log(parent)
       found = true
       // key = getArrayKey(parent.attributes)
       columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
+      console.log(columnFamily)
     }
     i += 1
   }
@@ -319,8 +324,12 @@ const findRelationArray = (entity) => {
         }
 
         if (relation.type == 'Relationship') {
-          if (relation.connectors[0].toER === entity) connectorTo = relation.connectors[1]
+          if (relation.connectors[0].toER.label == entity.label) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
+
+          
+          console.log(entity.label)
+          console.log(connectorTo)
           // relation.label = `${entity.label}-${relation.label}`
   
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
@@ -329,6 +338,7 @@ const findRelationArray = (entity) => {
               relation: relation,
             })
           }
+          
           else if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'Many') {
             relationArray.push ({
               type: 'BinaryManyToMany',
@@ -471,6 +481,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
     // console.log('=============================================================================')
     // console.log(columnFamily)
     // console.log(columFamilyFromRelation)
+    console.log(isSameKey(columnFamily, columFamilyFromRelation))
     if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
@@ -559,6 +570,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
     newColumnFamily.parentColumnFam = columnFamily2
+    console.log("WOWWOWOWOW")
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
