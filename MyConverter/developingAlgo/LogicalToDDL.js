@@ -60,7 +60,6 @@ const logicalToDDL = (logicalModel) => {
 }
 
 const logicalModel = convertERToLogical(ERModel)
-console.log(logicalModel)
 
 // const DDL = logicalToDDL(logicalModel)
 // printDDL(DDL)
@@ -155,4 +154,3 @@ const drawArtificialRelation = (gojs) => {
 }
 
 const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-console.log(logicalSchema)

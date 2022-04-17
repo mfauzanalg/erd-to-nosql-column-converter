@@ -78,8 +78,6 @@ const convertToDDL = () => {
   const stringQuery = logicalToDDL(logicalModel)
   const joinedQuery = createKeyspace(ername.value) +  stringQuery.join('\n')
 
-  console.log(joinedQuery)
-
   const textareaDDL = document.getElementById("ddl-content")
   textareaDDL.value = joinedQuery
   textAreaAdjust(textareaDDL)

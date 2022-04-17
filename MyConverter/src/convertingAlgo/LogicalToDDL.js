@@ -23,6 +23,12 @@ const createPrimaryKey = (parentKeys, cfKeys, stringQuery) => {
   stringQuery.push(`  PRIMARY KEY (${primaryKey})`)
 }
 
+const removeNewLine = (str) => {
+  newStr = str.replace(/\n|\r\n|\r/g, "_");
+  newStr = newStr.replace(/ /g, "_");
+  return newStr
+}
+
 const logicalToDDL = (logicalModel) => {
   let stringQuery = []
   logicalModel.columnFamilies.forEach((cf) => {
@@ -34,13 +40,10 @@ const logicalToDDL = (logicalModel) => {
     
     if (cf.parentColumnFam) {
       const parentAttributes = cf.parentColumnFam.attributes
-      console.log(parentAttributes)
       parentAttributes.forEach((attr) => {
         if (['Key', 'Auxiliary'].includes(attr.type)) {
-          console.log(cf.label)
-          console.log(attr.label)
           const dataType = document.getElementById(`${cf.parentColumnFam.label}-${attr.label}`).value
-          stringQuery.push(`  ${attr.label} ${dataType.toUpperCase()},`)
+          stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
           parentKeys.push(attr.label)
         }
       })
@@ -49,7 +52,7 @@ const logicalToDDL = (logicalModel) => {
     if (cf.attributes) {
       cf.attributes.forEach((attr) => {
         const dataType = document.getElementById(`${cf.label}-${attr.label}`).value
-        stringQuery.push(`  ${attr.label}  ${dataType.toUpperCase()},`)
+        stringQuery.push(`  ${removeNewLine(attr.label)}  ${dataType.toUpperCase()},`)
         if (['Key', 'Auxiliary'].includes(attr.type)) {
           cfKeys.push(attr.label)
         }

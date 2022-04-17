@@ -64,8 +64,6 @@ const getIsSpecialization = (inspectedObject) => {
   // If the seledted item is a link
   if (from && to) {
     // If the selected item is able to click isTotal
-    console.log(from.figure)
-    console.log(to.figure)
     if (from.figure == "TriangleDown" || to.figure == "TriangleDown") {
       isSpecialization = true
     }

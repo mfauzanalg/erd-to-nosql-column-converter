@@ -1,10 +1,6 @@
 
 // Defining class using es6
 
-const testConsole = () => {
-    console.log("HAHAHA")
-}
-
 class Vehicle {
     constructor(name, maker, engine) {
       this.name = name;
