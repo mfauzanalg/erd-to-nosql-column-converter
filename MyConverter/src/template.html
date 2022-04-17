@@ -35,7 +35,7 @@
         <script src="./app.js" id="code"></script>
 
         <!-- ERD Schema -->
-        <div class="header">Entity-Relationship Diagram</div>
+        <div class="header" id="er-section">Entity-Relationship Diagram</div>
         <div class="step-container" id="step-container-er">
           <div class="input-name-container">
             <div class="ername">Entity Relationship Name:</div>
@@ -127,6 +127,7 @@
           <div class="header">Data Defenition Language in CQL</div>
           <div class="step-container" id="step-container-ddl">
             <button class="button copy-btn" onclick="copyDDL()">Copy to Clipboard</button>
+            <button class="button copy-btn" onclick="scrollToTop()">Scroll to Top</button>
             <textarea readonly id="ddl-content"></textarea>
           </div>
         </div>

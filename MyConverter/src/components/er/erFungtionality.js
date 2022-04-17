@@ -20,8 +20,9 @@ const clearDiagram = () => {
 
   document.getElementById("convertDDL-btn").style.display = "inline-block"
   document.getElementById("button-container-logical").style.display = "block"
-  // document.getElementById("data-type-input").innerHTML = ""
-  // document.getElementById("data-type-input").style.display = "none"
+  document.getElementById("data-type-input").innerHTML = ""
+  document.getElementById("data-type-input-container").style.display = "none"
+  document.getElementById("ddl-section").style.display = "none"
 }
 
 // Save Diagram
@@ -158,8 +159,9 @@ const convertToLogical = () => {
   const ername = document.getElementById("er-name-input")
   document.getElementById("convertDDL-btn").style.display = "inline-block"
   document.getElementById("button-container-logical").style.display = "block"
-  // document.getElementById("data-type-input").innerHTML = ""
-  // document.getElementById("data-type-input").style.display = "none"
+  document.getElementById("data-type-input").innerHTML = ""
+  document.getElementById("data-type-input-container").style.display = "none"
+  document.getElementById("ddl-section").style.display = "none"
 
 
   if (ername.value == "") {

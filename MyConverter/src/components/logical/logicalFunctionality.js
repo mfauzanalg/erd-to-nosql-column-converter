@@ -92,3 +92,8 @@ function copyToClipboard(text) {
   document.execCommand("copy");
   document.body.removeChild(dummy);
 }
+
+const scrollToTop = () => {
+  document.getElementById("er-section").scrollIntoView()
+  // window.scrollTo(0, 0);
+}
