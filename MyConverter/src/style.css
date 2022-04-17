@@ -177,6 +177,7 @@ body {
 .attribute-container {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 5px;
 }
 
 a {
@@ -202,6 +203,9 @@ a {
 textarea {
   width: 100%;
   padding: 20px;
+}
+
+.hidden-textarea{ 
   display: none;
 }
 
@@ -213,6 +217,7 @@ textarea {
   font-weight: normal;
   font-size: 16px;
   background-color: white;
+  resize: none;
 }
 
 #step-container-er {
@@ -224,11 +229,15 @@ textarea {
 }
 
 #step-container-ddl {
-  background-color: rgba(254, 252, 199, 0.808);
+  background-color: rgb(251, 240, 213);
 }
 
 button {
   border-radius: 5px;
   border: 1px solid black;
   cursor: pointer;
+}
+
+.copy-btn {
+  margin-bottom: 20px;
 }

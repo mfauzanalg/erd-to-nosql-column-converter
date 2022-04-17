@@ -21,6 +21,7 @@ function initERInspector() {
       isParent: {show: false, type: "checkbox"},
       isTotal: {show: false, type: "checkbox"},
       isOne: {show: false, type: "checkbox"},
+      strokeDashArray: {show: false}
     },
   });
 }

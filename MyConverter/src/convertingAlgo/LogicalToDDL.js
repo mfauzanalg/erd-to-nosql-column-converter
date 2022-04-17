@@ -34,9 +34,13 @@ const logicalToDDL = (logicalModel) => {
     
     if (cf.parentColumnFam) {
       const parentAttributes = cf.parentColumnFam.attributes
+      console.log(parentAttributes)
       parentAttributes.forEach((attr) => {
         if (['Key', 'Auxiliary'].includes(attr.type)) {
-          stringQuery.push(`  ${attr.label} TEXT,`)
+          console.log(cf.label)
+          console.log(attr.label)
+          const dataType = document.getElementById(`${cf.parentColumnFam.label}-${attr.label}`).value
+          stringQuery.push(`  ${attr.label} ${dataType.toUpperCase()},`)
           parentKeys.push(attr.label)
         }
       })
@@ -44,7 +48,8 @@ const logicalToDDL = (logicalModel) => {
 
     if (cf.attributes) {
       cf.attributes.forEach((attr) => {
-        stringQuery.push(`  ${attr.label} TEXT,`)
+        const dataType = document.getElementById(`${cf.label}-${attr.label}`).value
+        stringQuery.push(`  ${attr.label}  ${dataType.toUpperCase()},`)
         if (['Key', 'Auxiliary'].includes(attr.type)) {
           cfKeys.push(attr.label)
         }
@@ -57,11 +62,6 @@ const logicalToDDL = (logicalModel) => {
   return stringQuery
 }
 
-// const logicalModel = (ERModel)
-// console.log(logicalModel)
-
-// const DDL = logicalToDDL(logicalModel)
-// printDDL(DDL)
 
 // ============================================================================================
 // Visualize logical schema

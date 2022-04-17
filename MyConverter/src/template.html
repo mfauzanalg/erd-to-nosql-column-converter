@@ -71,6 +71,7 @@
 
           <textarea
             id="mySavedModel"
+            class="hidden-textarea"
           >
                 { "class": "GraphLinksModel",
                   "nodeDataArray": [
@@ -121,10 +122,12 @@
           <a href="#ddl-section" class="button-a" onclick="convertToDDL()">Convert to DDL CQL</a>
         </div>
 
+        <!-- section for ddl -->
         <div id="ddl-section">
           <div class="header">Data Defenition Language in CQL</div>
           <div class="step-container" id="step-container-ddl">
-            <div id="ddl-content">Hello</div>
+            <button class="button copy-btn" onclick="copyDDL()">Copy to Clipboard</button>
+            <textarea readonly id="ddl-content"></textarea>
           </div>
         </div>
 

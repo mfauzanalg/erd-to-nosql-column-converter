@@ -12,9 +12,9 @@ function initERPalette() {
   myPalette.model.nodeDataArray = [
     {text: '', figure: 'Ellipse', color: 'white', height: 70},
     {text: 'Multivalued\nAttribute', color: 'black', figure: 'Ring', width: 90, height: 50},
-    {text: 'Derived\nAttribute', color: 'black', figure: 'Ellipse', strokeDashArray: [2, 2], width: 80, height: 40},
-    {text: 'Identifier\nAttribute', color: 'black', figure: 'Ellipse', underline: true, width: 80, height: 40},
-    {text: 'Regular\nAttribute', color: 'black', figure: 'Ellipse', width: 80, height: 40},
+    {text: 'Derived\nAttribute', color: 'black', figure: 'Ellipse', strokeDashArray: [2, 2]},
+    {text: 'Identifier\nAttribute', color: 'black', figure: 'Ellipse', underline: true},
+    {text: 'Regular\nAttribute', color: 'black', figure: 'Ellipse'},
     {text: 'Total', color: 'black', figure: 'TriangleDown'},
     {text: 'Partial', color: 'black', figure: 'TriangleDown'},
     {text: 'Relation', color: 'black', figure: 'Diamond', width: 110, height: 50},

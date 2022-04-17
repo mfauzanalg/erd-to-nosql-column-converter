@@ -5,7 +5,6 @@ function loadLogical(logicalSchema) {
 
 const createTableInput = (cf) => {
   let dataTable = ''
-  console.log(cf)
 
   dataTable += `
   <div class="table-input-container">
@@ -16,7 +15,7 @@ const createTableInput = (cf) => {
     dataTable += `
     <div class="attribute-container">
       <div class="attribute-name">${attr.label}</div>
-      <select class="attribute-input">
+      <select class="attribute-input" id="${cf.label}-${attr.label}">
         <option value="ascii">ascii</option>
         <option value="bigint">bigint</option>
         <option value="blob">blob</option>
@@ -64,4 +63,32 @@ const showDataTypeForm = () => {
 
 const convertToDDL = () => {
   document.getElementById("ddl-section").style.display = "block"
+  const stringQuery = logicalToDDL(logicalModel)
+  const joinedQuery = stringQuery.join('\n')
+
+  console.log(joinedQuery)
+
+  const textareaDDL = document.getElementById("ddl-content")
+  textareaDDL.value = joinedQuery
+  textAreaAdjust(textareaDDL)
+}
+
+const copyDDL = () => {
+  const textareaDDL = document.getElementById("ddl-content")
+  copyToClipboard(textareaDDL.value)
+  alert('Successfully Copy DDL to Clipboard')
+}
+
+function textAreaAdjust(element) {
+  element.style.height = "1px";
+  element.style.height = (25+element.scrollHeight)+"px";
+}
+
+function copyToClipboard(text) {
+  var dummy = document.createElement("textarea");
+  document.body.appendChild(dummy);
+  dummy.value = text;
+  dummy.select();
+  document.execCommand("copy");
+  document.body.removeChild(dummy);
 }
