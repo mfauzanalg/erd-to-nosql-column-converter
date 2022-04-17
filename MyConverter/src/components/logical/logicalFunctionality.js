@@ -61,10 +61,22 @@ const showDataTypeForm = () => {
   document.getElementById('data-type-input').insertAdjacentHTML("afterbegin", dataTypeFormComponent);
 }
 
+const createKeyspace = (name) => {
+  const newName = name.replace(/ /g, "_");
+
+  return `CREATE KEYSPACE ${newName}
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
+
+USE ${newName};
+
+`
+  
+}
+
 const convertToDDL = () => {
   document.getElementById("ddl-section").style.display = "block"
   const stringQuery = logicalToDDL(logicalModel)
-  const joinedQuery = stringQuery.join('\n')
+  const joinedQuery = createKeyspace(ername.value) +  stringQuery.join('\n')
 
   console.log(joinedQuery)
 
