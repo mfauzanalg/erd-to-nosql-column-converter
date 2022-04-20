@@ -177,7 +177,8 @@ const findParentKey = (entity, logicalCF, columnFamily) => {
         if (relation.connectors[0].toER == entity) connectorTo = relation.connectors[1]
         else connectorTo = relation.connectors[0]
 
-        if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
+        // if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
+        if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One') 
           || (relation.type === 'WeakRelationship' && connectorTo.cardinality === 'One')) {
           
           const entityAcrossID = connectorTo.toER.id
@@ -208,12 +209,11 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
     // if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
     if (connectors[i].cardinality == 'One') {
       const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
-      console.log("PARENT")
-      console.log(parent)
-      found = true
-      // key = getArrayKey(parent.attributes)
-      columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
-      console.log(columnFamily)
+      if (parent) {
+        found = true
+        // key = getArrayKey(parent.attributes)
+        columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
+      }
     }
     i += 1
   }
@@ -270,8 +270,8 @@ const findParentArray = (entity) => {
             parentArray.push(connectorTo.toER)
           }
           
-          if (entityFromCardinality === 'One' && connector.participation === 'Partial'
-              && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+          if (entityFromCardinality === 'One' && connector.participation === 'Total'
+              && connectorTo.cardinality === 'One' && connectorTo.participation === 'Partial') {
             parentArray.push(connectorTo.toER)
           }
         }
@@ -327,10 +327,9 @@ const findRelationArray = (entity) => {
           if (relation.connectors[0].toER.label == entity.label) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
 
-          
-          console.log(entity.label)
-          console.log(connectorTo)
-          // relation.label = `${entity.label}-${relation.label}`
+        
+          relation.label = `${relation.label}-${entity.label}`
+          relation.id = `${relation.id}-${entity.id}`
   
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             relationArray.push ({
@@ -346,7 +345,8 @@ const findRelationArray = (entity) => {
             })
           }
           else if (entityFromCardinality === 'One' 
-            && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+            // && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+            && connectorTo.cardinality === 'One') {
             if (!isVisited(relation, visited)) {
               relationArray.push ({
                 type: 'BinaryOneToOne',
@@ -397,13 +397,14 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     // Here process parentnya first tapi nanti dlu ya
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const parentArray = findParentArray(entityRelation)
-      // console.log('parent array', entityRelation.label)
-      // console.log(parentArray)
+
       parentArray.forEach((entity) => {
         // this is migrate to merge
         columnFamilySet = mergeLogicalCF(columnFamilySet, createFamily(entity, logicalCF))
       })
     }
+
+    console.log("prosess", entityRelation.label)
 
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
@@ -435,8 +436,6 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     //Process for the relation
     if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const relationDetailArray = findRelationArray(entityRelation)
-      // console.log('relation array detail')
-      // console.log(relationDetailArray)
       relationDetailArray.forEach((relationDetail) => {
         columnFamilySet = mergeLogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
@@ -482,7 +481,8 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
     // console.log(columnFamily)
     // console.log(columFamilyFromRelation)
     console.log(isSameKey(columnFamily, columFamilyFromRelation))
-    if (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship') {
+    console.log(relationDetail.relation.type)
+    if (relationDetail.type != 'BinaryOneToOne' && (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship')) {
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
   }
@@ -570,7 +570,6 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
     newColumnFamily.parentColumnFam = columnFamily2
-    console.log("WOWWOWOWOW")
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
@@ -629,7 +628,6 @@ const defineKey = (entityRelation, logicalCF, columnFamily) => {
   }
   else { // if thre type is Relationship
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
-    // console.log(key, 'keyy')
   }
   if (key.length < 1 && !columnFamily.parentColumnFam) {
     key = [`id_${entityRelation.label}`]
