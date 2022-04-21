@@ -595,14 +595,14 @@ const getColumnType = (column, attribute) => {
 
 const convertAttribute = (columnFamily, attribute) => {
   let additionalColumnFamily = []
-  if (attribute.type === 'Composite') {
+  if (attribute.children.length > 0) {
     let newColumFamily = {}
     newColumFamily.label = `${columnFamily.label}-${attribute.label}`
     newColumFamily.id = `${columnFamily.label}-${attribute.label}`
     newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
-    newColumFamily.attributes = filterKey(columnFamily.attributes)
+    newColumFamily.attributes = []
 
-    if (attribute.children) {
+    if (attribute.children.length > 0) {
       attribute.children.forEach(child => {
         additionalColumnFamily = [...additionalColumnFamily,
           ...convertAttribute(newColumFamily, child)] 

@@ -41,7 +41,7 @@ const download = (filename, text) => {
 
 const save = () => {
   document.getElementById('mySavedModel').value = myDiagram.model.toJson();
-  download("hello.json", myDiagram.model.toJson());
+  download(`${ername.value}.json`, myDiagram.model.toJson());
   myDiagram.isModified = false;
 }
 
@@ -55,6 +55,7 @@ const readSingleFile = (evt) => {
         myDiagram.model = go.Model.fromJson(contents)
       }
       r.readAsText(f);
+      ername.value = f.name.slice(0, -5)
   } else {
       alert("Failed to load file");
   }
@@ -122,9 +123,75 @@ const convertToERModel = (ername) => {
     }
   })
 
+  let ERToERLinks = []
+  let attrToAttrLinks = []
+  let attrToERLinks = []
+  let attrDirectToER = []
+  let processedAttribute = []
+  let connectorCount = {}
+  const processedLinks = []
+  ERSchema.linkDataArray.forEach((link) => {
+    // if (connectorCount[link.from]) {
+    //   connectorCount[link.from] += 1
+    // }
+    // else {
+    //   connectorCount[link.from] = 1
+    // }
+    // if (connectorCount[link.to]) {
+    //   connectorCount[link.to] += 1
+    // }
+    // else {
+    //   connectorCount[link.to] = 1
+    // }
+    let attrFrom = attributeArray.find(o => o.id == link.from)
+    let attrTo = attributeArray.find(o => o.id == link.to)
+
+    if (attrFrom && attrTo) {
+      attrToAttrLinks.push(link)
+    }
+    else if (!attrFrom && !attrTo){
+      ERToERLinks.push(link)
+    }
+    else {
+      attrToERLinks.push(link)
+      if (attrFrom) {
+        attrDirectToER.push(link.from)
+        processedAttribute.push(link.from)
+      }
+      else {
+        attrDirectToER.push(link.to)
+        processedAttribute.push(link.to)
+      }
+    }
+  })
+
+  while (attrToAttrLinks.length > 0) {
+    tempArr = [...attrToAttrLinks]
+    attrToAttrLinks.forEach((link, index) => {
+      let attrFrom = attributeArray.find(o => o.id == link.from)
+      let attrTo = attributeArray.find(o => o.id == link.to)
+  
+      // the unprocessed is on the to side
+      if (processedAttribute.includes(link.from)) {
+        attrFrom.children.push(attrTo)
+        processedAttribute.push(link.to)
+      }
+      // the unprocessed is on the from side
+      else if (processedAttribute.includes(link.to)) {
+        attrTo.children.push(attrFrom)
+        processedAttribute.push(link.from)
+      }
+      tempArr[index] = null
+    })
+
+    attrToAttrLinks = tempArr.filter(function (el) {
+      return el != null;
+    });
+
+  }
+
+
   // Process the link
-  const processedAttributes = []
-  const unprocessedLinks = []
   ERSchema.linkDataArray.forEach((link) => {
     const cardinality = link.isOne ? "One" : "Many"
     const participation = link.isTotal ? "Total" : "Partial"
@@ -139,6 +206,10 @@ const convertToERModel = (ername) => {
       ERFrom.connectors.push(newConnector)
       ERTo.connectors.push(newConnector)
     }
+    // From attribute to attribute
+    else if (!ERFrom && !ERTo) {
+      // unprocessedLinks.push(link)
+    }
     // From Attribute to Entity/Relationship
     else if (!ERFrom) {
       ERFrom = attributeArray.find(o => o.id == link.from)
@@ -152,6 +223,9 @@ const convertToERModel = (ername) => {
     }
   })
 
+  // console.log("RESULT")
+  console.log(newERModel)
+  // console.log(unprocessedLinks)
   return newERModel
 }
 
@@ -194,8 +268,8 @@ const convertToLogical = () => {
   
     const newERModel = convertToERModel(ername.value)
   
-    console.log("ER MODEL")
-    console.log(newERModel)
+    // console.log("ER MODEL")
+    // console.log(newERModel)
 
     createReference(newERModel)
     splitER(newERModel)

@@ -53,5 +53,7 @@ class Attribute {
         this.ER = ER
         this. label = label
         this. type = type
+        this.children = []
+        this.isComposite = false
     }
 }
