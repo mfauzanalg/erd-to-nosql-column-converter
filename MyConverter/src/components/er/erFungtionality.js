@@ -155,6 +155,24 @@ const convertToERModel = (ername) => {
   return newERModel
 }
 
+checkParentColumFam = (columnFamilies) => {
+  let isSwapping = false
+  columnFamilies.forEach((cf, index) => {
+    if (Number.isInteger(cf.parentColumnFam)) {
+      const parentIdx = columnFamilies.findIndex(o => o.id == cf.parentColumnFam)
+      cf.parentColumnFam = columnFamilies[parentIdx]
+
+      isSwapping = !isSwapping
+      if (isSwapping) {
+        var temp = columnFamilies[index];
+        columnFamilies[index] = columnFamilies[parentIdx];
+        columnFamilies[parentIdx] = temp;
+      }
+
+    }
+  })
+}
+
 const convertToLogical = () => {
   const ername = document.getElementById("er-name-input")
   document.getElementById("convertDDL-btn").style.display = "inline-block"
@@ -184,6 +202,8 @@ const convertToLogical = () => {
   
     
     logicalModel = convertERToLogical(newERModel)
+    checkParentColumFam(logicalModel.columnFamilies)
+    
     const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
   
     loadLogical(logicalSchema);

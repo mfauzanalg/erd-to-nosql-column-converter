@@ -87,6 +87,7 @@ const getSymbol = (attr) => {
 }
 
 const visualizeLogicalModel = (columnFamilies) => {
+  console.log(columnFamilies)
   let gojs = {
     "class": "go.GraphLinksModel",
     "nodeDataArray": [],

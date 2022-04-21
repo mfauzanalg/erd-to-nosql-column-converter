@@ -211,12 +211,12 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
       const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
       if (parent) {
         found = true
-        // key = getArrayKey(parent.attributes)
         columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
       }
     }
     i += 1
   }
+
   return key
 }
 
@@ -342,6 +342,7 @@ const findRelationArray = (entity) => {
             relationArray.push ({
               type: 'BinaryManyToMany',
               relation: relation,
+              entityAcross: connectorTo.toER
             })
           }
           else if (entityFromCardinality === 'One' 
@@ -404,7 +405,7 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
       })
     }
 
-    console.log("prosess", entityRelation.label)
+    // console.log("prosess", entityRelation.label)
 
     columnFamily.id = entityRelation.id
     columnFamily.label = entityRelation.label
@@ -437,6 +438,7 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const relationDetailArray = findRelationArray(entityRelation)
       relationDetailArray.forEach((relationDetail) => {
+        relationDetail.relation.binaryType = relationDetail.type
         columnFamilySet = mergeLogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
       })
     }
@@ -478,10 +480,10 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
     }
 
     // console.log('=============================================================================')
-    // console.log(columnFamily)
     // console.log(columFamilyFromRelation)
-    console.log(isSameKey(columnFamily, columFamilyFromRelation))
-    console.log(relationDetail.relation.type)
+    // console.log(columnFamily)
+    // console.log(relationDetail)
+    // console.log(relationDetail.relation.type)
     if (relationDetail.type != 'BinaryOneToOne' && (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship')) {
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
@@ -569,7 +571,9 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
-    newColumnFamily.parentColumnFam = columnFamily2
+    // console.log("WOI")
+    // console.log(relationDetail.entityAcross)
+    newColumnFamily.parentColumnFam = relationDetail.entityAcross.id
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
@@ -629,7 +633,7 @@ const defineKey = (entityRelation, logicalCF, columnFamily) => {
   else { // if thre type is Relationship
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
   }
-  if (key.length < 1 && !columnFamily.parentColumnFam) {
+  if (key.length < 1 && !columnFamily.parentColumnFam && !(entityRelation.binaryType == "BinaryManyToMany")) {
     key = [`id_${entityRelation.label}`]
   }
   return arrayKeysToAttribute(key)
