@@ -33,6 +33,8 @@ class Specialization extends Relationship {
         super(type)
         this.isTotal = isTotal,
         this.isDisjoint = isDisjoint
+        this.connectors = []
+        this.attributes = []
     }
 }
 

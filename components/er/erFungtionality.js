@@ -128,21 +128,7 @@ const convertToERModel = (ername) => {
   let attrToERLinks = []
   let attrDirectToER = []
   let processedAttribute = []
-  let connectorCount = {}
-  const processedLinks = []
   ERSchema.linkDataArray.forEach((link) => {
-    // if (connectorCount[link.from]) {
-    //   connectorCount[link.from] += 1
-    // }
-    // else {
-    //   connectorCount[link.from] = 1
-    // }
-    // if (connectorCount[link.to]) {
-    //   connectorCount[link.to] += 1
-    // }
-    // else {
-    //   connectorCount[link.to] = 1
-    // }
     let attrFrom = attributeArray.find(o => o.id == link.from)
     let attrTo = attributeArray.find(o => o.id == link.to)
 
@@ -195,14 +181,25 @@ const convertToERModel = (ername) => {
   ERSchema.linkDataArray.forEach((link) => {
     const cardinality = link.isOne ? "One" : "Many"
     const participation = link.isTotal ? "Total" : "Partial"
+    const isParentConnector = link.isParent
     const newConnector = new Connector(ERModelName, link.from, link.to, cardinality, participation)
-
     let ERFrom = newERModel.entityRelations.find(o => o.id == link.from)
     let ERTo = newERModel.entityRelations.find(o => o.id == link.to)
 
     // Relation between Entity and Relationship
     if (ERFrom && ERTo) {
+
       newConnector.type = "RelationConnector"
+      if (ERFrom.type == "SpecialConnector") newConnector.type = "SpecialConnector"
+
+      if (isParentConnector) {
+        ERFrom.superID = link.to
+        newConnector.type = "ParentSpecialization"
+        if (link.isTotal) ERFrom.isTotal = true
+        else ERFrom.isTotal = false
+      }
+
+
       ERFrom.connectors.push(newConnector)
       ERTo.connectors.push(newConnector)
     }
@@ -224,7 +221,7 @@ const convertToERModel = (ername) => {
   })
 
   // console.log("RESULT")
-  console.log(newERModel)
+  // console.log(newERModel)
   // console.log(unprocessedLinks)
   return newERModel
 }
@@ -267,9 +264,6 @@ const convertToLogical = () => {
     logicalTitle.scrollIntoView()
   
     const newERModel = convertToERModel(ername.value)
-  
-    // console.log("ER MODEL")
-    // console.log(newERModel)
 
     createReference(newERModel)
     splitER(newERModel)

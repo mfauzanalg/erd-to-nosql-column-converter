@@ -517,6 +517,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
       // console.log(relationDetail)
       // console.log(columnFamily)
       // console.log(logicalCF)
+      console.log("WOWW")
       const parentColumnFamily = logicalCF.find(o => o.id === relationDetail.relation.superID);
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
     }
@@ -595,7 +596,7 @@ const getColumnType = (column, attribute) => {
 
 const convertAttribute = (columnFamily, attribute) => {
   let additionalColumnFamily = []
-  if (attribute.children.length > 0) {
+  if (attribute.children?.length > 0) {
     let newColumFamily = {}
     newColumFamily.label = `${columnFamily.label}-${attribute.label}`
     newColumFamily.id = `${columnFamily.label}-${attribute.label}`
