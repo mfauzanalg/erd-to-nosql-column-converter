@@ -20,7 +20,7 @@ const createPrimaryKey = (parentKeys, cfKeys, stringQuery) => {
     primaryKey += cfKeys.join(', ')
   }
 
-  stringQuery.push(`  PRIMARY KEY (${primaryKey})`)
+  stringQuery.push(`  PRIMARY KEY (${removeNewLine(primaryKey)})`)
 }
 
 const removeNewLine = (str) => {
@@ -42,7 +42,10 @@ const logicalToDDL = (logicalModel) => {
       const parentAttributes = cf.parentColumnFam.attributes
       parentAttributes.forEach((attr) => {
         if (['Key', 'Auxiliary'].includes(attr.type)) {
-          const dataType = document.getElementById(`${cf.parentColumnFam.label}-${attr.label}`).value
+          let dataType = document.getElementById(`${cf.parentColumnFam.label}-${attr.label}`).value
+          if (attr.type == "Multivalued") {
+            dataType = `list<${dataType}>`
+          }
           stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
           parentKeys.push(attr.label)
         }
@@ -51,7 +54,11 @@ const logicalToDDL = (logicalModel) => {
 
     if (cf.attributes) {
       cf.attributes.forEach((attr) => {
-        const dataType = document.getElementById(`${cf.label}-${attr.label}`).value
+        let dataType = document.getElementById(`${cf.label}-${attr.label}`).value
+        if (attr.type == "Multivalued") {
+          dataType = `list<${dataType}>`
+        }
+
         stringQuery.push(`  ${removeNewLine(attr.label)}  ${dataType.toUpperCase()},`)
         if (['Key', 'Auxiliary'].includes(attr.type)) {
           cfKeys.push(attr.label)
@@ -66,8 +73,9 @@ const logicalToDDL = (logicalModel) => {
 }
 
 
-// ============================================================================================
+// =========================
 // Visualize logical schema
+// =========================
 
 const getGroup = (cf) => {
   if (cf.parentColumnFam) {
@@ -82,6 +90,9 @@ const getSymbol = (attr) => {
   }
   else if (attr.type == 'Intermediary') {
     return `^ ${attr.label}`
+  }
+  else if (attr.type == 'Multivalued') {
+    return `[] ${attr.label}`
   }
   return attr.label
 }

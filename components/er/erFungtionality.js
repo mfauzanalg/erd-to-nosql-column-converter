@@ -220,8 +220,8 @@ const convertToERModel = (ername) => {
     }
   })
 
-  // console.log("RESULT")
-  // console.log(newERModel)
+  console.log("RESULT")
+  console.log(newERModel)
   // console.log(unprocessedLinks)
   return newERModel
 }

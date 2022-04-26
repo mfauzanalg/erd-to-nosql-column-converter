@@ -517,7 +517,6 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
       // console.log(relationDetail)
       // console.log(columnFamily)
       // console.log(logicalCF)
-      console.log("WOWW")
       const parentColumnFamily = logicalCF.find(o => o.id === relationDetail.relation.superID);
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
     }
@@ -572,7 +571,6 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
-    // console.log("WOI")
     // console.log(relationDetail.entityAcross)
     newColumnFamily.parentColumnFam = relationDetail.entityAcross.id
     // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
@@ -591,6 +589,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 // Masih harus dikerjain yaaa
 const getColumnType = (column, attribute) => {
   if (attribute.type == 'Key') column.type = 'Key'
+  else if (attribute.type == 'Multivalued') column.type = 'Multivalued'
   else column.type = 'Regular'
 }
 
@@ -612,11 +611,13 @@ const convertAttribute = (columnFamily, attribute) => {
     additionalColumnFamily.push(newColumFamily)
   }
   else {
-    const column = {}
-    column.label = attribute.label
-    getColumnType(column, attribute)
-    
-    columnFamily.attributes = mergeArray([column], columnFamily.attributes)
+    if (attribute.type != "Derived") {
+      const column = {}
+      column.label = attribute.label
+      getColumnType(column, attribute)
+      
+      columnFamily.attributes = mergeArray([column], columnFamily.attributes)
+    }
   }
   return additionalColumnFamily
 }
