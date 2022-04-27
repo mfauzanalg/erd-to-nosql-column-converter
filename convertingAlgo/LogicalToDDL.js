@@ -35,7 +35,7 @@ const logicalToDDL = (logicalModel) => {
     let parentKeys = []
     let cfKeys = []
 
-    stringQuery.push(`DROP TABLE IF EXISTS ${cf.label};`)
+    stringQuery.push(`DROP TABLE IF EXISTS ${removeNewLine(cf.label)};`)
     stringQuery.push(`CREATE TABLE ${cf.label} (`)
     
     if (cf.parentColumnFam) {

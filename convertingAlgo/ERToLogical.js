@@ -343,8 +343,8 @@ const findRelationArray = (entity) => {
           else connectorTo = relation.connectors[0]
 
         
-          relation.label = `${relation.label}-${entity.label}`
-          relation.id = `${relation.id}-${entity.id}`
+          relation.label = `${relation.label}_${entity.label}`
+          relation.id = `${relation.id}_${entity.id}`
   
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             relationArray.push ({
@@ -561,7 +561,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   if (!newColumnFamily) {
     const temporaryEntity = {
       id: `temporary${columnFamily1.id}`,
-      label: `${columnFamily1.label}-${columnFamily2.label}`,
+      label: `${columnFamily1.label}_${columnFamily2.label}`,
       type: 'Entity',
       isTemporaryEntity: true,
       parentColumnFam: columnFamily1,
@@ -616,8 +616,8 @@ const convertAttribute = (columnFamily, attribute) => {
   let additionalColumnFamily = []
   if (attribute.children?.length > 0) {
     let newColumFamily = {}
-    newColumFamily.label = `${columnFamily.label}-${attribute.label}`
-    newColumFamily.id = `${columnFamily.label}-${attribute.label}`
+    newColumFamily.label = `${columnFamily.label}_${attribute.label}`
+    newColumFamily.id = `${columnFamily.label}_${attribute.label}`
     newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
     newColumFamily.attributes = []
 
