@@ -72,8 +72,8 @@ const loadDefault = () => {
   logicalSection.style.display = "none"
 
   // development
-  document.getElementById("convert-logical-btn").click()
-  document.getElementById("convertDDL-btn").click()
+  // document.getElementById("convert-logical-btn").click()
+  // document.getElementById("convertDDL-btn").click()
 }
 
 // Convert Diagram
@@ -249,146 +249,81 @@ const convertToLogical = () => {
   document.getElementById("data-type-input-container").style.display = "none"
   document.getElementById("ddl-section").style.display = "none"
 
+  let error = []
 
   if (ername.value == "") {
-    alert("Please fill yhe entity relationship name")
+    alert("Please fill The entity relationship name")
   }
   else {
-    logicalSection.style.display = "block"
-    logicalName.innerHTML = `for ${ername.value}`
-
-    const logicalTitle = document.getElementById("logical-schema-title")
-    logicalTitle.scrollIntoView()
-  
     const newERModel = convertToERModel(ername.value)
 
-    const newERModel123123 = {
-      entityRelations: [
-        {
-          id: 0,
-          label: 'E',
-          type: 'Entity',
-          attributes: [
-            {
-              type: 'Key',
-              label: 'Name'
-            },
-          ],
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'Many',
-              participation: 'Partial'
-            },
-          ]
-        },
-        {
-          id: 5,
-          label: 'R2',
-          type: 'Relationship',
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 5,
-              to: 4,
-              cardinality: 'One',
-              participation: 'Total',
-            },
-            {
-              type: 'RelationConnector',
-              from: 5,
-              to: 2,
-              cardinality: 'One',
-              participation: 'Partial',
-            }
-          ],
-        },
-        {
-          id: 2,
-          label: 'R3',
-          type: 'AssociativeEntity',
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 5,
-              to: 2,
-              cardinality: 'One',
-              participation: 'Partial',
-            },
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'Many',
-              participation: 'Partial'
-            },
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 3,
-              cardinality: 'Many',
-              participation: 'Partial'
-            }
-          ]
-        },
-        {
-          id: 4,
-          label: 'D',
-          type: 'Entity',
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 5,
-              to: 4,
-              cardinality: 'One',
-              participation: 'Total',
-            }
-          ]
-        },
-        {
-          id: 3,
-          label: 'H',
-          type: 'Entity',
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 3,
-              cardinality: 'Many',
-              participation: 'Partial'
-            },
-          ],
-          attributes: [
-            {
-              type: 'Key',
-              label: 'Plat'
-            },
-            {
-              type: 'Regular',
-              label: 'Color'
-            }
-          ],
-        },
-      ],
-    }
+    // Validate duplicate attribute
+    newERModel.entityRelations.forEach(er => {
+      const attrLookUp = createLookup(er.attributes)
+
+      for (const property in attrLookUp) {
+        if (attrLookUp[property] != 0) {
+          error.push(`>> Duplicate attribute ${property} in ${er.type} ${er.label}`)
+        }
+      }
+
+    })
 
     createReference(newERModel)
     splitER(newERModel)
+
+    // Validation duplicate ER Name
+    const entityLookUp = createLookup(newERModel.entities)
+    const relationshipLookUp = createLookup(newERModel.relationships)
+
+    for (const property in entityLookUp) {
+      if (entityLookUp[property] != 0) {
+        error.push(`>> Duplicate Entity Label ${property}`)
+      }
+    }
+
+    for (const property in relationshipLookUp) {
+      if (relationshipLookUp[property] != 0) {
+        error.push(`>> Duplicate Relationship Label ${property}`)
+      }
+    }
+
   
 
-    console.log("RESULT")
-    print2(newERModel)
-    
-    logicalModel = convertERToLogical(newERModel)
-    checkParentColumFam(logicalModel.columnFamilies)
-    
-    const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-
-    loadLogical(logicalSchema);
+    if (error.length != 0) {
+      alert(error.join('\n'))
+    }
+    else {
+      logicalSection.style.display = "block"
+      logicalName.innerHTML = `for ${ername.value}`
+  
+      const logicalTitle = document.getElementById("logical-schema-title")
+      logicalTitle.scrollIntoView()
+      // console.log(newERModel.entityRelations.filter(e => lookup[e.label]));
+  
+      // console.log("RESULT")
+      // print2(newERModel)
+      
+      logicalModel = convertERToLogical(newERModel)
+      checkParentColumFam(logicalModel.columnFamilies)
+      
+      const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+  
+      loadLogical(logicalSchema);
+    }
   }
 }
+
+const createLookup = (arr) => {
+  const lookup = arr.reduce((a, e) => {
+    a[e.label] = ++a[e.label] || 0;
+    return a;
+  }, {});
+
+  return lookup
+}
+
+
 
 // createReference(ERModel)
 // splitER(ERModel)

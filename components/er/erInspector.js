@@ -37,8 +37,6 @@ const getIsShowTotalOne = (inspectedObject) => {
   isShowOne = false
   // If the seledted item is a link
   if (from && to) {
-    console.log(from)
-    console.log(to)
     // If the selected item is able to click isTotal
     if (ERType.includes(from.figure) && ERType.includes(to.figure)) {
       isShowTotal = true
