@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
-let ERType = ["Rectangle", "DoubleRectangle", "AssociativeEntity", "Diamond", "DoubleDiamond"]
+let ERType = ["Rectangle", "DoubleRectangle", "AssociativeRectangle", "Diamond", "DoubleDiamond"]
 let isShowTotal = false
 let isShowOne = false
 let isSpecialization = false
@@ -37,6 +37,8 @@ const getIsShowTotalOne = (inspectedObject) => {
   isShowOne = false
   // If the seledted item is a link
   if (from && to) {
+    console.log(from)
+    console.log(to)
     // If the selected item is able to click isTotal
     if (ERType.includes(from.figure) && ERType.includes(to.figure)) {
       isShowTotal = true

@@ -146,6 +146,7 @@ const findColumnFamilyByID = (id, logicalCF) => {
   return key
 }
 
+// HERE
 const findParentKey = (entity, logicalCF, columnFamily) => {
   let connectors = entity.connectors
   let key = []
@@ -269,11 +270,25 @@ const findParentArray = (entity) => {
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             parentArray.push(connectorTo.toER)
           }
-          
-          if (entityFromCardinality === 'One' && connector.participation === 'Total'
-              && connectorTo.cardinality === 'One' && connectorTo.participation === 'Partial') {
-            parentArray.push(connectorTo.toER)
+
+          if (entityFromCardinality === 'One' && connectorTo.cardinality === 'One') {
+            if ((entity.type == 'AssociativeEntity' || connectorTo.toER.type == 'AssociativeEntity')) {
+              if (connector.participation === 'Partial' && connectorTo.participation === 'Total') {
+                parentArray.push(connectorTo.toER)
+              }
+            }
+            else if (connector.participation === 'Total' && connectorTo.participation === 'Partial') {
+              parentArray.push(connectorTo.toER)
+            }
           }
+          
+          // if (entityFromCardinality === 'One' && connector.participation === 'Partial'
+          //     && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
+          //   parentArray.push(connectorTo.toER)
+          //   console.log("AJJJJ")
+          //   console.log(entity.label)
+          //   console.log(parentArray)
+          // }
         }
       }
     })
@@ -398,6 +413,10 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     // Here process parentnya first tapi nanti dlu ya
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const parentArray = findParentArray(entityRelation)
+
+      // console.log("WOWW")
+      // console.log(entityRelation)
+      // console.log(parentArray)
 
       parentArray.forEach((entity) => {
         // this is migrate to merge

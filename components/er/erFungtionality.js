@@ -88,13 +88,13 @@ const convertToERModel = (ername) => {
   // Get the entity, relationship and attributes
   ERSchema.nodeDataArray.forEach((ER) => {
     // Entity
-    if (["Rectangle", "DoubleRectangle", "AssociativeEntity"].includes(ER.figure)) {
+    if (["Rectangle", "DoubleRectangle", "AssociativeRectangle"].includes(ER.figure)) {
       const newEntity = new Entity(ERModelName, ER.text)
       newEntity.id = ER.key
 
       if (ER.figure == "Rectangle") newEntity.type = "Entity"
       else if (ER.figure == "DoubleRectangle") newEntity.type = "WeakEntity"
-      else if (ER.figure == "AssocciativeEntity") newEntity.type = "AssociativeEntity"
+      else if (ER.figure == "AssociativeRectangle") newEntity.type = "AssociativeEntity"
 
       newERModel.entityRelations.push(newEntity)
     }
@@ -219,9 +219,6 @@ const convertToERModel = (ername) => {
       ERFrom.attributes.push(ERTo)
     }
   })
-
-  console.log("RESULT")
-  console.log(newERModel)
   // console.log(unprocessedLinks)
   return newERModel
 }
@@ -265,15 +262,130 @@ const convertToLogical = () => {
   
     const newERModel = convertToERModel(ername.value)
 
+    const newERModel123123 = {
+      entityRelations: [
+        {
+          id: 0,
+          label: 'E',
+          type: 'Entity',
+          attributes: [
+            {
+              type: 'Key',
+              label: 'Name'
+            },
+          ],
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'Many',
+              participation: 'Partial'
+            },
+          ]
+        },
+        {
+          id: 5,
+          label: 'R2',
+          type: 'Relationship',
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 5,
+              to: 4,
+              cardinality: 'One',
+              participation: 'Total',
+            },
+            {
+              type: 'RelationConnector',
+              from: 5,
+              to: 2,
+              cardinality: 'One',
+              participation: 'Partial',
+            }
+          ],
+        },
+        {
+          id: 2,
+          label: 'R3',
+          type: 'AssociativeEntity',
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 5,
+              to: 2,
+              cardinality: 'One',
+              participation: 'Partial',
+            },
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'Many',
+              participation: 'Partial'
+            },
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 3,
+              cardinality: 'Many',
+              participation: 'Partial'
+            }
+          ]
+        },
+        {
+          id: 4,
+          label: 'D',
+          type: 'Entity',
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 5,
+              to: 4,
+              cardinality: 'One',
+              participation: 'Total',
+            }
+          ]
+        },
+        {
+          id: 3,
+          label: 'H',
+          type: 'Entity',
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 3,
+              cardinality: 'Many',
+              participation: 'Partial'
+            },
+          ],
+          attributes: [
+            {
+              type: 'Key',
+              label: 'Plat'
+            },
+            {
+              type: 'Regular',
+              label: 'Color'
+            }
+          ],
+        },
+      ],
+    }
+
     createReference(newERModel)
     splitER(newERModel)
   
+
+    console.log("RESULT")
+    print2(newERModel)
     
     logicalModel = convertERToLogical(newERModel)
     checkParentColumFam(logicalModel.columnFamilies)
     
     const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-  
+
     loadLogical(logicalSchema);
   }
 }
