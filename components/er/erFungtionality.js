@@ -288,8 +288,27 @@ const convertToLogical = () => {
       }
     }
 
-  
+    // Validate parent
+    newERModel.relationships.forEach(relation => {
+      let count = 0
+      if (relation.type == 'SpecialConnector') {
+        relation.connectors.forEach(conn => {
+          if (conn.type == "ParentSpecialization") {
+            count += 1
+          }
+        })
+      }
 
+      if (count > 1) {
+        error.push(`>> Parent of Specialization on ${relation.superER.label} have ${count} parents`)
+      }
+      else if (count == 0) {
+        error.push(`>> No Parent on a specialization`)
+      }
+    })
+
+
+    // Finish Validating
     if (error.length != 0) {
       alert(error.join('\n'))
     }

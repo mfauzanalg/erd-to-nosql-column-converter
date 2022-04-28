@@ -71,5 +71,21 @@ function initERDiagram() {
         },
         new go.Binding("toArrow", "isOne", function(isOne) { return isOne ? "triangle" : "" }),
       ),
+      $(go.TextBlock,
+        {
+          font: "bold 10pt sans-serif",
+          width: 100,
+          textAlign: "right"
+        },                      // this is a Link label
+        new go.Binding("text", "isParent", function(isParent) { return isParent ? "Parent" : "" })
+      ),
+      $(go.TextBlock,
+        {
+          font: "bold 10pt sans-serif",
+          width: 120,
+          textAlign: "left"
+        },                      // this is a Link label
+        new go.Binding("text", "isDisjoint", function(isDisjoint) { return isDisjoint ? "Disjoint" : "" })
+      )
     );
 }
