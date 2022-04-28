@@ -21,6 +21,8 @@ function initERDiagram() {
         portId: '',
         fromLinkable: true,
         toLinkable: true,
+        fromLinkableDuplicates: false, 
+        toLinkableDuplicates: false,
       },
       new go.Binding('stroke', 'color'),
       new go.Binding('strokeDashArray'),
@@ -29,6 +31,10 @@ function initERDiagram() {
       new go.Binding('height'),
       new go.Binding('fromLinkable'),
       new go.Binding('toLinkable'),
+      new go.Binding('toLinkable'),
+      new go.Binding('fromLinkableDuplicates'),
+      new go.Binding('toLinkableDuplicates'),
+      new go.Binding('fromMaxLinks'),
     ),
     $(
       go.TextBlock,
@@ -86,6 +92,15 @@ function initERDiagram() {
           textAlign: "left"
         },                      // this is a Link label
         new go.Binding("text", "isDisjoint", function(isDisjoint) { return isDisjoint ? "Disjoint" : "" })
+      ),
+      $(go.TextBlock,
+        {
+          font: "regular 10pt sans-serif",
+          width: 120,
+          stroke: "red",
+          textAlign: "center"
+        },                      // this is a Link label
+        new go.Binding("text", "text")
       )
     );
 }

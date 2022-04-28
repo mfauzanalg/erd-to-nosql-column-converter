@@ -290,8 +290,9 @@ const convertToLogical = () => {
 
     // Validate parent
     newERModel.relationships.forEach(relation => {
-      let count = 0
+      let count = -1
       if (relation.type == 'SpecialConnector') {
+        count = 0
         relation.connectors.forEach(conn => {
           if (conn.type == "ParentSpecialization") {
             count += 1
