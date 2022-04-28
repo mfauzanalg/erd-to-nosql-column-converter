@@ -4,8 +4,8 @@ function init() {
         // when a drag-drop occurs in the Diagram's background, make it a top-level node
         mouseDrop: e => finishDrop(e, null),
         layout:  // Diagram has simple horizontal layout
-          new go.GridLayout(
-            { wrappingWidth: Infinity, alignment: go.GridLayout.Position, cellSize: new go.Size(1, 1) }),
+          new go.ForceDirectedLayout(
+            { wrappingWidth: Infinity, alignment: go.ForceDirectedLayout.Position, cellSize: new go.Size(1, 1) }),
         "commandHandler.archetypeGroupData": { isGroup: true, text: "Group", horiz: false },
         "undoManager.isEnabled": true
       });

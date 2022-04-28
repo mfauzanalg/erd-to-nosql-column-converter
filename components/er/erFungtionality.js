@@ -72,8 +72,8 @@ const loadDefault = () => {
   logicalSection.style.display = "none"
 
   // development
-  // document.getElementById("convert-logical-btn").click()
-  // document.getElementById("convertDDL-btn").click()
+  document.getElementById("convert-logical-btn").click()
+  document.getElementById("convertDDL-btn").click()
 }
 
 // Convert Diagram
