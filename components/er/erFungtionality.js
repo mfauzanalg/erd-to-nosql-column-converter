@@ -198,8 +198,6 @@ const convertToERModel = (ername) => {
         if (link.isTotal) ERFrom.isTotal = true
         else ERFrom.isTotal = false
       }
-
-
       ERFrom.connectors.push(newConnector)
       ERTo.connectors.push(newConnector)
     }
@@ -255,9 +253,9 @@ const convertToLogical = () => {
     alert("Please fill The entity relationship name")
   }
   else {
-    const newERModel123 = convertToERModel(ername.value)
+    const newERModel = convertToERModel(ername.value)
 
-    const newERModel = {
+    const newERModel123 = {
       entityRelations: [
         {
           id: 0,
@@ -367,6 +365,16 @@ const convertToLogical = () => {
       }
       else if (count == 0) {
         error.push(`>> No Parent on a specialization`)
+      }
+
+      // ReflexiveRelationship
+      if (relation.type == 'Relationship') {
+        const erConnectors = relation.connectors 
+        if (erConnectors.length == 2) {
+          if (erConnectors[0].to == erConnectors[1].to) {
+            relation.type = 'ReflexiveRelationship'
+          }
+        }
       }
     })
 

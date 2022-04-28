@@ -23,7 +23,9 @@ function initERInspector() {
       isOne: {show: false, type: "checkbox"},
       strokeDashArray: {show: false},
       fromLinkableDuplicates: {show: false},
+      toLinkableDuplicates: {show: false},
       fromMaxLinks: {show: false},
+      underline: {show: false},
     },
   });
 }
