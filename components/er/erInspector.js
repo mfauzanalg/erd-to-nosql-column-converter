@@ -21,7 +21,9 @@ function initERInspector() {
       isParent: {show: false, type: "checkbox"},
       isTotal: {show: false, type: "checkbox"},
       isOne: {show: false, type: "checkbox"},
-      strokeDashArray: {show: false}
+      strokeDashArray: {show: false},
+      fromLinkableDuplicates: {show: false},
+      fromMaxLinks: {show: false},
     },
   });
 }
@@ -44,6 +46,10 @@ const getIsShowTotalOne = (inspectedObject) => {
     }
   }
   
+  inspector.declaredProperties.text = {
+    show: isShowTotal,
+  }
+
   inspector.declaredProperties.isTotal = {
     show: isShowTotal,
     type: "checkbox"

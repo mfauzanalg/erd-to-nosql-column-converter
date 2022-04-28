@@ -255,7 +255,67 @@ const convertToLogical = () => {
     alert("Please fill The entity relationship name")
   }
   else {
-    const newERModel = convertToERModel(ername.value)
+    const newERModel123 = convertToERModel(ername.value)
+
+    const newERModel = {
+      entityRelations: [
+        {
+          id: 0,
+          label: 'Employee',
+          type: 'Entity',
+          key: ['Name'],
+          attributes: [
+            {
+              type: 'Key',
+              label: 'Name'
+            },
+            {
+              type: 'Regular',
+              label: 'Address'
+            }
+          ],
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'One',
+              participation: 'Partial'
+            },
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'Many',
+              participation: 'Partial'
+            },
+          ]
+        },
+        {
+          id: 2,
+          label: 'Supervision',
+          type: 'ReflexiveRelationship',
+          attributes: [],
+          connectors: [
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'One',
+              participation: 'Partial'
+            },
+            {
+              type: 'RelationConnector',
+              from: 2,
+              to: 0,
+              cardinality: 'Many',
+              participation: 'Total'
+            }
+          ]
+        },
+      ],
+    }
+
 
     // Validate duplicate attribute
     newERModel.entityRelations.forEach(er => {
@@ -271,6 +331,8 @@ const convertToLogical = () => {
 
     createReference(newERModel)
     splitER(newERModel)
+
+    console.log(newERModel)
 
     // Validation duplicate ER Name
     const entityLookUp = createLookup(newERModel.entities)
@@ -288,8 +350,28 @@ const convertToLogical = () => {
       }
     }
 
-  
+    // Validate parent
+    newERModel.relationships.forEach(relation => {
+      let count = -1
+      if (relation.type == 'SpecialConnector') {
+        count = 0
+        relation.connectors.forEach(conn => {
+          if (conn.type == "ParentSpecialization") {
+            count += 1
+          }
+        })
+      }
 
+      if (count > 1) {
+        error.push(`>> Parent of Specialization on ${relation.superER.label} have ${count} parents`)
+      }
+      else if (count == 0) {
+        error.push(`>> No Parent on a specialization`)
+      }
+    })
+
+
+    // Finish Validating
     if (error.length != 0) {
       alert(error.join('\n'))
     }
@@ -299,10 +381,6 @@ const convertToLogical = () => {
   
       const logicalTitle = document.getElementById("logical-schema-title")
       logicalTitle.scrollIntoView()
-      // console.log(newERModel.entityRelations.filter(e => lookup[e.label]));
-  
-      // console.log("RESULT")
-      // print2(newERModel)
       
       logicalModel = convertERToLogical(newERModel)
       checkParentColumFam(logicalModel.columnFamilies)
