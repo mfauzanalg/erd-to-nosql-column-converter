@@ -259,58 +259,62 @@ ELSE:
 ENDIF
 
 // findParentArray
-Input : entityRelation Shape,
-Output: parentArray Shape[],
+Input : entity Entity,
+Output: parentArray Entity[],
 
 parentArray <- []
-connecotrs <- entityRelation.connecotrs
-FOREACH connectorFrom IN connectors:
-  IF (connectorFrom.type == 'ChildrenSpecialization'):
-    specializationShape <- ERModel.find(connector.from)
-    parentEntity <- ERModel.find(specializationShape.parentID)
-    parentArray.add(parentEntity)
-  ENDIF
-  ELSE IF (connector.type == 'RelationConnector'):
-    relation <- ERModel.find(connector.to)
-    connectorTo <- relation.connector //different from connectorFrom
-    IF (relation.type == 'Relationship'):
-      IF ((connectorFrom.cardinality == 'Many' & 
-          connectorTo.cardinality == 'One') ||
-          (connectorFrom.cardinality == 'One' &
-          connectorFrom.participation == 'Partial' &
-          connectorTo.cardinality == 'One' &
-          connectorTo.participation == 'Total' )):
-        parentArray.add(ERModel.find(connectorTo.to))
+connecotrs <- entity.connecotrs
+IF (connectors)
+  FOREACH connector From IN connectors:
+    IF (connectorFrom.type == 'SpecialConnector'):
+      specializationShape <- connector.from
+      parentEntity <- specializationShape.super
+      parentArray.add(parentEntity)
+    ENDIF
+    ELSE IF (connector.type == 'RelationConnector'):
+      entityFromCardinality <- connector.cardinality
+      relation <- connector.to
+      connectorTo <- relation.connector
+
+      IF (relation.type == 'Relationship'):
+        IF (entityFromCardinality == 'Many' AND 
+            connectorTo.cardinality == 'One'):
+          parentArray.push(connectorTo.to)
+        ENDIF
+      ENDIF
+
+      IF (entityFromCardinality == 'One' AND
+          connectorTo.cardinality == 'One'):
+        IF (entity.type == 'AssociativeEntity'):
+          parentArray.push(coonectorTo.to)
+        ENDIF
       ENDIF
     ENDIF
-  ENDIF
-ENDFOR
-
-interface RelationDetail {
-  type: 'BinaryOneToOne' | 'BinaryOneToMany' | 'BinaryManyToMany',
-  relations: Shape
-  entityAcrossId?: number
-}
+  ENDFOR
+ENDIF
 
 // findRelationArray
-Input : entityRelation Shape,
+Input : entityRelation Relationship,
 Output: relationDArray RelationDetail[],
 
 relationDArray <- []
 connecotrs <- entityRelation.connecotrs
 FOREACH connectorFrom IN connectors:
-  IF (connectorFrom.type == 'ChildrenSpecialization'):
-    specializationShape <- ERModel.find(connector.from)
+  IF (connectorFrom.type == 'SpecialConnector'):
+    specializationShape <- connector.from
     relationArray.add({
-      type: 'Specialization',
+      type: 'SpecialConnector',
       relation: specializationShape,
-      entityAcrossId: specializationShape.parentID
     })
   ENDIF
   ELSE IF (connector.type == 'RelationConnector'):
     relation <- ERModel.find(connector.to)
     connectorTo <- relation.connector //different from connectorFrom
     IF (relation.type == 'Relationship'):
+
+      relation.CF.label = relation.label + entity.label
+      relation.id = relation.connector[0]
+
       IF ((connectorFrom.cardinality == 'Many' & 
           connectorTo.cardinality == 'One') ||
           (connectorFrom.cardinality == 'Many' & 
@@ -334,3 +338,80 @@ FOREACH connectorFrom IN connectors:
   ENDIF
 ENDFOR
 
+// findParentKey
+Input:  entity Entity,
+        logicalCF ColumnFamily[],
+        cf ColumnFamily
+
+connectors <- entity.connectors
+
+IF (entity.isTemporaryEntity):
+  cf.parentColumnFam = getParentCF(entity.parentColumnFam, logicalCF)
+ENDIF
+
+FOREACH connector IN connectors:
+  IF (connector.type == 'SpecialConnector'):
+    specializationShape = connector.from
+    IF (specializationShape.isTotal):
+      columnFamily.parentColumnFam = getParentCF(specializationShape.super, logicalCF)
+    ENDIF
+
+  ELSE IF (relation.type == 'Relationship' OR 'WeakRelationship'):
+    connectorTo = relation.connectors[0]
+
+    IF (connector.cardinality == 'One' AND connectorTo.cardinality == 'One' OR
+        relation.type == 'WeakRelationship' AND connector.cardinality == 'One'):
+      
+      entityAcrossID = connector.to.id
+      columnFamilyAcrpss = logicalCF.find(entityAcrossID)
+
+      IF (columnFamilyAccross):
+        columnFamilt.parentColumFam = getParentCF(columnFamilyAcross, logicalCF)
+      ENDIF
+    ENDIF
+  ENDIF
+ENDFOR
+
+// findRelationshipKey
+Input:  relationship Relationship,
+        logicalCF ColumnFamily[],
+        cf ColumnFamily
+
+connectors <- relationship.connectors
+
+FOREACH connector IN connectors:
+  IF (connector.cardinality == 'One'):
+    parent = mergeLogicalCF.find(connector.toString.id)
+    IF (parent):
+      columnFamily.parentColumnFam = getParentCF(parent, logicalCF)
+    ENDIF
+  ENDIF
+ENDFOR
+
+// getparentid
+
+// getparentCF
+Input:  cf ColumnFamily,
+        logicalCF ColumnFamily[],
+Output: parentCF ColumnFamily
+
+parentCF <- logicalCF.find(columnFamily.id)
+IF (cf.panretColumnFam):
+  return getParentCF(cf.parentColumnFam, logicalCF)
+ELSE:
+  return parentCF
+ENDIF
+
+// arrayKeytoAttribute
+Input:  keys String[],
+Output: arrayAttr Attribute[],
+
+arrayAttr <- []
+FOREACH key IN keys:
+  arrayAttr.add({
+    label: key,
+    type: "Key"
+  })
+ENDFOR
+
+RETURN arrayAttr
