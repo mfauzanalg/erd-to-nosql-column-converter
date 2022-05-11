@@ -20,7 +20,7 @@ const createPrimaryKey = (parentKeys, cfKeys, stringQuery) => {
     primaryKey += cfKeys.join(', ')
   }
 
-  stringQuery.push(`  PRIMARY KEY (${removeNewLine(primaryKey)})`)
+  stringQuery.push(`  PRIMARY KEY (${primaryKey})`)
 }
 
 const removeNewLine = (str) => {
@@ -47,7 +47,7 @@ const logicalToDDL = (logicalModel) => {
             dataType = `list<${dataType}>`
           }
           stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
-          parentKeys.push(attr.label)
+          parentKeys.push(removeNewLine(attr.label))
         }
       })
     }
@@ -61,7 +61,7 @@ const logicalToDDL = (logicalModel) => {
 
         stringQuery.push(`  ${removeNewLine(attr.label)}  ${dataType.toUpperCase()},`)
         if (['Key', 'Auxiliary'].includes(attr.type)) {
-          cfKeys.push(attr.label)
+          cfKeys.push(removeNewLine(attr.label))
         }
       })
     }
