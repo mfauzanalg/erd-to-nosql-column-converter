@@ -292,6 +292,7 @@ IF (connectors)
     ENDIF
   ENDFOR
 ENDIF
+RETURN parentArray
 
 // findRelationArray
 Input : entityRelation Relationship,
@@ -388,7 +389,18 @@ FOREACH connector IN connectors:
   ENDIF
 ENDFOR
 
-// getparentid
+// getArrayKey
+Input : attributes Attribute[]
+Output: arrKey String[]
+arrayKeys = []
+FOREACH attr IN attributes:
+  IF (attr.type == "Key"):
+      arrayKeysToAttribute.push(attr.label)
+  ENDIF
+ENDFOR
+
+RETURN arrayKeys
+
 
 // getparentCF
 Input:  cf ColumnFamily,
@@ -402,7 +414,7 @@ ELSE:
   return parentCF
 ENDIF
 
-// arrayKeytoAttribute
+// arrayKeystoAttribute
 Input:  keys String[],
 Output: arrayAttr Attribute[],
 
