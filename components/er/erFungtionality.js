@@ -41,24 +41,31 @@ const download = (filename, text) => {
 
 const save = () => {
   document.getElementById('mySavedModel').value = myDiagram.model.toJson();
-  download(`${ername.value}.json`, myDiagram.model.toJson());
+  download(`${ername.value}.ercvt`, myDiagram.model.toJson());
   myDiagram.isModified = false;
 }
 
 // Load Diagram
 const readSingleFile = (evt) => {
   var f = evt.target.files[0];
+  console.log(f)
   if (f) {
       var r = new FileReader();
       r.onload = function(e) { 
         contents = e.target.result;
-        myDiagram.model = go.Model.fromJson(contents)
+        try {
+          myDiagram.model = go.Model.fromJson(contents)
+        }
+        catch {
+          alert("Error loading file, please select .ercvt file")
+        }
       }
       r.readAsText(f);
-      ername.value = f.name.slice(0, -5)
+      ername.value = f.name.slice(0, -6)
   } else {
       alert("Failed to load file");
   }
+  document.getElementById('load-input').value = ''
 }
 document.getElementById('load-input').addEventListener('change', readSingleFile, false);
 
@@ -343,7 +350,7 @@ const convertToLogical = () => {
     }
 
     for (const property in relationshipLookUp) {
-      if (relationshipLookUp[property] != 0) {
+      if (relationshipLookUp[property] != 0 && property != "Speciali\nzation") {
         error.push(`>> Duplicate Relationship Label ${property}`)
       }
     }
