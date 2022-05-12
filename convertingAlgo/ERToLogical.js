@@ -205,19 +205,24 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
   let found = false;
   let key = []
   const connectors = relationship.connectors
-  while (!found && connectors && i < connectors.length) {
-    // Harusnya memang total
-    // if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
-    if (connectors[i].cardinality == 'One') {
-      const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
-      if (parent) {
-        found = true
-        columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
-      }
-    }
-    i += 1
+  if (relationship.binaryType == 'ReflexiveRelationship') {
+    const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
+    columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
   }
-
+  else {
+    while (!found && connectors && i < connectors.length) {
+      // Harusnya memang total
+      // if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
+      if (connectors[i].cardinality == 'One') {
+        const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
+        if (parent) {
+          found = true
+          columnFamily.parentColumnFam = getParentCF(parent, logicalCF);
+        }
+      }
+      i += 1
+    }
+  }
   return key
 }
 
@@ -341,11 +346,8 @@ const findRelationArray = (entity) => {
         if (relation.type == 'Relationship') {
           if (relation.connectors[0].toER.label == entity.label) connectorTo = relation.connectors[1]
           else connectorTo = relation.connectors[0]
-
-        
-          relation.label = `${relation.label}_${entity.label}`
-          relation.id = `${relation.id}_${entity.id}`
-  
+          
+          let type = ''
           if (entityFromCardinality === 'Many' && connectorTo.cardinality === 'One') {
             relationArray.push ({
               type: 'BinaryManyToOne',
@@ -364,11 +366,18 @@ const findRelationArray = (entity) => {
             // && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
             && connectorTo.cardinality === 'One') {
             if (!isVisited(relation, visited)) {
+              type = 'BinaryOneToOne',
               relationArray.push ({
                 type: 'BinaryOneToOne',
                 relation: relation,
               })
             }
+          }
+
+          // TODO: Need to be decided again about this two lines
+          if (type != 'BinaryOneToOne') {
+            relation.label = `${relation.label}_${entity.label}`
+            relation.id = `${relation.id}_${entity.id}`
           }
         }
 
@@ -379,6 +388,9 @@ const findRelationArray = (entity) => {
             connector: connector
           })
         }
+
+
+
       }
     })
   }
@@ -552,6 +564,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   if (columnFamily1.isFromRelationship) {
     newColumnFamily = duplicateArray(columnFamily1)
+    
   }
   else {
     const preexistentColumnFamily = logicalCF.find(o => o.id === columnFamily1.id);
@@ -578,8 +591,8 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   newColumnFamily.attributes.push(auxAttribute)
   
   // Nanti dikerjain ini knp many to many ngga
-  if (relationDetail.type !== 'BinaryManyToMany') {
-    let interAttribute = {};
+  let interAttribute = {};
+  if (relationDetail.type !== 'BinaryManyToMany' && relationDetail.type !== 'ReflexiveRelationship') {
     interAttribute.label = columnFamily1.label
     interAttribute.artificialID = artificialID;
     interAttribute.type = "Intermediary";
@@ -598,6 +611,13 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   // Coba2 lagi ya nanti
   // if (relationDetail.type === 'BinaryOneToOne') {
   //   newColumnFamily.key = [...columnFamily2.key]
+  // }
+  
+  // if (relationDetail.type == 'ReflexiveRelationship') {
+  //   interAttribute.type = 'Multivalued'
+  //   newLogicalCF = mergeLogicalCF(newLogicalCF, [columnFamily2])
+  // } else {
+  //   newLogicalCF = mergeLogicalCF(newLogicalCF, [newColumnFamily, columnFamily2])
   // }
   newLogicalCF = mergeLogicalCF(newLogicalCF, [newColumnFamily, columnFamily2])
   // [...newLogicalCF, newColumnFamily, columnFamily2]
@@ -652,6 +672,7 @@ const defineKey = (entityRelation, logicalCF, columnFamily) => {
     key = [...ERKeys, ...findParentKey(entityRelation, logicalCF, columnFamily)]
   }
   else { // if thre type is Relationship
+    // if (entityRelation.type != 'ReflexiveRelationship') {}
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
   }
   if (key.length < 1 && !columnFamily.parentColumnFam && !(entityRelation.binaryType == "BinaryManyToMany")) {
