@@ -592,7 +592,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   
   // Nanti dikerjain ini knp many to many ngga
   let interAttribute = {};
-  if (relationDetail.type !== 'BinaryManyToMany' && relationDetail.type !== 'ReflexiveRelationship') {
+  if (relationDetail.type !== 'BinaryManyToMany') {
     interAttribute.label = columnFamily1.label
     interAttribute.artificialID = artificialID;
     interAttribute.type = "Intermediary";
