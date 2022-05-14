@@ -47,6 +47,7 @@ const save = () => {
 
 // Load Diagram
 const readSingleFile = (evt) => {
+  clearDiagram()
   var f = evt.target.files[0];
   console.log(f)
   if (f) {
@@ -67,6 +68,7 @@ const readSingleFile = (evt) => {
   }
   document.getElementById('load-input').value = ''
 }
+
 document.getElementById('load-input').addEventListener('change', readSingleFile, false);
 
 const load = () => {
@@ -242,6 +244,11 @@ checkParentColumFam = (columnFamilies) => {
         columnFamilies[parentIdx] = temp;
       }
 
+    } 
+
+    // Might Error
+    if (cf == cf.parentColumnFam){
+      cf.parentColumnFam = null
     }
   })
 }
@@ -400,23 +407,22 @@ const convertToLogical = () => {
       alert(error.join('\n'))
     }
     else {
-      
       try {
         logicalModel = convertERToLogical(newERModel)
         checkParentColumFam(logicalModel.columnFamilies)
-
+  
         logicalSection.style.display = "block"
         logicalName.innerHTML = `for ${ername.value}`
-
+  
         const logicalTitle = document.getElementById("logical-schema-title")
         logicalTitle.scrollIntoView()
         
         const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-    
         loadLogical(logicalSchema);
       }
-      catch {
-        alert(`>> Error converting, please check your ERD`)
+      catch(e) {
+        alert(`>> Error converting, please check your ER Diagram`)
+        console.log(e)
       }
     }
   }
