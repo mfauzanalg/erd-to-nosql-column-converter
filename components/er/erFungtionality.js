@@ -79,8 +79,8 @@ const loadDefault = () => {
   logicalSection.style.display = "none"
 
   // development
-  document.getElementById("convert-logical-btn").click()
-  document.getElementById("convertDDL-btn").click()
+  // document.getElementById("convert-logical-btn").click()
+  // document.getElementById("convertDDL-btn").click()
 }
 
 // Convert Diagram
@@ -261,129 +261,112 @@ const convertToLogical = () => {
   }
   else {
     const newERModel = convertToERModel(ername.value)
+    try {
+      // Validate duplicate attribute
+      newERModel.entityRelations.forEach(er => {
+        const attrLookUp = createLookup(er.attributes)
 
-    const newERModel123 = {
-      entityRelations: [
-        {
-          id: 0,
-          label: 'Employee',
-          type: 'Entity',
-          key: ['Name'],
-          attributes: [
-            {
-              type: 'Key',
-              label: 'Name'
-            },
-            {
-              type: 'Regular',
-              label: 'Address'
-            }
-          ],
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'One',
-              participation: 'Partial'
-            },
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'Many',
-              participation: 'Partial'
-            },
-          ]
-        },
-        {
-          id: 2,
-          label: 'Supervision',
-          type: 'ReflexiveRelationship',
-          attributes: [],
-          connectors: [
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'One',
-              participation: 'Partial'
-            },
-            {
-              type: 'RelationConnector',
-              from: 2,
-              to: 0,
-              cardinality: 'Many',
-              participation: 'Total'
-            }
-          ]
-        },
-      ],
-    }
+        for (const property in attrLookUp) {
+          if (attrLookUp[property] != 0) {
+            error.push(`>> Duplicate attribute ${property} in ${er.type} ${er.label}`)
+          }
+        }
 
+      })
 
-    // Validate duplicate attribute
-    newERModel.entityRelations.forEach(er => {
-      const attrLookUp = createLookup(er.attributes)
+      createReference(newERModel)
+      splitER(newERModel)
 
-      for (const property in attrLookUp) {
-        if (attrLookUp[property] != 0) {
-          error.push(`>> Duplicate attribute ${property} in ${er.type} ${er.label}`)
+      // Validation duplicate ER Name
+      const entityLookUp = createLookup(newERModel.entities)
+      const relationshipLookUp = createLookup(newERModel.relationships)
+
+      for (const property in entityLookUp) {
+        if (entityLookUp[property] != 0) {
+          error.push(`>> Duplicate Entity Label ${property}`)
         }
       }
 
-    })
-
-    createReference(newERModel)
-    splitER(newERModel)
-
-    console.log(newERModel)
-
-    // Validation duplicate ER Name
-    const entityLookUp = createLookup(newERModel.entities)
-    const relationshipLookUp = createLookup(newERModel.relationships)
-
-    for (const property in entityLookUp) {
-      if (entityLookUp[property] != 0) {
-        error.push(`>> Duplicate Entity Label ${property}`)
-      }
-    }
-
-    for (const property in relationshipLookUp) {
-      if (relationshipLookUp[property] != 0 && property != "Speciali\nzation") {
-        error.push(`>> Duplicate Relationship Label ${property}`)
-      }
-    }
-
-    // Validate parent
-    newERModel.relationships.forEach(relation => {
-      let count = -1
-      if (relation.type == 'SpecialConnector') {
-        count = 0
-        relation.connectors.forEach(conn => {
-          if (conn.type == "ParentSpecialization") {
-            count += 1
-          }
-        })
-      }
-
-      if (count > 1) {
-        error.push(`>> Parent of Specialization on ${relation.superER.label} have ${count} parents`)
-      }
-      else if (count == 0) {
-        error.push(`>> No Parent on a specialization`)
-      }
-
-      // ReflexiveRelationship
-      if (relation.type == 'Relationship') {
-        const erConnectors = relation.connectors 
-        if (erConnectors.length == 2) {
-          if (erConnectors[0].to == erConnectors[1].to) {
-            relation.type = 'ReflexiveRelationship'
-          }
+      for (const property in relationshipLookUp) {
+        if (relationshipLookUp[property] != 0 && property != "Speciali\nzation") {
+          error.push(`>> Duplicate Relationship Label ${property}`)
         }
       }
-    })
+
+      // Validate entities
+      newERModel.entities.forEach(entity => {
+        // Validate Weak Entity
+        let count = 9999
+        if (entity.type == 'WeakEntity') {
+          count = 0
+
+          entity.connectors.forEach(conn => {
+            if (conn.fromER.type == 'WeakRelationship') {
+              count += 1
+            }
+          })
+        }
+
+        if (count < 1) {
+          error.push(`>> Weak Entity ${entity.label} has no relation with any weak relationship`)
+        }
+      })
+
+      // Validate relationship
+      newERModel.relationships.forEach(relation => {
+        // Validate Specialization
+        let count = -1
+        if (relation.type == 'SpecialConnector') {
+          count = 0
+          
+          relation.connectors.forEach(conn => {
+            if (conn.toER.type != 'Entity') {
+              error.push(`>> Specialization ERD Error has ${conn.toER.type}`)
+            }
+            if (conn.type == 'ParentSpecialization') {
+              count += 1
+            }
+          })
+        }
+
+        if (count > 1) {
+          error.push(`>> Parent of Specialization on ${relation.superER.label} has ${count} parents`)
+        }
+        else if (count == 0) {
+          error.push(`>> No Parent on a specialization`)
+        }
+
+        // Validate Weak Relationship
+        count = -1
+        if (relation.type == 'WeakRelationship') {
+          count = 0
+          console.log(relation)
+          relation.connectors.forEach(conn => {
+            if (conn.toER.type == 'WeakEntity') {
+              count += 1
+            }
+          })
+        }
+
+        if (count == 0) {
+          error.push(`>> Weak relationship ${relation.label} has no weak entity`)
+        }
+
+        // Create ReflexiveRelationship
+        if (relation.type == 'Relationship') {
+          const erConnectors = relation.connectors 
+          if (erConnectors.length == 2) {
+            if (erConnectors[0].to == erConnectors[1].to) {
+              relation.type = 'ReflexiveRelationship'
+            }
+          }
+        }
+      })
+    } 
+    catch (e) {
+      error.push(`>> Error converting, please check your ERD`)
+      console.log(e)
+    }
 
 
     // Finish Validating
@@ -391,18 +374,24 @@ const convertToLogical = () => {
       alert(error.join('\n'))
     }
     else {
-      logicalSection.style.display = "block"
-      logicalName.innerHTML = `for ${ername.value}`
-  
-      const logicalTitle = document.getElementById("logical-schema-title")
-      logicalTitle.scrollIntoView()
       
-      logicalModel = convertERToLogical(newERModel)
-      checkParentColumFam(logicalModel.columnFamilies)
-      
-      const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
-  
-      loadLogical(logicalSchema);
+      try {
+        logicalModel = convertERToLogical(newERModel)
+        checkParentColumFam(logicalModel.columnFamilies)
+
+        logicalSection.style.display = "block"
+        logicalName.innerHTML = `for ${ername.value}`
+
+        const logicalTitle = document.getElementById("logical-schema-title")
+        logicalTitle.scrollIntoView()
+        
+        const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+    
+        loadLogical(logicalSchema);
+      }
+      catch {
+        alert(`>> Error converting, please check your ERD`)
+      }
     }
   }
 }

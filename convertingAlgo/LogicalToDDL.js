@@ -60,7 +60,7 @@ const logicalToDDL = (logicalModel) => {
           dataType = `list<${dataType}>`
         }
 
-        stringQuery.push(`  ${removeNewLine(attr.label)}  ${dataType.toUpperCase()},`)
+        stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
         if (['Key', 'Auxiliary'].includes(attr.type)) {
           cfKeys.push(removeNewLine(attr.label))
         }
