@@ -408,7 +408,7 @@ const convertToLogical = () => {
     }
     else {
       try {
-        logicalModel = newERModel.convertERToLogical(newERModel)
+        logicalModel = newERModel.convertERToLogical()
         checkParentColumFam(logicalModel.columnFamilies)
   
         logicalSection.style.display = "block"

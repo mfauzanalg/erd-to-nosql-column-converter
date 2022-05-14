@@ -94,58 +94,6 @@ const mergeArray = (arr1, arr2) => {
   return newArr
 }
 
-// Unused
-const findPreexistentColumnFamily = (entityRelation, logicalCF) => {
-  let found = false;
-  let i = 0;
-  let columnFamilySet = []
-
-  while (!found && i < logicalCF.length) {
-    let j = 0;
-    if (logicalCF[i].label === entityRelation.label) {
-      found = true
-      columnFamilySet.push(logicalCF[i])
-    }
-
-    if (!found && logicalCF[i].children) {
-      while (j < logicalCF[i].children.length) {
-        if (logicalCF[i].children[j].label === entityRelation.label) {
-          found = true
-          columnFamilySet.push(logicalCF[i].children[j])
-        }
-        j += 1;
-      }
-    }
-    i += 1;
-  }
-  return columnFamilySet
-}
-
-// Unused
-const findColumnFamilyByID = (id, logicalCF) => {
-  let found = false;
-  let i = 0;
-  let key = []
-  while (!found && i < logicalCF.length) {
-    let j = 0;
-    if (logicalCF[i].id === id) {
-      found = true
-      key = [...logicalCF[i].key]
-    }
-    if (!found && logicalCF[i].children) {
-      while (j < logicalCF[i].children.length) {
-        if (logicalCF[i].children[j].label === id) {
-          found = true
-          key = logicalCF[i].children[j].key
-        }
-        j += 1;
-      }
-    }
-    i += 1;
-  }
-  return key
-}
-
 // HERE
 const findParentKey = (entity, logicalCF, columnFamily) => {
   let connectors = entity.connectors
@@ -161,7 +109,6 @@ const findParentKey = (entity, logicalCF, columnFamily) => {
       let specializationShape = connectors[i].fromER
       if (specializationShape.isTotal) {
         let parentEntity = specializationShape.superER
-        // key = getArrayKey(parentEntity.attributes)
         columnFamily.parentColumnFam = getParentCF(specializationShape.superER, logicalCF)
         found = true
       }
@@ -195,7 +142,7 @@ const findParentKey = (entity, logicalCF, columnFamily) => {
           })
         }
 
-        // if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') 
+        //  Total
         if ((connectors[i].cardinality === 'One' && connectorTo.cardinality === 'One') 
           || (relation.type === 'WeakRelationship' && connectorTo.cardinality === 'One')) {
           
@@ -228,8 +175,7 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
   }
   else {
     while (!found && connectors && i < connectors.length) {
-      // Harusnya memang total
-      // if (connectors[i].cardinality == 'One' && connectors[i].participation == 'Total') {
+      // Total
       if (connectors[i].cardinality == 'One') {
         const parent = logicalCF.find(o => o.id === connectors[i].toER.id)
         if (parent) {
@@ -245,26 +191,6 @@ const findRelationshipKey = (relationship, logicalCF, columnFamily) => {
 
 const isVisited = (entityRelation, visited) => {
   return visited.includes(entityRelation.id)
-}
-
-const convertERToLogical = (ERModel) => {
-  visited = []
-  artificialID = 0;
-  let logicalCF = []
-  const entities = ERModel.entities
-  for (let i = 0; i < entities.length; i++) {
-    if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
-      const columnFamilySet = createFamily(entities[i],logicalCF)
-      logicalCF = mergeLogicalCF(columnFamilySet, logicalCF)
-    }
-  }
-
-  const logicalModel = {
-    label: ERModel.label,
-    columnFamilies: logicalCF
-  }
-  
-  return logicalModel
 }
 
 const findParentArray = (entity) => {
@@ -305,17 +231,8 @@ const findParentArray = (entity) => {
               parentArray.push(connectorTo.toER)
             }
           }
-          
-          // if (entityFromCardinality === 'One' && connector.participation === 'Partial'
-          //     && connectorTo.cardinality === 'One' && connectorTo.participation === 'Total') {
-          //   parentArray.push(connectorTo.toER)
-          //   console.log("AJJJJ")
-          //   console.log(entity.label)
-          //   console.log(parentArray)
-          // }
         }
 
-        // console.log('Whyy', connector.fromER.type)
         if (connector.fromER.type == 'AssociativeEntity') {
           relation.connectors.forEach(conn => {
             if (conn.toER.type == 'Entity' && conn.toER != entity) {
@@ -406,7 +323,7 @@ const findRelationArray = (entity) => {
             }
           }
 
-          // TODO: Need to be decided again about this two lines
+          // For change the label in many to many
           if (type != 'BinaryOneToOne') {
             relation.label = `${relation.label}_${entity.label}`
             relation.id = `${relation.id}_${entity.id}`
@@ -439,11 +356,10 @@ const removeDuplicate = (arr) => {
 }
 
 const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
-  // let columnFamilySet = findPreexistentColumnFamily(entityRelation, logicalCF)
   let columnFamilySet = [...logicalCF]
   let columnFamily = logicalCF.find(o => o.id === entityRelation.id);
 
-  // Soalnya ngedouble kalo relation
+  // For the relation, so it's not processes twice
   if (!columnFamily || entityRelation.type == 'Relationship') {
     columnFamily = {}
   }
@@ -452,13 +368,10 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
   if (firstCome || entityRelation.type !== 'Entity') {
     visited.push(entityRelation.id)
 
-    // Here process parentnya first tapi nanti dlu ya
+    // Process the parents first
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
       const parentArray = findParentArray(entityRelation)
 
-      // console.log("WOWW")
-      // console.log(entityRelation)
-      // console.log(parentArray)
 
       parentArray.forEach((entity) => {
         // this is migrate to merge
@@ -470,12 +383,6 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     columnFamily.label = entityRelation.label
     const attributes = [...defineKey(entityRelation, columnFamilySet, columnFamily)];
     columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
-
-    // if (isSharedKey) {
-    //   // columnFamily.parentColumnFam = getParentCF(parentColumnFam);
-    //   // columnFamily.attributes = mergeArray(columnFamily.attributes, filterKey(columnFamily.parentColumnFam?.attributes) || []))
-    //   isSharedKey = false;
-    // }
     
     if (!columnFamily.attributes) {
       columnFamily.attributes = [];
@@ -505,7 +412,6 @@ const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
     }
   }
 
-
   if (returnNewCF) return columnFamily
   return columnFamilySet
 }
@@ -531,8 +437,8 @@ const isSameKey = (columnFamily1, columnFamily2) => {
 }
 
 const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
-  // Baru case 1 doang yang diimplement
   let newLogicalCF = [];
+  // Case1
   if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
     const columFamilyFromRelation = createFamily(relationDetail.relation, logicalCF, true)
 
@@ -540,11 +446,6 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
       newLogicalCF.push(columFamilyFromRelation)
     }
 
-    // console.log('==========')
-    // console.log(columFamilyFromRelation)
-    // console.log(columnFamily)
-    // console.log(relationDetail)
-    // console.log(relationDetail.relation.label)
     if (relationDetail.type != 'BinaryOneToOne' && (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship')) {
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
     }
@@ -575,9 +476,6 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
   // Case 3
   else if (['SpecialConnector'].includes(relationDetail.type)) {
     if (!relationDetail.relation?.isTotal) {
-      // console.log(relationDetail)
-      // console.log(columnFamily)
-      // console.log(logicalCF)
       const parentColumnFamily = logicalCF.find(o => o.id === relationDetail.relation.superID);
       newLogicalCF = [...newLogicalCF, ...createArtificialRelation(columnFamily, parentColumnFamily, relationDetail, logicalCF)]
     }
@@ -586,11 +484,8 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
 }
 
 const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, logicalCF) => {
-  // let relation = relationDetail.relation
-  // let withTemporary = false;
   let newLogicalCF = []
   let newColumnFamily = undefined;
-
 
   if (columnFamily1.isFromRelationship) {
     newColumnFamily = duplicateArray(columnFamily1)
@@ -620,7 +515,7 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   auxAttribute.artificialID = artificialID;
   newColumnFamily.attributes.push(auxAttribute)
   
-  // Nanti dikerjain ini knp many to many ngga
+  // Skip many to many, just like the original alog
   let interAttribute = {};
   if (relationDetail.type !== 'BinaryManyToMany') {
     interAttribute.label = columnFamily1.label
@@ -633,29 +528,13 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
 
   // handle many to many artificial relation
   if (relationDetail.type === 'BinaryManyToMany') {
-    // console.log(relationDetail.entityAcross)
     newColumnFamily.parentColumnFam = relationDetail.entityAcross.id
-    // newColumnFamily.attributes = mergeArray(newColumnFamily.attributes, filterKey(columnFamily2.attributes))
   }
 
-  // Coba2 lagi ya nanti
-  // if (relationDetail.type === 'BinaryOneToOne') {
-  //   newColumnFamily.key = [...columnFamily2.key]
-  // }
-  
-  // if (relationDetail.type == 'ReflexiveRelationship') {
-  //   interAttribute.type = 'Multivalued'
-  //   newLogicalCF = mergeLogicalCF(newLogicalCF, [columnFamily2])
-  // } else {
-  //   newLogicalCF = mergeLogicalCF(newLogicalCF, [newColumnFamily, columnFamily2])
-  // }
   newLogicalCF = mergeLogicalCF(newLogicalCF, [newColumnFamily, columnFamily2])
-  // [...newLogicalCF, newColumnFamily, columnFamily2]
-
   return newLogicalCF
 }
 
-// Masih harus dikerjain yaaa
 const getColumnType = (column, attribute) => {
   if (attribute.type == 'Key') column.type = 'Key'
   else if (attribute.type == 'Multivalued') column.type = 'Multivalued'
@@ -702,7 +581,6 @@ const defineKey = (entityRelation, logicalCF, columnFamily) => {
     key = [...ERKeys, ...findParentKey(entityRelation, logicalCF, columnFamily)]
   }
   else { // if thre type is Relationship
-    // if (entityRelation.type != 'ReflexiveRelationship') {}
     key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
   }
   if (key.length < 1 && !columnFamily.parentColumnFam && !(entityRelation.binaryType == "BinaryManyToMany")) {
@@ -710,35 +588,3 @@ const defineKey = (entityRelation, logicalCF, columnFamily) => {
   }
   return arrayKeysToAttribute(key)
 } 
-
-const print = (myObject) => {
-  console.log(JSON.stringify(myObject, null, 2));
-}
-
-const print2 = (myObject) => {
-  console.log(JSON.stringify(myObject, stringifyCircularObject, 2));
-}
-
-// createReference(ERModel)
-// splitER(ERModel)
-
-
-// print2(ERModel)
-// console.log(ERModel)
-// convertERToLogical(ERModel)
-// print(convertERToLogical(ERModel));
-// print2(convertERToLogical(ERModel));
-// console.log(convertERToLogical(ERModel));
-
-
-// Yang blm
-// One to one partial both
-// Relationship ada attribute
-// Kalo kebetulan nama key nya sama gmn
-
-
-// Notes
-// Weak entity kalo many to many emng gabisa
-// N-ary SKIP
-// Refelxive udah tapi masih aneh
-
