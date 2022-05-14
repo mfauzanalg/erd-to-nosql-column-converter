@@ -13,7 +13,6 @@ const createReference = (entityRelations) => {
 const splitER = (ERModel, entityRelations) => {
   entityRelations.forEach(er => {
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(er.type)) {
-      console.log(er)
       ERModel.addEntity(er)
     }
     else {
@@ -110,7 +109,7 @@ const findParentKey = (entity, logicalCF, columnFamily) => {
       let relation;
       let connectorTo;
       
-      if (entity == connectors[i].toER) relation = connectors[i].fromER
+      if (entity.type == connectors[i].toER.type) relation = connectors[i].fromER
       else relation = connectors[i].toER
 
       // Define Associative Entity Parent
@@ -201,8 +200,12 @@ const findParentArray = (entity) => {
         let relation
         let connectorTo;
 
-        if (entity === connector.toER) relation = connector.fromER
-        else relation = connector.toER
+        if (entity.type === connector.toER.type) {
+          relation = connector.fromER
+        }
+        else {
+          relation = connector.toER
+        } 
 
         if (relation.type == 'Relationship') {
           if (relation.connectors[0].toER === entity) connectorTo = relation.connectors[1]
@@ -256,6 +259,10 @@ const duplicateArray = (array) => {
   return structuredClone(array)
 }
 
+const clone = (orig) => {
+  return Object.assign(Object.create(Object.getPrototypeOf(orig)), orig)
+}
+
 const findRelationArray = (entity) => {
   let relationArray = []
   let connectors = entity.connectors
@@ -272,12 +279,13 @@ const findRelationArray = (entity) => {
       else if (connector.type === 'RelationConnector') {
         let entityFromCardinality = connector.cardinality
         let targetRelation
-        if (entity === connector.toER) targetRelation = connector.fromER
+        if (entity.type === connector.toER.type) targetRelation = connector.fromER
         else targetRelation = connector.toER
 
-        let relation = structuredClone(targetRelation)
-        let connectorTo;
+        let relation = clone(targetRelation)
+        // relation.createFamily = targetRelation.createFamily
 
+        let connectorTo;
         if (relation.type == 'ReflexiveRelationship') {
           relationArray.push ({
             type: 'ReflexiveRelationship',
@@ -348,67 +356,6 @@ const removeDuplicate = (arr) => {
   return uniqueArray
 }
 
-const createFamily = (entityRelation, logicalCF, returnNewCF = false) => {
-  let columnFamilySet = [...logicalCF]
-  let columnFamily = logicalCF.find(o => o.id === entityRelation.id);
-
-  // For the relation, so it's not processes twice
-  if (!columnFamily || entityRelation.type == 'Relationship') {
-    columnFamily = {}
-  }
-
-  let firstCome = !isVisited(entityRelation, visited)
-  if (firstCome || entityRelation.type !== 'Entity') {
-    visited.push(entityRelation.id)
-
-    // Process the parents first
-    if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-      const parentArray = findParentArray(entityRelation)
-
-
-      parentArray.forEach((entity) => {
-        // this is migrate to merge
-        columnFamilySet = mergeLogicalCF(columnFamilySet, createFamily(entity, logicalCF))
-      })
-    }
-
-    columnFamily.id = entityRelation.id
-    columnFamily.label = entityRelation.label
-    const attributes = [...defineKey(entityRelation, columnFamilySet, columnFamily)];
-    columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
-    
-    if (!columnFamily.attributes) {
-      columnFamily.attributes = [];
-    }
-    entityRelation.attributes?.forEach(attribute => {
-      columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
-    })
-
-    if (
-        (['Relationship', 'ReflexiveRelationship'].includes(entityRelation.type) 
-        && !entityRelation.isTemporaryRelation)
-        ) columnFamily.isFromRelationship = true
-
-    if (entityRelation.type === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
-
-    columnFamilySet.push(columnFamily)
-  
-    //Process for the relation
-    if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-      if (!(entityRelation.type == 'AssociativeEntity' && !firstCome)) {
-        const relationDetailArray = findRelationArray(entityRelation)
-        relationDetailArray.forEach((relationDetail) => {
-          relationDetail.relation.binaryType = relationDetail.type
-          columnFamilySet = mergeLogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
-        })
-      }
-    }
-  }
-
-  if (returnNewCF) return columnFamily
-  return columnFamilySet
-}
-
 const isSameKey = (columnFamily1, columnFamily2) => {
   let result = false
   if (columnFamily1.parentColumnFam && columnFamily1.parentColumnFam?.id === columnFamily2.id) {
@@ -433,7 +380,7 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
   let newLogicalCF = [];
   // Case1
   if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
-    const columFamilyFromRelation = createFamily(relationDetail.relation, logicalCF, true)
+    const columFamilyFromRelation = relationDetail.relation.createFamily(relationDetail.relation, logicalCF, true)
 
     if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
       newLogicalCF.push(columFamilyFromRelation)
@@ -445,22 +392,37 @@ const convertRelationship = (relationDetail, columnFamily, logicalCF) => {
   }
   // Case 2 
   else if (['AssociativeEntity'].includes(relationDetail.type)) {
-    const columFamilyFromAssociative = createFamily(relationDetail.relation, logicalCF)
+    const columFamilyFromAssociative = relationDetail.relation.createFamily(relationDetail.relation, logicalCF)
     newLogicalCF = mergeLogicalCF(newLogicalCF, columFamilyFromAssociative)
 
     let type = 'BinaryManyToOne'
     if (relationDetail.connector.cardinality === 'One') {
       type = 'BinaryOneToOne'
     }
+
+    const tempRelation = new Relationship(
+      relationDetail.relation.ERModel,
+      relationDetail.relation.label,
+      'Relationship'
+    )
+    tempRelation.isTemporaryRelation = true
+    tempRelation.id = relationDetail.relation.id
+
     const temporaryRelationDetail = {
       type: type,
-      relation: {
-        id: relationDetail.relation.id,
-        label: relationDetail.relation.label,
-        type: 'Relationship',
-        isTemporaryRelation: true,
-      }
+      relation: tempRelation
     }
+
+    // const temporaryRelationDetail = {
+    //   type: type,
+    //   relation: {
+    //     id: relationDetail.relation.id,
+    //     label: relationDetail.relation.label,
+    //     type: 'Relationship',
+    //     isTemporaryRelation: true,
+    //   }
+    // }
+
 
     const result = convertRelationship(temporaryRelationDetail, columnFamily, newLogicalCF)
     newLogicalCF = mergeLogicalCF(result, newLogicalCF)
@@ -490,16 +452,18 @@ const createArtificialRelation = (columnFamily1, columnFamily2, relationDetail, 
   }
 
   if (!newColumnFamily) {
-    const temporaryEntity = {
-      id: `temporary${columnFamily1.id}`,
-      label: `${columnFamily1.label}_${columnFamily2.label}`,
-      type: 'Entity',
-      isTemporaryEntity: true,
-      parentColumnFam: columnFamily1,
-      attributes: []
-    }
+    const temporaryEntity = new Entity(
+      'ERModel', 
+      `${columnFamily1.label}_${columnFamily2.label}`,
+      'Entity'
+    )
+
+    temporaryEntity.id = `temporary${columnFamily1.id}`
+    temporaryEntity.isTemporaryEntity = true
+    temporaryEntity.parentColumnFam = columnFamily1
+
   
-    newColumnFamily = createFamily(temporaryEntity, logicalCF, true)
+    newColumnFamily = temporaryEntity.createFamily(temporaryEntity, logicalCF, true)
   }
   
   let auxAttribute = {};

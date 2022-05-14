@@ -12,7 +12,7 @@ class ERModel {
     const entities = this.entities;
     for (let i = 0; i < entities.length; i++) {
       if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
-        const columnFamilySet = createFamily(entities[i], logicalCF);
+        const columnFamilySet = entities[i].createFamily(entities[i], logicalCF);
         logicalCF = mergeLogicalCF(columnFamilySet, logicalCF);
       }
     }
@@ -30,27 +30,89 @@ class ERModel {
   }
 
   addRelationship(relationship) {
-    this.entities.push(relationship)
+    this.relationships.push(relationship)
   }
 }
 
-class Entity {
-  constructor(ERModel, label, type) {
+class EntityRelation {
+  constructor(ERModel, label, type, connectors, attributes) {
     this.ERModel = ERModel;
     this.label = label;
     this.type = type;
-    this.connectors = [];
-    this.attributes = [];
+    this.connectors = connectors || [],
+    this.attributes = attributes || []
+  }
+
+  createFamily(entityRelation, logicalCF, returnNewCF = false) {
+    let columnFamilySet = [...logicalCF]
+    let columnFamily = logicalCF.find(o => o.id === entityRelation.id);
+  
+    // For the relation, so it's not processes twice
+    if (!columnFamily || entityRelation.type == 'Relationship') {
+      columnFamily = {}
+    }
+  
+    let firstCome = !isVisited(entityRelation, visited)
+    if (firstCome || entityRelation.type !== 'Entity') {
+      visited.push(entityRelation.id)
+  
+      // Process the parents first
+      if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
+        const parentArray = findParentArray(entityRelation)
+        parentArray.forEach((entity) => {
+          // this is migrate to merge
+          columnFamilySet = mergeLogicalCF(columnFamilySet, entity.createFamily(entity, logicalCF))
+        })
+      }
+  
+      columnFamily.id = entityRelation.id
+      columnFamily.label = entityRelation.label
+      const attributes = [...defineKey(entityRelation, columnFamilySet, columnFamily)];
+      columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
+      
+      if (!columnFamily.attributes) {
+        columnFamily.attributes = [];
+      }
+      entityRelation.attributes?.forEach(attribute => {
+        columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
+      })
+  
+      if (
+          (['Relationship', 'ReflexiveRelationship'].includes(entityRelation.type) 
+          && !entityRelation.isTemporaryRelation)
+          ) columnFamily.isFromRelationship = true
+  
+      if (entityRelation.type === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
+  
+      columnFamilySet.push(columnFamily)
+    
+      //Process for the relation
+      if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
+        if (!(entityRelation.type == 'AssociativeEntity' && !firstCome)) {
+          const relationDetailArray = findRelationArray(entityRelation)
+          relationDetailArray.forEach((relationDetail) => {
+            relationDetail.relation.binaryType = relationDetail.type
+            columnFamilySet = mergeLogicalCF(columnFamilySet, convertRelationship(relationDetail, columnFamily, columnFamilySet))
+          })
+        }
+      }
+    }
+  
+    if (returnNewCF) return columnFamily
+    return columnFamilySet
+  }
+
+}
+
+class Entity extends EntityRelation {
+  constructor(ERModel, label, type, connectors, attributes) {
+    super(ERModel, label, type, connectors, attributes)
   }
 }
 
-class Relationship {
-  constructor(ERModel, label, type) {
-    this.ERModel = ERModel;
-    this.label = label;
-    this.type = type;
-    this.connectors = [];
-    this.attributes = [];
+class Relationship extends EntityRelation {
+  constructor(ERModel, label, type, connectors, attributes) {
+    super(ERModel, label, type, connectors, attributes)
   }
 }
 
