@@ -4,6 +4,10 @@ class ERModel {
         this.entities = entities
         this.relationships = relationships
     }
+
+    convertERToLogical(ERModel) {
+        return convertERToLogical(ERModel)
+    }
 }
 
 class Entity {
