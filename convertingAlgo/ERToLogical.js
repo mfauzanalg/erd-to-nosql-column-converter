@@ -1,32 +1,25 @@
-const createReference = (ERSchema) => {
-  ERSchema.entityRelations.forEach(er => {
+const createReference = (entityRelations) => {
+  entityRelations.forEach(er => {
     if (er.superID || er.superID == 0) {
-      er.superER = ERSchema.entityRelations.find(o => o.id == er.superID)
+      er.superER = entityRelations.find(o => o.id == er.superID)
     }
     er.connectors.forEach(conn => {
-      conn.fromER = ERSchema.entityRelations.find(o => o.id == conn.from)
-      conn.toER = ERSchema.entityRelations.find(o => o.id == conn.to)
+      conn.fromER = entityRelations.find(o => o.id == conn.from)
+      conn.toER = entityRelations.find(o => o.id == conn.to)
     })
   })
 }
 
-const splitER = (ERSchema) => {
-  let Entity = []
-  let Relationship = []
-
-  ERSchema.entityRelations.forEach(er => {
+const splitER = (ERModel, entityRelations) => {
+  entityRelations.forEach(er => {
     if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(er.type)) {
-      Entity.push(er)
+      console.log(er)
+      ERModel.addEntity(er)
     }
     else {
-      Relationship.push(er)
+      ERModel.addRelationship(er)
     }
   })
-  
-  ERSchema.entities = Entity
-  ERSchema.relationships = Relationship
-  ERSchema.entityRelations = []
-
 }
 
 let visited = []

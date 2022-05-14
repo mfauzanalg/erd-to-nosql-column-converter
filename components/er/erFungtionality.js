@@ -91,7 +91,7 @@ const convertToERModel = (ername) => {
   const ERSchema = JSON.parse(myDiagram.model.toJson());
   
   let newERModel = new ERModel(ERModelName)
-  newERModel.entityRelations = []
+  entityRelations = []
   let attributeArray = []
 
   // Get the entity, relationship and attributes
@@ -105,7 +105,7 @@ const convertToERModel = (ername) => {
       else if (ER.figure == "DoubleRectangle") newEntity.type = "WeakEntity"
       else if (ER.figure == "AssociativeRectangle") newEntity.type = "AssociativeEntity"
 
-      newERModel.entityRelations.push(newEntity)
+      entityRelations.push(newEntity)
     }
     // Relationship
     else if (["TriangleDown", "Diamond", "DoubleDiamond"].includes(ER.figure)) {
@@ -116,7 +116,7 @@ const convertToERModel = (ername) => {
       else if (ER.figure == "Diamond") newRelationship.type = "Relationship"
       else if (ER.figure == "DoubleDiamond") newRelationship.type = "WeakRelationship"
 
-      newERModel.entityRelations.push(newRelationship)
+      entityRelations.push(newRelationship)
     }
     // Attribute
     else {
@@ -192,8 +192,8 @@ const convertToERModel = (ername) => {
     const participation = link.isTotal ? "Total" : "Partial"
     const isParentConnector = link.isParent
     const newConnector = new Connector(ERModelName, link.from, link.to, cardinality, participation)
-    let ERFrom = newERModel.entityRelations.find(o => o.id == link.from)
-    let ERTo = newERModel.entityRelations.find(o => o.id == link.to)
+    let ERFrom = entityRelations.find(o => o.id == link.from)
+    let ERTo = entityRelations.find(o => o.id == link.to)
 
     // Relation between Entity and Relationship
     if (ERFrom && ERTo) {
@@ -270,7 +270,7 @@ const convertToLogical = () => {
     const newERModel = convertToERModel(ername.value)
     try {
       // Validate duplicate attribute
-      newERModel.entityRelations.forEach(er => {
+      entityRelations.forEach(er => {
         const attrLookUp = createLookup(er.attributes)
 
         for (const property in attrLookUp) {
@@ -281,8 +281,8 @@ const convertToLogical = () => {
 
       })
 
-      createReference(newERModel)
-      splitER(newERModel)
+      createReference(entityRelations)
+      splitER(newERModel, entityRelations)
 
       // Validation duplicate ER Name
       const entityLookUp = createLookup(newERModel.entities)

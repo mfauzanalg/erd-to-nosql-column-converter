@@ -1,8 +1,8 @@
 class ERModel {
   constructor(label, entities, relationships) {
     this.label = label;
-    this.entities = entities;
-    this.relationships = relationships;
+    this.entities = entities || [];
+    this.relationships = relationships || [];
   }
 
   convertERToLogical() {
@@ -23,6 +23,14 @@ class ERModel {
     };
 
     return logicalModel;
+  }
+
+  addEntity(entity) {
+    this.entities.push(entity)
+  }
+
+  addRelationship(relationship) {
+    this.entities.push(relationship)
   }
 }
 
