@@ -74,7 +74,7 @@ class EntityRelation {
         columnFamily.attributes = [];
       }
       entityRelation.attributes?.forEach(attribute => {
-        columnFamilySet = [...columnFamilySet, ...convertAttribute(columnFamily, attribute)]
+        columnFamilySet = [...columnFamilySet, ...attribute.convertAttribute(columnFamily, attribute)]
       })
   
       if (
@@ -92,7 +92,6 @@ class EntityRelation {
           const relationDetailArray = findRelationArray(entityRelation)
           relationDetailArray.forEach((relationDetail) => {
             relationDetail.relation.binaryType = relationDetail.type
-            console.log(relationDetail.relation);
             columnFamilySet = mergeLogicalCF(columnFamilySet, relationDetail.relation.convertRelationship(relationDetail, columnFamily, columnFamilySet))
           })
         }
@@ -242,19 +241,17 @@ class Relationship extends EntityRelation {
 }
 
 class Specialization extends Relationship {
-  constructor(ERModel, label, type, isTotal, isDisjoint) {
-    super(ERModel);
-    super(label);
-    super(type);
-    (this.isTotal = isTotal), (this.isDisjoint = isDisjoint);
-    this.connectors = [];
-    this.attributes = [];
+  constructor(ERModel, label, type, connectors, attributes, isTotal, isDisjoint) {
+    super(ERModel, label, type, connectors, attributes)
+    this.isTotal = isTotal
+    this.isDisjoint = isDisjoint
   }
 }
 
 class Connector {
   constructor(ERModel, from, to, cardinality, participation, type) {
-    (this.ERModel = ERModel), (this.id = `${ERModel}-${from}-${to}`);
+    this.ERModel = ERModel 
+    this.id = `${ERModel}-${from}-${to}`
     this.type = type;
     this.cardinality = cardinality;
     this.participation = participation;
@@ -269,5 +266,34 @@ class Attribute {
     this.label = label;
     this.type = type;
     this.children = [];
+  }
+
+  convertAttribute (columnFamily, attribute) {
+    let additionalColumnFamily = []
+    if (attribute.children?.length > 0) {
+      let newColumFamily = {}
+      newColumFamily.label = `${columnFamily.label}_${attribute.label}`
+      newColumFamily.id = `${columnFamily.label}_${attribute.label}`
+      newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
+      newColumFamily.attributes = []
+  
+      if (attribute.children.length > 0) {
+        attribute.children.forEach(child => {
+          additionalColumnFamily = [...additionalColumnFamily,
+            ...attribute.convertAttribute(newColumFamily, child)] 
+        })
+      }
+      additionalColumnFamily.push(newColumFamily)
+    }
+    else {
+      if (attribute.type != "Derived") {
+        const column = {}
+        column.label = attribute.label
+        getColumnType(column, attribute)
+        
+        columnFamily.attributes = mergeArray([column], columnFamily.attributes)
+      }
+    }
+    return additionalColumnFamily
   }
 }

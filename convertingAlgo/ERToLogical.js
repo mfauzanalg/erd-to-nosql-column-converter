@@ -381,32 +381,3 @@ const getColumnType = (column, attribute) => {
   else if (attribute.type == 'Multivalued') column.type = 'Multivalued'
   else column.type = 'Regular'
 }
-
-const convertAttribute = (columnFamily, attribute) => {
-  let additionalColumnFamily = []
-  if (attribute.children?.length > 0) {
-    let newColumFamily = {}
-    newColumFamily.label = `${columnFamily.label}_${attribute.label}`
-    newColumFamily.id = `${columnFamily.label}_${attribute.label}`
-    newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
-    newColumFamily.attributes = []
-
-    if (attribute.children.length > 0) {
-      attribute.children.forEach(child => {
-        additionalColumnFamily = [...additionalColumnFamily,
-          ...convertAttribute(newColumFamily, child)] 
-      })
-    }
-    additionalColumnFamily.push(newColumFamily)
-  }
-  else {
-    if (attribute.type != "Derived") {
-      const column = {}
-      column.label = attribute.label
-      getColumnType(column, attribute)
-      
-      columnFamily.attributes = mergeArray([column], columnFamily.attributes)
-    }
-  }
-  return additionalColumnFamily
-}
