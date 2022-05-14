@@ -293,6 +293,7 @@ const convertToLogical = () => {
         }
       }
 
+      console.log(newERModel)
       // Validate entities
       newERModel.entities.forEach(entity => {
         // Validate Weak Entity
@@ -310,6 +311,31 @@ const convertToLogical = () => {
         if (count < 1) {
           error.push(`>> Weak Entity ${entity.label} has no relation with any weak relationship`)
         }
+
+        // Validate  Associatibe Entity
+        let countEntity = 999
+        let countRelationship = 999
+
+        if (entity.type == 'AssociativeEntity') {
+          countEntity = 0
+          countRelationship = 0
+          entity.connectors.forEach(conn => {
+            if (conn.fromER.type == 'WeakRelationship' || conn.fromER.type == 'Relationship') {
+              countRelationship += 1
+            }
+            if (conn.toER.type == 'WeakEntity' || conn.toER.type == 'Entity') {
+              countEntity += 1
+            }
+          })
+        
+          if (countEntity != 2) {
+            error.push(`>> Associative Entity ${entity.label} has to have 2 connections with other entity`)
+          }
+          if (countRelationship < 1) {
+            error.push(`>> Associative Entity ${entity.label} has to have 1 connections with other relationship`)
+          }
+        }
+
       })
 
       // Validate relationship
