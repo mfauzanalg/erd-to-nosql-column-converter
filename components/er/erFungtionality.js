@@ -236,6 +236,8 @@ checkParentColumFam = (columnFamilies) => {
     if (Number.isInteger(cf.parentColumnFam)) {
       const parentIdx = columnFamilies.findIndex(o => o.id == cf.parentColumnFam)
       cf.parentColumnFam = columnFamilies[parentIdx]
+      cf.parentColumnFam =  getParentCF(cf.parentColumnFam, logicalModel.columnFamilies)
+
 
       isSwapping = !isSwapping
       if (isSwapping) {
@@ -300,7 +302,6 @@ const convertToLogical = () => {
         }
       }
 
-      console.log(newERModel)
       // Validate entities
       newERModel.entities.forEach(entity => {
         // Validate Weak Entity
@@ -410,6 +411,14 @@ const convertToLogical = () => {
       try {
         logicalModel = newERModel.convertERToLogical()
         checkParentColumFam(logicalModel.columnFamilies)
+
+        logicalModel.columnFamilies.forEach((cf) => {
+          if (cf.parentColumnFam) {
+            console.log(cf.label)
+            console.log(cf.parentColumnFam)
+            // cf.parentColumnFam =  getParentCF(cf.parentColumnFam, logicalModel.columnFamilies)
+          } 
+        })
   
         logicalSection.style.display = "block"
         logicalName.innerHTML = `for ${ername.value}`
