@@ -223,7 +223,7 @@ const findParentArray = (entity) => {
                 } 
               }
             }
-            else if (connector.participation === 'Total' && connectorTo.participation === 'Partial') {
+            else if (connector.participation === 'Partial' && connectorTo.participation === 'Total') {
               parentArray.push(connectorTo.toER)
             }
           }
