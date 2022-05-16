@@ -39,25 +39,42 @@ class EntityRelation {
     this.ERModel = ERModel;
     this.label = label;
     this.type = type;
-    this.connectors = connectors || [],
+    this.connectors = connectors || []
     this.attributes = attributes || []
+    this.id = -999
+  }
+
+  getLabel() {
+    return this.label
+  }
+  setLabel(label) {
+    this.label = label
+  }
+  getId() {
+    return this.id
+  }
+  getType() {
+    return this.type
+  }
+  getAttributes() {
+    return this.attributes
   }
 
   createFamily(entityRelation, logicalCF, returnNewCF = false) {
     let columnFamilySet = [...logicalCF]
-    let columnFamily = logicalCF.find(o => o.id === entityRelation.id);
+    let columnFamily = logicalCF.find(o => o.id === entityRelation.getId());
   
     // For the relation, so it's not processes twice
-    if (!columnFamily || entityRelation.type == 'Relationship') {
+    if (!columnFamily || entityRelation.getType() == 'Relationship') {
       columnFamily = {}
     }
   
     let firstCome = !isVisited(entityRelation, visited)
-    if (firstCome || entityRelation.type !== 'Entity') {
-      visited.push(entityRelation.id)
+    if (firstCome || entityRelation.getType() !== 'Entity') {
+      visited.push(entityRelation.getId())
   
       // Process the parents first
-      if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
+      if(['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.getType())) {
         const parentArray = findParentArray(entityRelation)
         parentArray.forEach((entity) => {
           // this is migrate to merge
@@ -65,30 +82,30 @@ class EntityRelation {
         })
       }
   
-      columnFamily.id = entityRelation.id
-      columnFamily.label = entityRelation.label
+      columnFamily.id = entityRelation.getId()
+      columnFamily.label = entityRelation.getLabel()
       const attributes = [...entityRelation.defineKey(entityRelation, columnFamilySet, columnFamily)];
       columnFamily.attributes = mergeArray(attributes, columnFamily.attributes || [])
       
       if (!columnFamily.attributes) {
         columnFamily.attributes = [];
       }
-      entityRelation.attributes?.forEach(attribute => {
+      entityRelation.getAttributes()?.forEach(attribute => {
         columnFamilySet = [...columnFamilySet, ...attribute.convertAttribute(columnFamily, attribute)]
       })
   
       if (
-          (['Relationship', 'ReflexiveRelationship'].includes(entityRelation.type) 
+          (['Relationship', 'ReflexiveRelationship'].includes(entityRelation.getType()) 
           && !entityRelation.isTemporaryRelation)
           ) columnFamily.isFromRelationship = true
   
-      if (entityRelation.type === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
+      if (entityRelation.getType() === 'AssociativeEntity') columnFamily.isAssociativeEntity = true
   
       columnFamilySet.push(columnFamily)
     
       //Process for the relation
-      if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
-        if (!(entityRelation.type == 'AssociativeEntity' && !firstCome)) {
+      if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.getType())) {
+        if (!(entityRelation.getType() == 'AssociativeEntity' && !firstCome)) {
           const relationDetailArray = findRelationArray(entityRelation)
           relationDetailArray.forEach((relationDetail) => {
             relationDetail.relation.binaryType = relationDetail.type
@@ -104,19 +121,19 @@ class EntityRelation {
 
   defineKey (entityRelation, logicalCF, columnFamily) {
     let key = [];
-    let ERKeys = getArrayKey(entityRelation.attributes)
+    let ERKeys = getArrayKey(entityRelation.getAttributes())
   
     if (ERKeys.length > 0) {
       key = duplicateArray(ERKeys)
     }
-    if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.type)) {
+    if (['Entity', 'AssociativeEntity', 'WeakEntity'].includes(entityRelation.getType())) {
       key = [...ERKeys, ...findParentKey(entityRelation, logicalCF, columnFamily)]
     }
     else { // if thre type is Relationship
       key = [...ERKeys, ...findRelationshipKey(entityRelation, logicalCF, columnFamily)]
     }
     if (key.length < 1 && !columnFamily.parentColumnFam && !(entityRelation.binaryType == "BinaryManyToMany")) {
-      key = [`id_${entityRelation.label}`]
+      key = [`id_${entityRelation.getLabel()}`]
     }
     return arrayKeysToAttribute(key)
   }
@@ -127,11 +144,11 @@ class EntityRelation {
     if (['BinaryManyToOne', 'BinaryManyToMany', 'BinaryOneToOne', 'ReflexiveRelationship'].includes(relationDetail.type)) {
       const columFamilyFromRelation = relationDetail.relation.createFamily(relationDetail.relation, logicalCF, true)
   
-      if (relationDetail.relation?.attributes?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
+      if (relationDetail.relation?.getAttributes()?.length > 0 && relationDetail.type === 'BinaryOneToOne') {
         newLogicalCF.push(columFamilyFromRelation)
       }
   
-      if (relationDetail.type != 'BinaryOneToOne' && (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.type == 'ReflexiveRelationship')) {
+      if (relationDetail.type != 'BinaryOneToOne' && (!isSameKey(columnFamily, columFamilyFromRelation) || relationDetail.relation.getType() == 'ReflexiveRelationship')) {
         newLogicalCF = [...newLogicalCF, ...relationDetail.relation.createArtificialRelation(columFamilyFromRelation, columnFamily, relationDetail, logicalCF)]
       }
     }

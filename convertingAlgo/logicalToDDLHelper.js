@@ -1,9 +1,3 @@
-const printDDL = (DDL) => {
-  DDL.forEach(row => {
-    console.log(row)
-  })
-}
-
 const createPrimaryKey = (parentKeys, cfKeys, stringQuery) => {
   let primaryKey = ""
   if (parentKeys.length > 1) {
@@ -93,7 +87,7 @@ const getSymbol = (attr) => {
     return `^ ${attr.label}`
   }
   else if (attr.type == 'Multivalued') {
-    return `[] ${attr.label}`
+    return `[ ] ${attr.label}`
   }
   return attr.label
 }
