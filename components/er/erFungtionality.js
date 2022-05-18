@@ -76,8 +76,8 @@ const load = () => {
 }
 
 const loadDefault = () => {
-  myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
-  ername.value = "Car and Person"
+  // myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
+  // ername.value = "Car and Person"
   logicalSection.style.display = "none"
 
   // development
@@ -374,7 +374,6 @@ const convertToLogical = () => {
         count = -1
         if (relation.type == 'WeakRelationship') {
           count = 0
-          console.log(relation)
           relation.connectors.forEach(conn => {
             if (conn.toER.type == 'WeakEntity') {
               count += 1
@@ -385,6 +384,21 @@ const convertToLogical = () => {
         if (count == 0) {
           error.push(`>> Weak relationship ${relation.label} has no weak entity`)
         }
+
+        // Validate relationship
+        let countEntity = 0
+        if (relation.type == 'Relationship') {
+          relation.connectors.forEach(conn => {
+            if (['WeakEntity', 'AssociativeEntity', 'Entity'].includes(conn.toER.type)) {
+              countEntity += 1
+            }
+          })  
+          
+          if (countEntity != 2) {
+            error.push(`>> Entity ${relation.label} has to be connected to two entities`)
+          }
+        }
+
 
         // Create ReflexiveRelationship
         if (relation.type == 'Relationship') {
