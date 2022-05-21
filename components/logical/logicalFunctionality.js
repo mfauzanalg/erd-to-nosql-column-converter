@@ -74,7 +74,7 @@ USE ${newName};
 
 const convertToDDL = () => {
   document.getElementById("ddl-section").style.display = "block"
-  const stringQuery = logicalToDDL(logicalModel)
+  const stringQuery = logicalModel.logicalToDDL(logicalModel)
   const joinedQuery = createKeyspace(ername.value) +  stringQuery.join('\n')
 
   const textareaDDL = document.getElementById("ddl-content")

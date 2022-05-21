@@ -433,7 +433,7 @@ const convertToLogical = () => {
         const logicalTitle = document.getElementById("logical-schema-title")
         logicalTitle.scrollIntoView()
         
-        const logicalSchema = visualizeLogicalModel(logicalModel.columnFamilies)
+        const logicalSchema = logicalModel.visualizeLogicalModel(logicalModel.columnFamilies)
         loadLogical(logicalSchema);
       }
       catch(e) {
