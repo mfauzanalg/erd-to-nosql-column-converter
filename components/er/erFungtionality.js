@@ -76,8 +76,8 @@ const load = () => {
 }
 
 const loadDefault = () => {
-  // myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
-  // ername.value = "Car and Person"
+  myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
+  ername.value = "Book Owner"
   logicalSection.style.display = "none"
 
   // development

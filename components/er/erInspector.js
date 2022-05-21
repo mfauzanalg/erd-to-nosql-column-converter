@@ -26,6 +26,8 @@ function initERInspector() {
       toLinkableDuplicates: {show: false},
       fromMaxLinks: {show: false},
       underline: {show: false},
+      from: {show: false},
+      to: {show: false},
     },
   });
 }
