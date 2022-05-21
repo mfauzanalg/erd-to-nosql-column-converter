@@ -31,24 +31,44 @@ function initERDiagram() {
       new go.Binding('height'),
       new go.Binding('fromLinkable'),
       new go.Binding('toLinkable'),
-      new go.Binding('toLinkable'),
       new go.Binding('fromLinkableDuplicates'),
       new go.Binding('toLinkableDuplicates'),
       new go.Binding('fromMaxLinks'),
+      new go.Binding('max'),
+      new go.Binding('min'),
     ),
     $(
       go.TextBlock,
       {
-        margin: new go.Margin(5, 5, 5, 5),
         font: '9pt sans-serif',
-        minSize: new go.Size(16, 16),
-        maxSize: new go.Size(120, NaN),
+        textAlign: 'left',
+        alignment: go.Spot.TopLeft, 
+      },
+      new go.Binding('text', 'min').makeTwoWay(),
+    ),
+    $(
+      go.TextBlock,
+      {
+        font: '9pt sans-serif',
+        textAlign: 'left',
+        alignment: go.Spot.TopRight, 
+      },
+      new go.Binding('text', 'max').makeTwoWay(),
+    ),
+    $(
+      go.TextBlock,
+      {
+        margin: new go.Margin(5, 0, 5, 0),
+        font: '9pt sans-serif',
+        overflow: go.TextBlock.OverflowEllipsis,
+        width: 65,
         textAlign: 'center',
         editable: true,
+        verticalAlignment: go.Spot.Bottom,
       },
       new go.Binding('text').makeTwoWay(),
       new go.Binding("isUnderline", "underline"),
-    )
+    ),
   );
 
   myDiagram.linkTemplate =
