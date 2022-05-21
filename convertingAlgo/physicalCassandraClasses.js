@@ -4,6 +4,24 @@ class PhysicalCassandra {
     this.tables = tables || []
   }
 
+  createDDL() {
+    let stringQuery = []
+    this.tables.forEach((table) => {
+      stringQuery.push(`DROP TABLE IF EXISTS ${table.label};`)
+      stringQuery.push(`CREATE TABLE ${table.label} (`)
+
+      table.columns?.forEach((column) => {
+        stringQuery.push(`  ${column.label} ${column.dataType},`)
+      })
+
+      stringQuery.push(`  PRIMARY KEY (${table.keys})`)
+      stringQuery.push(');')
+      stringQuery.push('')
+    })
+
+    return stringQuery
+  }
+
   addTable(table) {
     this.tables.push(table)
   }

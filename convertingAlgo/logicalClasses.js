@@ -11,7 +11,7 @@ class LogicalModel {
       let parentKeys = []
       let cfKeys = []
 
-      table.setLabel(cf.label)
+      table.setLabel(removeNewLine(cf.label))
       
       if (cf.parentColumnFam) {
         const parentAttributes = cf.parentColumnFam.attributes
