@@ -15,7 +15,8 @@ class PhysicalCassandra {
       })
 
       stringQuery.push(`  PRIMARY KEY (${table.keys})`)
-      stringQuery.push(');')
+      if (table.comments.length > 0) stringQuery.push(`) WITH comment = '${table.comments.join(', ')}';`)
+      else stringQuery.push(');')
       stringQuery.push('')
     })
 
@@ -36,6 +37,7 @@ class Table {
     this.label = label
     this.keys = keys
     this.columns = columns || []
+    this.comments = []
   }
 
   setLabel(label) {
@@ -52,6 +54,10 @@ class Table {
 
   addColumn(column) {
     this.columns.push(column)
+  }
+
+  setComments(comments) {
+    this.comments = comments
   }
 }
 

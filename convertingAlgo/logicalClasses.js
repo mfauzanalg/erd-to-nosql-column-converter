@@ -8,10 +8,13 @@ class LogicalModel {
     const physicalCassandra = new PhysicalCassandra(logicalModel.label)
     logicalModel.columnFamilies.forEach((cf) => {
       let table = new Table()
+      let comments = []
       let parentKeys = []
       let cfKeys = []
 
       table.setLabel(removeNewLine(cf.label))
+      if (cf.min) comments.push(`Minimum number of ${removeNewLine(cf.label)} is ${cf.min}`)
+      if (cf.max) comments.push(`Maximum number of ${removeNewLine(cf.label)} is ${cf.max}`)
       
       if (cf.parentColumnFam) {
         const parentAttributes = cf.parentColumnFam.attributes
@@ -42,10 +45,13 @@ class LogicalModel {
           if (['Key', 'Auxiliary'].includes(attr.type)) {
             cfKeys.push(removeNewLine(attr.label))
           }
+          if (attr.min) comments.push(`Minimum number of ${removeNewLine(attr.label)} is ${attr.min}`)
+          if (attr.max) comments.push(`Maximum number of ${removeNewLine(attr.label)} is ${attr.max}`)
           table.addColumn(column)
         })
       }
       table.setKeys(createPrimaryKey(parentKeys, cfKeys))
+      table.setComments(comments)
       physicalCassandra.addTable(table)
     })
     return physicalCassandra
