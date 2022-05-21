@@ -139,6 +139,10 @@ class ColumnFamily {
     this.parentColumnFam = null;
     this.attributes = []
   }
+
+  addLogicalAttr(attr) {
+    this.attributes.push(attr)
+  }
 }
 
 class LogicalAttribute {
