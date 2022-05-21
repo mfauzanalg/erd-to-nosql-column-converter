@@ -376,8 +376,12 @@ const isSameKey = (columnFamily1, columnFamily2) => {
   return result
 }
 
-const getColumnType = (column, attribute) => {
-  if (attribute.type == 'Key') column.type = 'Key'
-  else if (attribute.type == 'Multivalued') column.type = 'Multivalued'
-  else column.type = 'Regular'
+const getColumnType = (logicalAttr, attribute) => {
+  if (attribute.type == 'Key') logicalAttr.setType('Key')
+  else if (attribute.type == 'Multivalued') {
+    logicalAttr.setType('Multivalued')
+    logicalAttr.min = attribute.min
+    logicalAttr.max = attribute.max
+  } 
+  else logicalAttr.setType('Regular')
 }

@@ -62,7 +62,7 @@ class LogicalModel {
       let groupData = {
         key: cf.id,
         isGroup: true,
-        text: cf.label
+        text: getColumnFamilyName(cf)
       }
       if (cf.parentColumnFam) {
         groupData.group = cf.parentColumnFam.id
@@ -136,5 +136,13 @@ class LogicalAttribute {
     this.label = label
     this.type = type
     this.artificialId = artificialId
+  }
+
+  setLabel(label){
+    this.label = label
+  }
+
+  setType(type){
+    this.type = type
   }
 }

@@ -287,6 +287,9 @@ class Attribute {
       newColumFamily.id = `${columnFamily.label}_${attribute.label}`
       newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily
       newColumFamily.attributes = []
+
+      newColumFamily.min = attribute.min
+      newColumFamily.max = attribute.max
   
       if (attribute.children.length > 0) {
         attribute.children.forEach(child => {
@@ -298,11 +301,10 @@ class Attribute {
     }
     else {
       if (attribute.type != "Derived") {
-        const column = {}
-        column.label = attribute.label
-        getColumnType(column, attribute)
-        
-        columnFamily.attributes = mergeArray([column], columnFamily.attributes)
+        const logicalAttr = new LogicalAttribute()
+        logicalAttr.setLabel(attribute.label)
+        getColumnType(logicalAttr, attribute)      
+        columnFamily.attributes = mergeArray([logicalAttr], columnFamily.attributes)
       }
     }
     return additionalColumnFamily

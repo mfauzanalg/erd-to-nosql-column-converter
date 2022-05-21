@@ -58,7 +58,7 @@ function initERDiagram() {
     $(
       go.TextBlock,
       {
-        margin: new go.Margin(5, 0, 5, 0),
+        margin: new go.Margin(5, 3, 5, 3),
         font: '9pt sans-serif',
         overflow: go.TextBlock.OverflowEllipsis,
         width: 65,

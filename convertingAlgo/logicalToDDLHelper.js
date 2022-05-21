@@ -11,6 +11,19 @@ const getGroup = (cf) => {
   else return `${cf.id}-attr`
 }
 
+const getColumnFamilyName = (cf) => {
+  const min = parseInt(cf.min)
+  const max = parseInt(cf.max)
+  let range = "["
+  if (min) range += min
+  if (min || max) range += ":"
+  if (max) range += max
+  range += "]"
+
+  if (min || max) return `${cf.label} | ${range}`
+  else return cf.label
+}
+
 const getSymbol = (attr) => {
   if (["Key", "Auxiliary"].includes(attr.type)) {
     return `# ${attr.label}`
@@ -19,7 +32,14 @@ const getSymbol = (attr) => {
     return `^ ${attr.label}`
   }
   else if (attr.type == 'Multivalued') {
-    return `[ ] ${attr.label}`
+    const min = parseInt(attr.min)
+    const max = parseInt(attr.max)
+    let range = "["
+    if (min) range += min
+    if (min || max) range += ":"
+    if (max) range += max
+    range += "]"
+    return `${range} ${attr.label}`
   }
   return attr.label
 }

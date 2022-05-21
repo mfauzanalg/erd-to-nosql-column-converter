@@ -122,7 +122,13 @@ const convertToERModel = (ername) => {
       const newAttribute = new Attribute(ER.text)
       newAttribute.id = ER.key
 
-      if (ER.figure == "Ring")  newAttribute.type = "Multivalued"
+      if (ER.figure == "Ring"){
+        newAttribute.type = "Multivalued"
+        const min = parseInt(ER.min)
+        const max = parseInt(ER.max)
+        if (min) newAttribute.min = ER.min
+        if (max) newAttribute.max = ER.max
+      } 
       else if (ER.figure == "Ellipse" && ER.underline) newAttribute.type = "Key"
       else if (ER.figure == "Ellipse" && ER.strokeDashArray?.length > 0) newAttribute.type = "Derived"
       else newAttribute.type = "Regular"
