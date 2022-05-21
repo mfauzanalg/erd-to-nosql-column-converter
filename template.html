@@ -11,7 +11,7 @@
         <div class="subtitle">
           This application converts Entity-Relationship Diagram to Data Defenition Language for
           Cassandra. First Entity-Relationship Diagram will be converted to Logical Schema. And then
-          the logical schema ill be conevrted to DDL.
+          the logical schema will be converted to DDL CQL.
         </div>
       </div>
 
@@ -22,9 +22,9 @@
         <link rel="stylesheet" href="./style.css" />
         <!-- Algorithm -->
         <script src="./convertingAlgo/erToLogicalHelper.js"></script>
+        <script src="./convertingAlgo/logicalClasses.js"></script>
         <script src="./convertingAlgo/erClasses.js"></script>
         <script src="./convertingAlgo/logicalToDDLHelper.js"></script>
-        <script src="./convertingAlgo/logicalClasses.js"></script>
         <!-- Components -->
         <script src="./gojs/helpers/Figures.js"></script>
         <script src="./gojs/helpers/DataInspector.js"></script>
@@ -75,15 +75,54 @@
             class="hidden-textarea"
           >
           { "class": "GraphLinksModel",
-            "nodeDataArray": [
-          {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-330.00755396559674 -57.74753423504819"},
-          {"text":"Have","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-5,"location":"-193.3484551046982 -57.74753423504819"},
-          {"text":"Book","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-56.68932856345663 -55.32879818594104"}
-          ],
-            "linkDataArray": [
-          {"from":-5,"to":-2,"text":"","isTotal":true,"isOne":true},
-          {"from":-5,"to":-3}
-          ]}
+          "nodeDataArray": [
+        {"text":"A","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-164.4375 -82.19998168945312"},
+        {"text":"Speciali\nzation","color":"black","figure":"TriangleDown","key":-7,"location":"-165.23751831054688 13.000091552734375"},
+        {"text":"B","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-307.1174880981445 123.66752982255159"},
+        {"text":"C","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-4,"location":"-167.99751281738276 124.4400131225586"},
+        {"text":"D","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-5,"location":"-13.677450561523358 122.44008178710939"},
+        {"text":"R1","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-6,"location":"-310.70732318364156 249.78317487438323"},
+        {"text":"id1","color":"black","figure":"Ellipse","underline":true,"key":-10,"location":"-261.20060577392576 -142.58998718261722"},
+        {"text":"a1","color":"black","figure":"Ellipse","key":-11,"location":"-85.99654936523442 -149.30998077392582"},
+        {"text":"a5","color":"black","figure":"Ellipse","key":-9,"location":"-465.11061859130865 249.69001922607424"},
+        {"text":"E","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-12,"location":"-310.76061859130857 377.5800064086915"},
+        {"text":"a2_1","color":"black","figure":"Ellipse","key":-14,"location":"-516.5606185913085 511.76999359130866"},
+        {"text":"a2_2","color":"black","figure":"Ellipse","key":-15,"location":"-357.6806121826171 533.4099807739259"},
+        {"text":"R2","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-16,"location":"-13.903864352711537 243.86871980337483"},
+        {"text":"R3","color":"black","figure":"AssociativeRectangle","width":100,"height":60,"key":-17,"location":"-16.559526499393996 380.7442352492652"},
+        {"text":"H","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-18,"location":"200.67516525537528 380.5610901795819"},
+        {"text":"id2","color":"black","figure":"Ellipse","underline":true,"key":-19,"location":"332.22773169046144 302.9946793806562"},
+        {"text":"a4","color":"black","figure":"Ellipse","key":-20,"location":"358.46079165261546 403.8817252187248"},
+        {"text":"Union","color":"black","figure":"TriangleDown","key":-21,"location":"203.11500376015343 496.6051366778836"},
+        {"text":"F","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-22,"location":"131.19746412956997 565.0460591721472"},
+        {"text":"G","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-23,"location":"283.9766615446513 563.8950722362459"},
+        {"text":"a3","color":"black","figure":"Ring","width":90,"height":50,"key":-8,"location":"429.2948989678341 566.1832583003838"},
+        {"text":"a2","color":"black","figure":"Ring","width":90,"height":50,"key":-24,"location":"-423.9624938964844 454.3999996185303"}
+        ],
+          "linkDataArray": [
+        {"from":-7,"to":-2,"isParent":true,"isTotal":true,"isDisjoint":true},
+        {"from":-7,"to":-3},
+        {"from":-7,"to":-4},
+        {"from":-7,"to":-5},
+        {"from":-6,"to":-3,"text":"","isTotal":true,"isOne":true},
+        {"from":-10,"to":-2},
+        {"from":-11,"to":-2},
+        {"from":-9,"to":-6},
+        {"from":-6,"to":-12},
+        {"from":-16,"to":-5,"text":"","isTotal":true,"isOne":true},
+        {"from":-16,"to":-17,"text":"","isTotal":false,"isOne":true},
+        {"from":-17,"to":-12},
+        {"from":-17,"to":-18},
+        {"from":-19,"to":-18},
+        {"from":-20,"to":-18},
+        {"from":-21,"to":-18,"isParent":true,"isTotal":false,"isDisjoint":false},
+        {"from":-21,"to":-22},
+        {"from":-21,"to":-23},
+        {"from":-8,"to":-23},
+        {"from":-24,"to":-12},
+        {"from":-24,"to":-15},
+        {"from":-24,"to":-14}
+        ]}
               </textarea
           >
         </div>

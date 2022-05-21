@@ -49,7 +49,6 @@ const save = () => {
 const readSingleFile = (evt) => {
   clearDiagram()
   var f = evt.target.files[0];
-  console.log(f)
   if (f) {
       var r = new FileReader();
       r.onload = function(e) { 
@@ -226,7 +225,6 @@ const convertToERModel = (ername) => {
       ERFrom.attributes.push(ERTo)
     }
   })
-  // console.log(unprocessedLinks)
   return newERModel
 }
 
@@ -256,6 +254,8 @@ checkParentColumFam = (columnFamilies) => {
 }
 
 const convertToLogical = () => {
+  visited = []
+  artificialID = 0
   const ername = document.getElementById("er-name-input")
   document.getElementById("convertDDL-btn").style.display = "inline-block"
   document.getElementById("button-container-logical").style.display = "block"
@@ -424,15 +424,8 @@ const convertToLogical = () => {
     else {
       try {
         logicalModel = newERModel.convertERToLogical()
+        console.log(logicalModel)
         checkParentColumFam(logicalModel.columnFamilies)
-
-        logicalModel.columnFamilies.forEach((cf) => {
-          if (cf.parentColumnFam) {
-            console.log(cf.label)
-            console.log(cf.parentColumnFam)
-            // cf.parentColumnFam =  getParentCF(cf.parentColumnFam, logicalModel.columnFamilies)
-          } 
-        })
   
         logicalSection.style.display = "block"
         logicalName.innerHTML = `for ${ername.value}`
@@ -464,7 +457,6 @@ const createLookup = (arr) => {
 
 // createReference(ERModel)
 // splitER(ERModel)
-
 
 
 // Kekurangan

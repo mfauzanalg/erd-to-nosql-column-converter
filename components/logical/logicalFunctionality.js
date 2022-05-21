@@ -2,7 +2,6 @@ function loadLogical(logicalSchema) {
   myLogicalDiagram.model = go.Model.fromJson(JSON.stringify(logicalSchema));
 }
 
-
 const createTableInput = (cf) => {
   let dataTable = ''
 
@@ -105,5 +104,4 @@ function copyToClipboard(text) {
 
 const scrollToTop = () => {
   document.getElementById("er-section").scrollIntoView()
-  // window.scrollTo(0, 0);
 }

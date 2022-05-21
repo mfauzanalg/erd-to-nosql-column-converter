@@ -6,21 +6,14 @@ class ERModel {
   }
 
   convertERToLogical() {
-    visited = [];
-    artificialID = 0;
-    let logicalCF = [];
+    const logicalModel = new LogicalModel(this.label)
     const entities = this.entities;
     for (let i = 0; i < entities.length; i++) {
       if (['Entity', 'WeakEntity'].includes(entities[i].type)) {
-        const columnFamilySet = entities[i].createFamily(entities[i], logicalCF);
-        logicalCF = mergeLogicalCF(columnFamilySet, logicalCF);
+        const columnFamilySet = entities[i].createFamily(entities[i], logicalModel.getCF());
+        logicalModel.setCF(columnFamilySet)
       }
     }
-
-    const logicalModel = {
-      label: this.label,
-      columnFamilies: logicalCF,
-    };
 
     return logicalModel;
   }
@@ -66,7 +59,7 @@ class EntityRelation {
   
     // For the relation, so it's not processes twice
     if (!columnFamily || entityRelation.getType() == 'Relationship') {
-      columnFamily = {}
+      columnFamily = new ColumnFamily(entityRelation.ERModel)
     }
   
     let firstCome = !isVisited(entityRelation, visited)
@@ -115,7 +108,9 @@ class EntityRelation {
       }
     }
   
-    if (returnNewCF) return columnFamily
+    if (returnNewCF) {
+      return columnFamily
+    }
     return columnFamilySet
   }
 
@@ -207,8 +202,7 @@ class Relationship extends EntityRelation {
     let newColumnFamily = undefined;
   
     if (columnFamily1.isFromRelationship) {
-      newColumnFamily = duplicateArray(columnFamily1)
-      
+      newColumnFamily = clone(columnFamily1)
     }
     else {
       const preexistentColumnFamily = logicalCF.find(o => o.id === columnFamily1.id);
@@ -288,7 +282,7 @@ class Attribute {
   convertAttribute (columnFamily, attribute) {
     let additionalColumnFamily = []
     if (attribute.children?.length > 0) {
-      let newColumFamily = {}
+      let newColumFamily = new ColumnFamily('ERModel')
       newColumFamily.label = `${columnFamily.label}_${attribute.label}`
       newColumFamily.id = `${columnFamily.label}_${attribute.label}`
       newColumFamily.parentColumnFam = columnFamily.parentColumnFam || columnFamily

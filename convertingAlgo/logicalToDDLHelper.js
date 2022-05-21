@@ -20,7 +20,6 @@ const createPrimaryKey = (parentKeys, cfKeys, stringQuery) => {
 const removeNewLine = (str) => {
   newStr = str.replace(/\n|\r\n|\r/g, "_");
   newStr = newStr.replace(/ /g, "_");
-  console.log(newStr)
   return newStr
 }
 
