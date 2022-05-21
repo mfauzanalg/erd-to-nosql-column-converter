@@ -4,51 +4,47 @@ class LogicalModel {
     this.columnFamilies = columnFamilies || []
   }
 
-  logicalToPhysicalCassandra (logicalModel) {
-    const physicalCassandra = new PhysicalCassandra(logicalModel.label)
+  logicalToDDLCQL (logicalModel) {
+    let stringQuery = []
     logicalModel.columnFamilies.forEach((cf) => {
-      let table = new Table()
       let parentKeys = []
       let cfKeys = []
-
-      table.setLabel(cf.label)
+  
+      stringQuery.push(`DROP TABLE IF EXISTS ${removeNewLine(cf.label)};`)
+      stringQuery.push(`CREATE TABLE ${cf.label} (`)
       
       if (cf.parentColumnFam) {
         const parentAttributes = cf.parentColumnFam.attributes
         parentAttributes.forEach((attr) => {
-          let column = new Column()
           if (['Key', 'Auxiliary'].includes(attr.type)) {
             let dataType = document.getElementById(`${cf.parentColumnFam.label}-${attr.label}`).value
             if (attr.type == "Multivalued") {
               dataType = `list<${dataType}>`
             }
-            column.setLabel(removeNewLine(attr.label))
-            column.setDataType(dataType.toUpperCase())
+            stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
             parentKeys.push(removeNewLine(attr.label))
-            table.addColumn(column)
           }
         })
       }
   
       if (cf.attributes) {
         cf.attributes.forEach((attr) => {
-          let column = new Column()
           let dataType = document.getElementById(`${cf.label}-${attr.label}`).value
           if (attr.type == "Multivalued") {
             dataType = `list<${dataType}>`
           }
-          column.setLabel(removeNewLine(attr.label))
-          column.setDataType(dataType.toUpperCase())
+  
+          stringQuery.push(`  ${removeNewLine(attr.label)} ${dataType.toUpperCase()},`)
           if (['Key', 'Auxiliary'].includes(attr.type)) {
             cfKeys.push(removeNewLine(attr.label))
           }
-          table.addColumn(column)
         })
       }
-      table.setKeys(createPrimaryKey(parentKeys, cfKeys))
-      physicalCassandra.addTable(table)
+      this.createPrimaryKey(parentKeys, cfKeys, stringQuery)
+      stringQuery.push(');')
+      stringQuery.push('')
     })
-    return physicalCassandra
+    return stringQuery
   }
 
   visualizeLogicalModel (columnFamilies) {

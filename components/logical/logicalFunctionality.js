@@ -72,10 +72,13 @@ USE ${newName};
   
 }
 
-const convertToDDL = () => {
+const convertToDDLCQL = () => {
   document.getElementById("ddl-section").style.display = "block"
-  const stringQuery = logicalModel.logicalToDDL(logicalModel)
-  const joinedQuery = createKeyspace(ername.value) +  stringQuery.join('\n')
+  const stringQuery = logicalModel.logicalToPhysicalCassandra(logicalModel)
+  console.log(stringQuery)
+  
+  // const joinedQuery = createKeyspace(ername.value) +  stringQuery.join('\n')
+
 
   const textareaDDL = document.getElementById("ddl-content")
   textareaDDL.value = joinedQuery

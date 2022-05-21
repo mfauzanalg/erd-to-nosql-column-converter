@@ -24,6 +24,25 @@ const getSymbol = (attr) => {
   return attr.label
 }
 
+const createPrimaryKey = (parentKeys, cfKeys) => {
+  let primaryKey = ""
+  if (parentKeys.length > 1) {
+    primaryKey = `(${parentKeys.join(', ')})`
+  } 
+  else {
+    primaryKey = parentKeys.join(', ')
+  }
+
+  if (cfKeys.length > 0) {
+    if (primaryKey) {
+      primaryKey += ', '
+    }
+    primaryKey += cfKeys.join(', ')
+  }
+
+  return primaryKey
+}
+
 const drawArtificialRelation = (gojs) => {
   let artificialMap = {}
   gojs.nodeDataArray.forEach(node => {
