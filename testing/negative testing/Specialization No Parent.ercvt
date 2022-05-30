@@ -1,0 +1,14 @@
+{ "class": "GraphLinksModel",
+  "nodeDataArray": [
+{"text":"Entity1","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-84.85955810546875 -85.43182373046875"},
+{"text":"Speciali\nzation","color":"black","figure":"TriangleDown","toLinkable":false,"width":120,"key":-7,"location":"-86.40478515625 31.44805908203125"},
+{"text":"Entity2","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-223.87615966796875 160.30230712890625"},
+{"text":"Entity3","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-4,"location":"-85.3348388671875 161.55718994140625"},
+{"text":"Entity4","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-5,"location":"59.9168701171875 162.697509765625"}
+],
+  "linkDataArray": [
+{"from":-7,"to":-2},
+{"from":-7,"to":-3},
+{"from":-7,"to":-4},
+{"from":-7,"to":-5}
+]}

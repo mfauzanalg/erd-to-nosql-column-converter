@@ -1,0 +1,10 @@
+{ "class": "GraphLinksModel",
+  "nodeDataArray": [
+{"text":"Entity 1","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-203.593994140625 -49.7347412109375"},
+{"text":"Entity 3","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"79.94000244140625 -54.293212890625"},
+{"text":"Weak","color":"black","figure":"DoubleDiamond","width":120,"height":50,"key":-6,"location":"-69.38250732421875 -51.2056884765625"}
+],
+  "linkDataArray": [
+{"from":-6,"to":-2},
+{"from":-6,"to":-3}
+]}

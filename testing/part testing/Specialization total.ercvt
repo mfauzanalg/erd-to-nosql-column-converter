@@ -1,0 +1,22 @@
+{ "class": "GraphLinksModel",
+  "nodeDataArray": [
+{"text":"b","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-288.31103515625 97.279296875"},
+{"text":"c","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-157.59954833984375 98.49114990234375"},
+{"text":"d","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-4,"location":"-4.2574462890625 97.70245361328125"},
+{"text":"Speciali\nzation","color":"black","figure":"TriangleDown","toLinkable":false,"width":120,"key":-7,"location":"-158.17333984375 3.53448486328125"},
+{"text":"a","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-5,"location":"-159.1051025390625 -109.20169067382812"},
+{"text":"idb","color":"black","figure":"Ellipse","underline":true,"key":-10,"location":"-325.725830078125 195.1666259765625"},
+{"text":"idc","color":"black","figure":"Ellipse","underline":true,"key":-8,"location":"-154.4151611328125 201.1728515625"},
+{"text":"idd","color":"black","figure":"Ellipse","underline":true,"key":-9,"location":"11.8955078125 196.338134765625"},
+{"text":"ida","color":"black","figure":"Ellipse","underline":true,"key":-11,"location":"-290.400634765625 -142.81796264648438"}
+],
+  "linkDataArray": [
+{"from":-7,"to":-5,"text":"","isParent":true,"isTotal":true,"isDisjoint":false},
+{"from":-7,"to":-2},
+{"from":-7,"to":-3},
+{"from":-7,"to":-4},
+{"from":-10,"to":-2},
+{"from":-8,"to":-3},
+{"from":-9,"to":-4},
+{"from":-11,"to":-5}
+]}
