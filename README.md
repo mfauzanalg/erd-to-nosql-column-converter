@@ -30,31 +30,27 @@
 </h2>
 
 
-&nbsp;
 ### Description
 This application converts Entity-Relationship Diagram to Logical Schema and then
 the logical schema can be converted to DDL CQL.
 
-&nbsp;
 ### Spesification
 Made with ___Javascript___ and ___Go.Js___
 
 
-&nbsp;
 ### How to Use
 1. Requirement for this program is you must have a web browser
 2. Open app.html
 3. The app is ready to use
 
-&nbsp;
 ### Application Interface
 1. Entity-Relationship Diagram Creation
 <div>
-  <img src="./assets/captures/Capture1.png" width="600px" />
+  <img src="./assets/captures/Capture1.JPG" width="600px" />
 </div>
 2. Logical Diagram View
 <div>
-  <img src="./assets/captures/Capture2.png" width="600px" />
+  <img src="./assets/captures/Capture2.JPG" width="600px" />
 </div>
 3. Insert the Data Type
 <div>
@@ -62,11 +58,10 @@ Made with ___Javascript___ and ___Go.Js___
 </div>
 4. Get the DDL 
 <div>
-  <img src="./assets/captures/Capture4.png" width="600px" />
+  <img src="./assets/captures/Capture4.JPG" width="600px" />
 </div>
 
 
-&nbsp;
 ### Author
 ```
 Muhammad Fauzan Al-Ghifari
