@@ -50,11 +50,11 @@ Made with ___Javascript___ and ___Go.Js___
 ### Application Interface
 1. Entity-Relationship Diagram Creation
 <div>
-  <img src="./assets/captures/Capture1.JPG" width="600px" />
+  <img src="./assets/captures/Capture1.png" width="600px" />
 </div>
 2. Logical Diagram View
 <div>
-  <img src="./assets/captures/Capture2.JPG" width="600px" />
+  <img src="./assets/captures/Capture2.png" width="600px" />
 </div>
 3. Insert the Data Type
 <div>
@@ -62,7 +62,7 @@ Made with ___Javascript___ and ___Go.Js___
 </div>
 4. Get the DDL 
 <div>
-  <img src="./assets/captures/Capture4.JPG" width="600px" />
+  <img src="./assets/captures/Capture4.png" width="600px" />
 </div>
 
 
