@@ -1,34 +1,24 @@
-
-   
 <h1 align="center">
-  <br>
   ERD To NoSQL Column Converter
-  <br>
-  <br>
+   <h2 align="center">
+      IF4092 Tugas Akhir 2
+   </h2>
 </h1>
 
-<h2 align="center">
-  <br>
-  IF4092 Tugas Akhir 2
-  <br>
-</h2>
-
 <h3 align="center">
-  <br>
   Pengembangan Aplikasi Konversi Entity-Relationship Diagram ke 
   <br>
   Logical Schema NoSQL Berorientasi Kolom
   <br>
 </h3>
 
-<h2 align="center">
-  <br>
+<h4 align="center">
   Muhammad Fauzan Al-Ghifari
   <br>
   13518112
   <br>
-</h2>
-
+  <br>
+</h4>
 
 ### Description
 This application converts Entity-Relationship Diagram to Logical Schema and then
@@ -37,11 +27,11 @@ the logical schema can be converted to DDL CQL.
 ### Spesification
 Made with ___Javascript___ and ___Go.Js___
 
-
 ### How to Use
 1. Requirement for this program is you must have a web browser
 2. Open app.html
 3. The app is ready to use
+4. You can use the example by loading the erd from testing folder
 
 ### Application Interface
 1. Entity-Relationship Diagram Creation
@@ -60,7 +50,6 @@ Made with ___Javascript___ and ___Go.Js___
 <div>
   <img src="./assets/captures/Capture4.JPG" width="600px" />
 </div>
-
 
 ### Author
 ```
