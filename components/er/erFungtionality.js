@@ -288,7 +288,13 @@ const convertToLogical = () => {
           })
 
           if (!isHaveId) {
-            error.push(`>> Entity ${er.label} does not have identifier attribute`)
+            let isRelatedSpecialization = false
+            er?.connectors?.forEach(conn => {
+              if (conn.type == "SpecialConnector") {
+                isRelatedSpecialization = true
+              }
+            })
+            if (!isRelatedSpecialization) error.push(`>> Entity ${er.label} does not have identifier attribute`)
           }
         }
       })
