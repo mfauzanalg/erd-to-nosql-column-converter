@@ -76,7 +76,7 @@ const load = () => {
 
 const loadDefault = () => {
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
-  ername.value = "Book Owner"
+  ername.value = ""
   logicalSection.style.display = "none"
 
   // development
@@ -277,6 +277,22 @@ const convertToLogical = () => {
   else {
     const newERModel = convertToERModel(ername.value)
     try {
+      // Validate attribute 
+      entityRelations.forEach(er => {
+        let isHaveId = false
+        if (er.type == "Entity" || er.type == 'WeakEntity') {
+          er?.attributes.forEach(attr => {
+            if (attr.type == 'Key') {
+              isHaveId = true
+            }
+          })
+
+          if (!isHaveId) {
+            error.push(`>> Entity ${er.label} does not have identifier attribute`)
+          }
+        }
+      })
+
       // Validate duplicate attribute
       entityRelations.forEach(er => {
         const attrLookUp = createLookup(er.attributes)
