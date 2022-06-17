@@ -6,10 +6,12 @@
 {"text":"First","color":"black","figure":"Diamond","width":110,"height":50,"key":-4,"location":"-7.508543750000001 138.64651874999998"},
 {"text":"Rounds","color":"black","figure":"Diamond","width":110,"height":50,"key":-5,"location":"-198.78449375000002 257.38765624999996"},
 {"text":"Round","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"key":-6,"location":"-14.586074999999937 256.4718187500001"},
-{"text":"Moves","color":"black","figure":"Ellipse","width":80,"height":40,"key":-7,"location":"155.5848000000001 258.9028312500001"},
-{"text":"username","color":"black","figure":"Ellipse","underline":true,"width":80,"height":40,"key":-11,"location":"130.63669999999985 -48.85093125000007"},
-{"text":"firstname","color":"black","figure":"Ellipse","width":80,"height":40,"key":-9,"location":"162.87783749999994 18.232593749999978"},
-{"text":"lastname","color":"black","figure":"Ellipse","width":80,"height":40,"key":-12,"location":"147.07625625000003 85.08543749999998"}
+{"text":"Moves","color":"black","figure":"Ellipse","fromMaxLinks":1,"width":80,"height":40,"key":-7,"location":"155.5848000000001 258.9028312500001"},
+{"text":"username","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"width":80,"height":40,"key":-11,"location":"130.63669999999985 -48.85093125000007"},
+{"text":"firstname","color":"black","figure":"Ellipse","fromMaxLinks":1,"width":80,"height":40,"key":-9,"location":"162.87783749999994 18.232593749999978"},
+{"text":"lastname","color":"black","figure":"Ellipse","fromMaxLinks":1,"width":80,"height":40,"key":-12,"location":"147.07625625000003 85.08543749999998"},
+{"text":"id_game","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-13,"location":"-359.2279880058967 155.33290065043826"},
+{"text":"id_round","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-14,"location":"-18.07580158774482 337.11863375838664"}
 ],
   "linkDataArray": [
 {"from":-8,"to":-10,"isOne":true,"isTotal":true},
@@ -21,5 +23,7 @@
 {"from":-7,"to":-6},
 {"from":-11,"to":-10},
 {"from":-9,"to":-10},
-{"from":-12,"to":-10}
+{"from":-12,"to":-10},
+{"from":-13,"to":-3},
+{"from":-14,"to":-6}
 ]}

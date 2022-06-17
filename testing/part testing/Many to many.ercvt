@@ -3,10 +3,10 @@
 {"text":"Car","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-431.0127868652344 -18.75775146484375"},
 {"text":"Have","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-5,"location":"-273.77178955078125 -20.207763671875"},
 {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-116.4813232421875 -23.461669921875"},
-{"text":"color","color":"black","figure":"Ellipse","key":-11,"location":"-543.2562255859375 -84.60711669921875"},
-{"text":"plate","color":"black","figure":"Ellipse","underline":true,"key":-10,"location":"-576.9222412109375 21.910400390625"},
-{"text":"id","color":"black","figure":"Ellipse","underline":true,"key":-6,"location":"31.9967041015625 -110.71661376953125"},
-{"text":"name","color":"black","figure":"Ellipse","key":-7,"location":"63.8912353515625 34.0623779296875"}
+{"text":"color","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-11,"location":"-543.2562255859375 -84.60711669921875"},
+{"text":"plate","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-10,"location":"-576.9222412109375 21.910400390625"},
+{"text":"id","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-6,"location":"31.9967041015625 -110.71661376953125"},
+{"text":"name","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-7,"location":"63.8912353515625 34.0623779296875"}
 ],
   "linkDataArray": [
 {"from":-5,"to":-2,"text":"","isTotal":false,"isOne":false},

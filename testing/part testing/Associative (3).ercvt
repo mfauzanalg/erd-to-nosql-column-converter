@@ -4,11 +4,17 @@
 {"text":"Student","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-270.7778311241498 -93.25232102145401"},
 {"text":"Teach","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-5,"location":"-71.78711884100261 -194.4415806647171"},
 {"text":"Cours","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-6,"location":"151.48859810488398 -95.9143142007859"},
-{"text":"Teacher","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-7,"location":"-73.56976339649412 -291.15391277390023"}
+{"text":"Teacher","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-7,"location":"-73.56976339649412 -291.15391277390023"},
+{"text":"NIP","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-10,"location":"-124.86029582182977 -358.37587415903283"},
+{"text":"NIM","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-8,"location":"-276.1233123081885 -9.93085425956906"},
+{"text":"code","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-9,"location":"156.9570242236415 -20.735313043672477"}
 ],
   "linkDataArray": [
 {"from":-5,"to":-7,"text":"","isTotal":true,"isOne":true},
 {"from":-5,"to":-4,"text":"","isTotal":false,"isOne":true},
 {"from":-4,"to":-2},
-{"from":-4,"to":-6}
+{"from":-4,"to":-6},
+{"from":-10,"to":-7},
+{"from":-8,"to":-2},
+{"from":-9,"to":-6}
 ]}

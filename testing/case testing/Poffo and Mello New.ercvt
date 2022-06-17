@@ -6,22 +6,23 @@
 {"text":"C","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-4,"location":"-167.99751281738276 124.4400131225586"},
 {"text":"D","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-5,"location":"-13.677450561523358 122.44008178710939"},
 {"text":"R1","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-6,"location":"-310.70732318364156 249.78317487438323"},
-{"text":"id1","color":"black","figure":"Ellipse","underline":true,"key":-10,"location":"-261.20060577392576 -142.58998718261722"},
-{"text":"a1","color":"black","figure":"Ellipse","key":-11,"location":"-85.99654936523442 -149.30998077392582"},
-{"text":"a5","color":"black","figure":"Ellipse","key":-9,"location":"-465.11061859130865 249.69001922607424"},
+{"text":"id1","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-10,"location":"-261.20060577392576 -142.58998718261722"},
+{"text":"a1","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-11,"location":"-85.99654936523442 -149.30998077392582"},
+{"text":"a5","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-9,"location":"-465.11061859130865 249.69001922607424"},
 {"text":"E","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-12,"location":"-310.76061859130857 377.5800064086915"},
-{"text":"a2_1","color":"black","figure":"Ellipse","key":-14,"location":"-489.33326560830113 544.1025117733383"},
-{"text":"a2_2","color":"black","figure":"Ellipse","key":-15,"location":"-333.005861273632 551.2779226489259"},
+{"text":"a2_1","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-14,"location":"-489.33326560830113 544.1025117733383"},
+{"text":"a2_2","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-15,"location":"-333.005861273632 551.2779226489259"},
 {"text":"R2","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-16,"location":"-13.903864352711537 243.86871980337483"},
 {"text":"R3","color":"black","figure":"AssociativeRectangle","width":100,"height":60,"key":-17,"location":"-16.559526499393996 380.7442352492652"},
 {"text":"H","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-18,"location":"200.67516525537528 380.5610901795819"},
-{"text":"id2","color":"black","figure":"Ellipse","underline":true,"key":-19,"location":"332.22773169046144 302.9946793806562"},
-{"text":"a4","color":"black","figure":"Ellipse","key":-20,"location":"358.46079165261546 403.8817252187248"},
+{"text":"id2","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-19,"location":"332.22773169046144 302.9946793806562"},
+{"text":"a4","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-20,"location":"358.46079165261546 403.8817252187248"},
 {"text":"Union","color":"black","figure":"TriangleDown","key":-21,"location":"203.11500376015343 496.6051366778836"},
 {"text":"F","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-22,"location":"131.19746412956997 565.0460591721472"},
 {"text":"G","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-23,"location":"283.9766615446513 563.8950722362459"},
-{"text":"a3","color":"black","figure":"Ring","width":100,"height":60,"key":-8,"location":"429.2948989678341 566.1832583003838","min":"1","max":"5"},
-{"text":"a2","color":"black","figure":"Ring","width":100,"height":60,"key":-24,"location":"-356.7449723054695 468.0136566355228","min":"1","max":"3"}
+{"text":"a3","color":"black","figure":"Ring","fromMaxLinks":1,"width":100,"height":60,"key":-8,"location":"429.2948989678341 566.1832583003838","min":"1","max":"5"},
+{"text":"a2","color":"black","figure":"Ring","fromMaxLinks":1,"width":100,"height":60,"key":-24,"location":"-356.7449723054695 468.0136566355228","min":"1","max":"3"},
+{"text":"id_E","color":"black","figure":"Ellipse","underline":true,"fromMaxLinks":1,"key":-25,"location":"-462.50010957784673 381.6689625000001"}
 ],
   "linkDataArray": [
 {"from":-7,"to":-2,"isParent":true,"isTotal":true,"isDisjoint":true},
@@ -45,5 +46,6 @@
 {"from":-8,"to":-23},
 {"from":-24,"to":-12},
 {"from":-24,"to":-15},
-{"from":-24,"to":-14}
+{"from":-24,"to":-14},
+{"from":-25,"to":-12}
 ]}

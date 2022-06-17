@@ -3,14 +3,14 @@
 {"text":"Car","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-225.1666717529297 382.3333435058594"},
 {"text":"Have","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-5,"location":"-48.63334655761719 379.13336181640625"},
 {"text":"Person","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"122.56672668457031 376.333251953125"},
-{"text":"model","color":"black","figure":"Ellipse","key":-11,"location":"-359.96246337890625 426.5999755859375"},
-{"text":"plate_number","color":"black","figure":"Ellipse","underline":true,"key":-10,"location":"-334.36248779296875 303.3999938964844"},
-{"text":"person_id","color":"black","figure":"Ellipse","underline":true,"key":-6,"location":"199.5381589347744 275.25393819023657"},
-{"text":"name","color":"black","figure":"Ellipse","key":-7,"location":"273.4954292292663 373.81243845781466"},
+{"text":"model","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-11,"location":"-359.96246337890625 426.5999755859375"},
+{"text":"plate_number","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-10,"location":"-334.36248779296875 303.3999938964844"},
+{"text":"person_id","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-6,"location":"199.5381589347744 275.25393819023657"},
+{"text":"name","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-7,"location":"273.4954292292663 373.81243845781466"},
 {"text":"Take","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-8,"location":"124.43746948242188 474.6000518798828"},
 {"text":"Driving_lesson","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-9,"location":"125.23751831054688 564.5266520739841"},
-{"text":"Instructor_name","color":"black","figure":"Ellipse","key":-12,"location":"230.6914278113412 628.4090767732243"},
-{"text":"lesson_id","color":"black","figure":"Ellipse","underline":true,"key":-13,"location":"35.67789708444684 630.1584666375923"}
+{"text":"Instructor_name","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-12,"location":"230.6914278113412 628.4090767732243"},
+{"text":"lesson_id","color":"black","figure":"Ellipse","fromMaxLinks":1,"underline":true,"key":-13,"location":"35.67789708444684 630.1584666375923"}
 ],
   "linkDataArray": [
 {"from":-11,"to":-2},

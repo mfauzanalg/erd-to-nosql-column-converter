@@ -3,8 +3,8 @@
 {"text":"Entity","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-2,"location":"-532.3026123046875 -102.3955078125"},
 {"text":"Relation","color":"black","figure":"Diamond","width":110,"height":50,"fromLinkableDuplicates":true,"fromMaxLinks":2,"key":-5,"location":"-380.70086669921875 -101.36114501953125"},
 {"text":"Entity","color":"black","figure":"Rectangle","width":90,"height":50,"fromLinkable":false,"toLinkableDuplicates":true,"key":-3,"location":"-227.96319580078125 -101.354736328125"},
-{"text":"A","color":"black","figure":"Ellipse","key":-11,"location":"-667.8326416015625 -152.74932861328125"},
-{"text":"A","color":"black","figure":"Ellipse","key":-6,"location":"-669.23828125 -51.385009765625"}
+{"text":"A","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-11,"location":"-667.8326416015625 -152.74932861328125"},
+{"text":"A","color":"black","figure":"Ellipse","fromMaxLinks":1,"key":-6,"location":"-669.23828125 -51.385009765625"}
 ],
   "linkDataArray": [
 {"from":-5,"to":-2},
