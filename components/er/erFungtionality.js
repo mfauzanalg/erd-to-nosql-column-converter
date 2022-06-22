@@ -7,6 +7,8 @@ const ername = document.getElementById("er-name-input")
 const logicalName = document.getElementById("logical-schema-name")
 const logicalSection = document.getElementById("logical-schema-section")
 let logicalModel
+let allAttribute = []
+let erAttribute = []
 
 // Clear Diagram
 const clearDiagram = () => {
@@ -119,6 +121,7 @@ const convertToERModel = (ername) => {
     }
     // Attribute
     else {
+      allAttribute.push(ER.text);
       const newAttribute = new Attribute(ER.text)
       newAttribute.id = ER.key
 
@@ -275,6 +278,8 @@ const convertToLogical = () => {
     alert("Please fill The entity relationship name")
   }
   else {
+    allAttribute = []
+    erAttribute = []
     const newERModel = convertToERModel(ername.value)
     try {
       // Validate attribute 
@@ -299,9 +304,20 @@ const convertToLogical = () => {
         }
       })
 
+      const addERattribute = (erAttribute, attr) => {
+        erAttribute.push(attr.label)
+        attr.children?.forEach((child) => {
+          addERattribute(erAttribute, child)
+        })
+      }
+
       // Validate duplicate attribute
       entityRelations.forEach(er => {
         const attrLookUp = createLookup(er.attributes)
+
+        er?.attributes.forEach(attr => {
+          addERattribute(erAttribute, attr)
+        })
 
         for (const property in attrLookUp) {
           if (attrLookUp[property] != 0) {
@@ -309,6 +325,12 @@ const convertToLogical = () => {
           }
         }
 
+      })
+
+      // Validate attribute has to connect to entity, relationship or other attribute
+      let difference = allAttribute.filter(x => !erAttribute.includes(x));
+      difference.forEach((diff) => {
+        error.push(`>> Attribute ${diff} need to connect to entity, relationship or other attribute`)
       })
 
       createReference(entityRelations)
@@ -452,7 +474,6 @@ const convertToLogical = () => {
     else {
       try {
         logicalModel = newERModel.convertERToLogical()
-        console.log(logicalModel)
         checkParentColumFam(logicalModel.columnFamilies)
   
         logicalSection.style.display = "block"
