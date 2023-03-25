@@ -19,6 +19,7 @@
         <!-- Styles -->
         <link rel="stylesheet" href="./assets/gojs/helpers/DataInspector.css" />
         <link rel="stylesheet" href="./style.css" />
+        <link rel="stylesheet" href="./style_extract_er.css" />
         <!-- Algorithm -->
         <script src="./convertingAlgo/erToLogicalHelper.js"></script>
         <script src="./convertingAlgo/physicalCassandraClasses.js"></script>
@@ -49,6 +50,43 @@
             <button class="button" onclick="save()">Save</button>
             <button id="load-btn" class="button" onclick="load()">Load</button>
             <input type="file" id="load-input" class="input-name" style="display: none" accept=".ercvt" />
+            <button id="extract-er-model" class="button">Extract ER from RDB</button>
+            <div id="popupBackground" style="display: none;">
+              <div id="popupForm">
+                <form>
+                  <h2>Extract ER Diagram From Relational Database</h2>
+                  <break>
+                  <div class="input-container">
+                    <label for="dbName">Database Name:</label>
+                    <input type="text" id="dbName" name="dbName">
+                  </div>
+                  <div class="input-container">
+                    <label for="url">URL:</label>
+                    <input type="text" id="url" name="url">
+                  </div>
+                  <div class="input-container">
+                    <label for="port">Port:</label>
+                    <input type="text" id="port" name="port">
+                  </div>
+                  <div class="input-container">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username">
+                  </div>
+                  <div class="input-container">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password">
+                  </div>
+
+ 
+                  <div class="button-container">
+                    <button type="button" id="cancelFormButton">Cancel</button>
+                    <button type="button" id="submitFormButton">Submit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            
             <button
               class="button"
               id="convert-logical-btn"

@@ -76,6 +76,66 @@ const load = () => {
   document.getElementById('load-input').click();
 }
 
+const extractERFromRDButton = document.getElementById('extract-er-model');
+const popupBackground = document.getElementById('popupBackground');
+const popupForm = document.getElementById('popupForm');
+const cancelFormButton = document.getElementById("cancelFormButton");
+const submitFormButton = document.getElementById('submitFormButton');
+
+// Add click event listener to open form button
+extractERFromRDButton.addEventListener('click', function() {
+  popupBackground.style.display = 'block';
+});
+
+// Add click event listener to close button
+popupBackground.addEventListener('click', function(event) {
+  if (event.target === popupBackground) {
+    popupBackground.style.display = 'none';
+  }
+});
+
+cancelFormButton.addEventListener("click", () => {
+  popupBackground.style.display = 'none';
+});
+
+// Add click event listener to submit form button
+submitFormButton.addEventListener('click', function() {
+  // Get form input values
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const url = document.getElementById('url').value;
+  const port = document.getElementById('port').value;
+  const dbName = document.getElementById('dbName').value;
+
+  // Process data in background (replace with your own code)
+  console.log('Username:', username);
+  console.log('Password:', password);
+  console.log('URL:', url);
+  console.log('Port:', port);
+  console.log('Database Name:', dbName);
+
+  // Hide form
+  popupBackground.style.display = 'none';
+});
+
+
+const extractERFromRelationalDB = () => {
+  fetch('http://localhost:8080/albums')
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+    try {
+      myDiagram.model = go.Model.fromJson(data)
+    }
+    catch(e) {
+      console.log(e)
+      alert("Error loading file, please select .ercvt file")
+    }
+    ername.value ="TEST BRO"
+  })
+  .catch(error => console.error(error));
+}
+
 const loadDefault = () => {
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
   ername.value = ""
