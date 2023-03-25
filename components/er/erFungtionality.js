@@ -98,29 +98,22 @@ cancelFormButton.addEventListener("click", () => {
   popupBackground.style.display = 'none';
 });
 
-// Add click event listener to submit form button
 submitFormButton.addEventListener('click', function() {
-  // Get form input values
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const url = document.getElementById('url').value;
-  const port = document.getElementById('port').value;
-  const dbName = document.getElementById('dbName').value;
+  const params = {
+    username: document.getElementById('username').value,
+    password: document.getElementById('password').value,
+    dbName: document.getElementById('dbName').value,
+    port: document.getElementById('port').value,
+    url: document.getElementById('url').value,
+  }
 
-  // Process data in background (replace with your own code)
-  console.log('Username:', username);
-  console.log('Password:', password);
-  console.log('URL:', url);
-  console.log('Port:', port);
-  console.log('Database Name:', dbName);
-
-  // Hide form
-  popupBackground.style.display = 'none';
-});
-
-
-const extractERFromRelationalDB = () => {
-  fetch('http://localhost:8080/albums')
+  fetch('http://localhost:8080/extract-eer', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params)
+  })
   .then(response => response.json())
   .then(data => {
     console.log(data)
@@ -131,10 +124,13 @@ const extractERFromRelationalDB = () => {
       console.log(e)
       alert("Error loading file, please select .ercvt file")
     }
-    ername.value ="TEST BRO"
+    ername.value = params.dbName
   })
   .catch(error => console.error(error));
-}
+
+  // Hide form
+  popupBackground.style.display = 'none';
+});
 
 const loadDefault = () => {
   myDiagram.model = go.Model.fromJson(document.getElementById('mySavedModel').value);
